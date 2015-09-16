@@ -1,10 +1,20 @@
+package muse;
+import java.awt.BorderLayout;
+import java.io.File;
 import java.util.*;
+
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
+
+
 
 /**
  * A TrackList is a structure to hold Tracks. It can be ordered by any meta data field. 
  * TrackLists should exist temporarily with the exception of the activeTrackList which is displayed by the MainView.
  */
-public class TrackList implements List{
+public class TrackList<K>{
 	
 	/** Generates an empty TrackList
 	 * 
@@ -13,141 +23,50 @@ public class TrackList implements List{
 		
 	}
 
-	@Override
-	public boolean add(Object arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	
+	public List<Track> importToMuse()
+	{
 
-	@Override
-	public void add(int arg0, Object arg1) {
-		// TODO Auto-generated method stub
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("MP3 Files", "mp3");
 		
-	}
-
-	@Override
-	public boolean addAll(Collection arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean addAll(int arg0, Collection arg1) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(filter);
 		
+		//default mode is FILES_ONLY. Changed it
+		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		chooser.setMultiSelectionEnabled(true);
+		
+		JPanel panel = new JPanel( new BorderLayout() );
+		int approval = chooser.showOpenDialog(panel);
+		
+		File[] files;
+		List<Track> trackList = new ArrayList<Track>();;
+		//make list of track objects from tracks user selects
+		if(approval == JFileChooser.APPROVE_OPTION){//Click Open
+			//a directory, list of tracks, or a track
+			files = chooser.getSelectedFiles();
+			
+			File[] filesInDir;
+			for(File file: files)
+			{
+				if(file.isDirectory())
+				{
+					FileSystemView fileSysView = chooser.getFileSystemView();
+					filesInDir = fileSysView.getFiles(file, false);
+					for(File fileInDir: filesInDir)
+					{
+						trackList.add( new Track( fileInDir.getAbsolutePath() ) );
+					}
+					
+				}else{//isFile
+					trackList.add( new Track(file.getAbsolutePath())	);
+				}  
+				
+			}
+			
+		}
+		
+		return trackList;
 	}
-
-	@Override
-	public boolean contains(Object arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean containsAll(Collection arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Object get(int arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int indexOf(Object arg0) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Iterator iterator() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int lastIndexOf(Object arg0) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public ListIterator listIterator() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ListIterator listIterator(int arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean remove(Object arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Object remove(int arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean removeAll(Collection arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean retainAll(Collection arg0) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Object set(int arg0, Object arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public List subList(int arg0, int arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object[] toArray() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object[] toArray(Object[] arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		
 }
