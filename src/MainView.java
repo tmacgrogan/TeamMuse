@@ -10,11 +10,12 @@ import javax.swing.table.DefaultTableModel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainView {
 
-	public TrackList activeTrackList;
+	public ArrayList<Track> activeTrackList;
 	private static JFrame frmSnap;
 	private static Color frameBG = new Color(32, 32, 32);
 	private static Color sideBG = new Color(64, 64, 64);
@@ -52,6 +53,7 @@ public class MainView {
 	 * Initialize the contents of the frame.
 	 */
 	private static void initialize() {
+		//DbManager.setupConnection();
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		frmSnap = new JFrame();
 		frmSnap.setTitle("Snap");
@@ -191,8 +193,7 @@ public class MainView {
 		btnImport.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				TrackList importList = new TrackList();
-				List<Track> tracklist = importList.importToMuse();
+				ArrayList<Track> tracklist = TrackListController.importToSnap();
 				
 				model = (DefaultTableModel) songTable.getModel();
 				

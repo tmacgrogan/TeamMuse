@@ -1,8 +1,7 @@
-package muse;
+//package muse;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;

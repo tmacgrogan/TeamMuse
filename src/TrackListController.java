@@ -1,3 +1,12 @@
+import java.awt.BorderLayout;
+import java.io.File;
+import java.util.*;
+
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileSystemView;
+
 
 public class TrackListController {
 	
@@ -24,5 +33,50 @@ public class TrackListController {
 	 */
 	public static TrackList exclude(TrackList mustBe, TrackList cantBe){
 		return null;
+	}
+	
+	public static ArrayList<Track> importToSnap()
+	{
+
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("MP3 Files", "mp3");
+		
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(filter);
+		
+		//default mode is FILES_ONLY. Changed it
+		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		chooser.setMultiSelectionEnabled(true);
+		
+		JPanel panel = new JPanel( new BorderLayout() );
+		int approval = chooser.showOpenDialog(panel);
+		
+		File[] files;
+		ArrayList<Track> trackList = new ArrayList<Track>();
+		//make list of track objects from tracks user selects
+		if(approval == JFileChooser.APPROVE_OPTION){//Click Open
+			//a directory, list of tracks, or a track
+			files = chooser.getSelectedFiles();
+			
+			File[] filesInDir;
+			for(File file: files)
+			{
+				if(file.isDirectory())
+				{
+					FileSystemView fileSysView = chooser.getFileSystemView();
+					filesInDir = fileSysView.getFiles(file, false);
+					for(File fileInDir: filesInDir)
+					{
+						trackList.add( new Track( fileInDir.getAbsolutePath() ) );
+					}
+					
+				}else{//isFile
+					trackList.add( new Track(file.getAbsolutePath())	);
+				}  
+				
+			}
+			
+		}
+		//DbManager.importTracks(trackList);
+		return trackList;
 	}
 }
