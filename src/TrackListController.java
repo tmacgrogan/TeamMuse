@@ -12,9 +12,9 @@ public class TrackListController {
 	
 	/**
 	 * @param toMerge
-	 * @return a TrackList that is the merge of all sets of toMerge
+	 * @return a ArrayList<Track> that is the merge of all sets of toMerge
 	 */
-	public static TrackList merge(TrackList[] toMerge){
+	public static ArrayList<Track> merge(ArrayList<Track>[] toMerge){
 		return null;
 	}
 	
@@ -22,16 +22,16 @@ public class TrackListController {
 	 * @param toIntersect
 	 * @return the intersection of every set of toIntersect
 	 */
-	public static TrackList intersect(TrackList[] toIntersect){
+	public static ArrayList<Track> intersect(ArrayList<Track>[] toIntersect){
 		return null;
 	}
 	
 	/**
 	 * @param mustBe 
 	 * @param cantBe
-	 * @return a TrackList containing every member that is in mustBe and is not in cantBe
+	 * @return a ArrayList<Track> containing every member that is in mustBe and is not in cantBe
 	 */
-	public static TrackList exclude(TrackList mustBe, TrackList cantBe){
+	public static ArrayList<Track> exclude(ArrayList<Track> mustBe, ArrayList<Track> cantBe){
 		return null;
 	}
 	
