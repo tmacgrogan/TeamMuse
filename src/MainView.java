@@ -27,8 +27,27 @@ public class MainView {
 	private static JTable songTable;
 	private static DefaultTableModel model;
 	
+	
+	
 	public static void main(String[] args) {
 		SnapMain();
+		
+		
+		ArrayList<Tag> testTagList = new ArrayList<Tag>();
+		for(int i = 0; i<226; i++){
+			testTagList.add(new Tag(""+i));
+			System.out.println(""+i+testTagList.get(i).getUniqueIdentifier());
+		}
+//		System.out.println(testTagList.get(222).getUniqueIdentifier());
+//		System.out.println(testTagList.get(223).getUniqueIdentifier());
+//		System.out.println(testTagList.get(224).getUniqueIdentifier());
+//		System.out.println(testTagList.get(225).getUniqueIdentifier());
+//		Tag tag = new Tag("pop");
+//		System.out.println( "First tag: " + tag.getUniqueIdentifier()  );
+//		
+//		Tag tag1 = new Tag("rap");
+//		System.out.println("Second tag: " + tag1.getUniqueIdentifier() );
+		
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {

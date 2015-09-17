@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 /**
  * The Search class holds a group of Tags that correspond to the sets of songs associated with those Tag either intersected, excluded, or merged.
@@ -17,7 +18,7 @@ public class Search {
 	 * Merges all of the TrackLists returned by getTracks for every Tag in tagsToExclude
 	 * @return a TrackList containing every Track found in all of the tagsToIntersect and in none of the tagsToExclude
 	 */
-	public TrackList executeSearch(){
+	public ArrayList<Track> executeSearch(){
 		return null;
 	}
 	

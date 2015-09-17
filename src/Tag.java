@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 /**
  * A Tag represents a single attribute that a track might have
@@ -9,17 +10,20 @@ public class Tag {
 	private String name;
 	private String description;	
 	
+	public static int tempTagID = 0;
+	
+	
 	public Tag(String name){
 		this.name = name;
-		uniqueIdentifier = this.generateUniqueIdentifier();
-		description = "y u no change this";
+		uniqueIdentifier = Tag.generateUniqueIdentifier();
+		
 	}
 	
 	/**creates a TrackList containing every Track listed under This in the database, 
 	 * then for every child This has, merges with the getTracks of the child.
 	 * @return 
 	 */
-	public TrackList getTracks(){
+	public ArrayList<Track> getTracks(){
 		return null;
 	}
 	
@@ -83,9 +87,19 @@ public class Tag {
 	 * @return a unique 8 character String used to identify this Tag.
 	 */
 	private static String generateUniqueIdentifier(){
-		return null;
+		
+		int p0 = (tempTagID % 224) + 32;
+		int p1 = (tempTagID / 224) + 32;
+		
+		String uniqueIdentifier = "" +(char)p1 + (char)p0;
+		
+		tempTagID++;
+		return uniqueIdentifier;
 	}
 	
+	public String getUniqueIdentifier(){
+		return uniqueIdentifier;
+	}
 	public String getName(){
 		return name;
 	}
