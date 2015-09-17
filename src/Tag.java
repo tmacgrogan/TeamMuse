@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 
 /**
  * A Tag represents a single attribute that a track might have
@@ -19,7 +21,7 @@ public class Tag {
 	 * then for every child This has, merges with the getTracks of the child.
 	 * @return 
 	 */
-	public TrackList getTracks(){
+	public ArrayList<Track> getTracks(){
 		return null;
 	}
 	

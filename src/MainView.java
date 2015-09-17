@@ -53,7 +53,7 @@ public class MainView {
 	 * Initialize the contents of the frame.
 	 */
 	private static void initialize() {
-		//DbManager.setupConnection();
+		DbManager.setupConnection();
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		frmSnap = new JFrame();
 		frmSnap.setTitle("Snap");

@@ -76,7 +76,7 @@ public class TrackListController {
 			}
 			
 		}
-		//DbManager.importTracks(trackList);
+		DbManager.importTracks(trackList);
 		return trackList;
 	}
 }
