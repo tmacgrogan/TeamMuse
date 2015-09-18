@@ -165,7 +165,7 @@ public class MainView {
 		btnAddTag = new JButton("Add Tag");
 		btnAddTag.setEnabled(false);
 		btnAddTag.setForeground(Color.BLACK);
-		btnAddTag.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
+		btnAddTag.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
 		btnAddTag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectedTrack.addTag(AddTagField.getText());
@@ -173,16 +173,17 @@ public class MainView {
 				AddTagField.setText("");
 			}
 		});
-		AddTagPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		AddTagPanel.setLayout(new BorderLayout(0, 0));
 		
 		AddTagField = new JTextField();
+		AddTagField.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
 		AddTagField.setHorizontalAlignment(SwingConstants.CENTER);
 		AddTagField.setEnabled(false);
 		AddTagField.setColumns(10);
 		AddTagPanel.add(AddTagField);
-		btnAddTag.setPreferredSize(new Dimension(45, 18));
+		btnAddTag.setPreferredSize(new Dimension(60, 30));
 		btnAddTag.setBackground(Color.DARK_GRAY);
-		AddTagPanel.add(btnAddTag);
+		AddTagPanel.add(btnAddTag, BorderLayout.SOUTH);
 		
 		JPanel TagInfoPanel = new JPanel();
 		TagInfoPanel.setForeground(Color.WHITE);
@@ -231,6 +232,10 @@ public class MainView {
 		TagInfoPanel.add(TagTable, BorderLayout.CENTER);
 		
 		btnDeleteTag = new JButton("Delete Tag");
+		btnDeleteTag.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		btnDeleteTag.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
