@@ -11,6 +11,7 @@ public class Tag {
 	private String name;
 	private String description;	
 	
+	//Tag pulled from the database
 	public Tag(String name, int id){
 		this(name);
 		this.id = id;
