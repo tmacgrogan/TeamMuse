@@ -41,7 +41,9 @@ public class DbManager {
 			}
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
+			if(!e.getMessage().equals("[SQLITE_CONSTRAINT]  Abort due to constraint violation (UNIQUE constraint failed: Track.FileLocation)")) {
+				e.printStackTrace();
+			}
 		}
 		return trackList;
 	}
@@ -71,21 +73,37 @@ public class DbManager {
 	}
 	
 	public static Tag addTagToTrack(String tagName, Track track){
-		ResultSet existing;
+		ResultSet existing = null;
 		try{
 			existing = safeQuery("SELECT * FROM Tag WHERE Name = ?;", tagName);
-			if(!existing.next()){   //if tag does not yet exist
-				existing = safeQuery("INSERT INTO Tag(Name) VALUES( ? );", tagName);
-				existing.next();
-			}
-			int nameCol = existing.findColumn("Name");
-			int idCol = existing.findColumn("TagId");
-			Tag tag = new Tag(existing.getString(nameCol), existing.getInt(idCol));
-			Statement stmt = connection.createStatement();
-			stmt.executeUpdate("INSERT INTO TrackTag(TrackId, TagId) VALUES( " + track.getTrackId() + ", " + tag.getTagId() + ");");
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
+			if(e.getMessage().equals("Query does not return results")){
+				try{
+					existing = safeQuery("INSERT INTO Tag(Name) VALUES( ? );", tagName);
+					existing.next();
+				}
+				catch (SQLException ee) {
+					ee.printStackTrace();
+				}
+			}
+			else{
+				e.printStackTrace();
+			}
+		}
+		finally{
+			try{
+				if(existing != null) {
+					int nameCol = existing.findColumn("Name");
+					int idCol = existing.findColumn("TagId");
+					Tag tag = new Tag(existing.getString(nameCol), existing.getInt(idCol));
+					Statement stmt = connection.createStatement();
+					stmt.executeUpdate("INSERT INTO TrackTag(TrackId, TagId) VALUES( " + track.getTrackId() + ", " + tag.getTagId() + ");");
+				}
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
@@ -95,7 +113,7 @@ public class DbManager {
 		ArrayList<Track> library = new ArrayList<Track>();
 		try{
 			Statement stmt = connection.createStatement();
-			results = stmt.executeQuery("SELECT TrackId, Location FROM Track;");
+			results = stmt.executeQuery("SELECT TrackId, FileLocation FROM Track;");
 			int locationCol = 0;
 			int idCol = 0;
 			while(results.next()){
@@ -113,8 +131,15 @@ public class DbManager {
 		return library;
 	}
 	
-	public void deleteTagFromTrack(String tagName, Track track){
-		
+	public void removeTagFromTrack(Tag tag, Track track){
+		try{
+			Statement stmt = connection.createStatement();
+			stmt.executeQuery("DELETE FROM TrackTag WHERE TrackId = " + track.getTrackId() + ", " + tag.getTagId() + ";");
+			stmt.close();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	//returns list of executable statements
