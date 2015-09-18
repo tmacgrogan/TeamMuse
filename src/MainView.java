@@ -167,6 +167,8 @@ public class MainView {
 		btnAddTag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectedTrack.addTag(AddTagField.getText());
+				updateTagTable();
+				AddTagField.setText("");
 			}
 		});
 		AddTagPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -292,22 +294,7 @@ public class MainView {
 	        	btnAddTag.setEnabled(true);
 	        	AddTagField.setEnabled(true);
 	        	
-	        	tagModel = (DefaultTableModel) TagTable.getModel();
-	        	
-	        	//clears row to be ready to display new set of tags
-	        	int rows = tagModel.getRowCount(); 
-	        	for(int i = rows - 1; i >=0; i--){
-	        		tagModel.removeRow(i); 
-	        	}
-	        	
-	        	tagArray = selectedTrack.getTags();
-	        	
-	        	//populates rows with tags of selected track
-	        	for(int i = 0; i < tagArray.size(); i++){
-	        		tagModel.addRow(new Object[]{tagArray.get(i).getName()});
-	        	}
-	        	
-	        	TagInfo.setText(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
+	        	updateTagTable();
 	            //System.out.println(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
 	        }
 	    });
@@ -367,6 +354,26 @@ public class MainView {
 		frmSnap.getContentPane().setLayout(groupLayout);
 		frmSnap.setBounds((screen.width/2)-(width/2), (screen.height/2)-(height/2), width, height);
 		frmSnap.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	
+	private static void updateTagTable() {
+		// TODO Auto-generated method stub
+		tagModel = (DefaultTableModel) TagTable.getModel();
+    	
+    	//clears row to be ready to display new set of tags
+    	int rows = tagModel.getRowCount(); 
+    	for(int i = rows - 1; i >=0; i--){
+    		tagModel.removeRow(i); 
+    	}
+    	
+    	tagArray = selectedTrack.getTags();
+    	
+    	//populates rows with tags of selected track
+    	for(int i = 0; i < tagArray.size(); i++){
+    		tagModel.addRow(new Object[]{tagArray.get(i).getName()});
+    	}
+    	
+    	TagInfo.setText(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
 	}
 	
 	/** Adds all .mp3 files in specified folder into the Library and updates activeTrackList
