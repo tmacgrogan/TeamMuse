@@ -8,7 +8,6 @@ import java.util.ArrayList;
 public class Tag {
 	
 	private int id;
-	private String uniqueIdentifier; 
 	private String name;
 	private String description;	
 	
@@ -19,7 +18,6 @@ public class Tag {
 	
 	public Tag(String name){
 		this.name = name;
-		uniqueIdentifier = this.generateUniqueIdentifier();
 		description = "y u no change this";
 	}
 	
@@ -36,7 +34,7 @@ public class Tag {
 	 * @param trackBeingAdded  
 	 */
 	public void addTrack(Track trackBeingAdded){
-		trackBeingAdded.addTag(this);
+		trackBeingAdded.addTag(this.name);
 	}
 	
 	/** see Track.removeTag
@@ -95,12 +93,6 @@ public class Tag {
 		this.id = id;
 	}
 	
-	/**Called upon Tag's creation. 
-	 * @return a unique 8 character String used to identify this Tag.
-	 */
-	private static String generateUniqueIdentifier(){
-		return null;
-	}
 	
 	public String getName(){
 		return name;
