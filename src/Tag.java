@@ -35,7 +35,7 @@ public class Tag {
 	 * @param trackBeingAdded  
 	 */
 	public void addTrack(Track trackBeingAdded){
-		trackBeingAdded.addTag(this);
+		//trackBeingAdded.addTag(this);
 	}
 	
 	/** see Track.removeTag
@@ -99,13 +99,13 @@ public class Tag {
 	 */
 	private static String generateUniqueIdentifier(){
 		
-		int p0 = (tempTagID % 224) + 32;
-		int p1 = (tempTagID / 224) + 32;
-		
-		String uniqueIdentifier = "" +(char)p1 + (char)p0;
-		
-		tempTagID++;
-		return uniqueIdentifier;
+//		int p0 = (tempTagID % 224) + 32;
+//		int p1 = (tempTagID / 224) + 32;
+//		
+//		String uniqueIdentifier = "" +(char)p1 + (char)p0;
+//		
+//		tempTagID++;
+		return "";
 	}
 	
 	public String getUniqueIdentifier(){

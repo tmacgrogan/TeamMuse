@@ -66,7 +66,12 @@ public class TrackListController {
 					filesInDir = fileSysView.getFiles(file, false);
 					for(File fileInDir: filesInDir)
 					{
-						trackList.add( new Track( fileInDir.getAbsolutePath() ) );
+						 
+						if( fileInDir.getAbsolutePath().contains("mp3")){
+							trackList.add( new Track( fileInDir.getAbsolutePath() ) );
+							System.out.println(fileInDir.toString() );
+						}
+						
 					}
 					
 				}else{//isFile
