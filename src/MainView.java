@@ -1,4 +1,5 @@
 import java.awt.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,11 +13,10 @@ import javax.swing.table.DefaultTableModel;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.Array;
+//import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
+//import java.util.List;
 
-import com.jgoodies.forms.factories.DefaultComponentFactory;
 
 public class MainView {
 
@@ -25,7 +25,7 @@ public class MainView {
 	private static Color frameBG = new Color(32, 32, 32);
 	private static Color sideBG = new Color(64, 64, 64);
 	private static Color middleBG = new Color(38,38,38);
-	private static Dimension listSize = new Dimension(610, 445);
+	//private static Dimension listSize = new Dimension(610, 445);
 	private static int width = 1000;
 	private static int height = 600;
 	private static JTextField searchField;
@@ -56,11 +56,11 @@ public class MainView {
 		SnapMain();
 		
 		
-		ArrayList<Tag> testTagList = new ArrayList<Tag>();
-		for(int i = 0; i<226; i++){
-			testTagList.add(new Tag(""+i));
-			System.out.println(""+i+testTagList.get(i).getUniqueIdentifier());
-		}
+//		ArrayList<Tag> testTagList = new ArrayList<Tag>();
+//		for(int i = 0; i<226; i++){
+//			testTagList.add(new Tag(""+i));
+//			System.out.println(""+i+testTagList.get(i).getUniqueIdentifier());
+//		}
 //		System.out.println(testTagList.get(222).getUniqueIdentifier());
 //		System.out.println(testTagList.get(223).getUniqueIdentifier());
 //		System.out.println(testTagList.get(224).getUniqueIdentifier());
@@ -75,8 +75,9 @@ public class MainView {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainView window = new MainView();
-					window.frmSnap.setVisible(true);
+					//MainView window = new MainView();
+					//window.frmSnap.setVisible(true);
+					MainView.frmSnap.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -229,16 +230,16 @@ public class MainView {
 		TagTable = new JTable();
 		TagTable.setShowGrid(false);
 		TagTable.setForeground(Color.LIGHT_GRAY);
-		TagTable.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"Tag"
-			}
-		) {
-			Class[] columnTypes = new Class[] {
-				String.class
-			};
+		TagTable.setModel(new DefaultTableModel(new Object[][]{},new String[]{"Tag"}) {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			
+			@SuppressWarnings("rawtypes")
+			Class[] columnTypes = new Class[]{String.class};
+			
+			@SuppressWarnings({ "rawtypes", "unchecked" })
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
@@ -297,9 +298,16 @@ public class MainView {
 				"Name", "Artist", "Album", "Genre"
 			}
 		) {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+			
+			@SuppressWarnings("rawtypes")
 			Class[] columnTypes = new Class[] {
 				String.class, String.class, String.class, String.class
 			};
+			@SuppressWarnings({ "rawtypes", "unchecked" })
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
@@ -396,24 +404,26 @@ public class MainView {
 		frmSnap.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
+	
 	/** Adds all .mp3 files in specified folder into the Library and updates activeTrackList
 	 * @param folderLocation location of folder containing files to import 
 	 */
-	private void importFiles(String folderLocation){
-		
-	}
+//	private void importFiles(String folderLocation){
+//		
+//	}
+	
 	
 	/**Converts the search parameters passed by the user into a Search object and then sets the activeTracklist to the results of executing the search
 	 * @param searchParams
 	 */
-	private void search(String searchParams){
-		
-	}	
+//	private void search(String searchParams){
+//		
+//	}	
 	
 	/**resets the activeTrackList to the whole Library
 	 * 
 	 */
-	private void clearSearch(){
-		
-	}
+//	private void clearSearch(){
+//		
+//	}
 }

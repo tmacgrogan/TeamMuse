@@ -19,17 +19,17 @@ import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
 public class Track {
 	
 	private int id;
-	private String Album;
-	private String Artist;
+	//private String Album;
+	//private String Artist;
 	
 	private MP3File mp3File;
 	
-	private String Genre;
+	//private String Genre;
 	private String Location;//Absolute path
 	
-	private Tag tag;
+	//private Tag tag;
 	
-	private String Title;
+	//private String Title;
 	
 	public Track(String location, int trackId){
 		this(location);
