@@ -118,10 +118,11 @@ public class DbManager {
 		return library;
 	}
 	
-	public void removeTagFromTrack(Tag tag, Track track){
+	public static void removeTagFromTrack(Tag tag, Track track){
 		try{
+			//System.out.println("Removing tag " + tag.getName() + " (" + tag.getTagId() + ")");
 			Statement stmt = connection.createStatement();
-			stmt.executeQuery("DELETE FROM TrackTag WHERE TrackId = " + track.getTrackId() + ", " + tag.getTagId() + ";");
+			stmt.executeUpdate("DELETE FROM TrackTag WHERE TrackId = " + track.getTrackId() + " AND TagId = " + tag.getTagId() + ";");
 			stmt.close();
 		}
 		catch (SQLException e) {
