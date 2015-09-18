@@ -59,7 +59,7 @@ public class DbManager {
 			while(results.next()){
 				if(nameCol == 0 || idCol == 0){
 					nameCol = results.findColumn("Name");
-					idCol = results.findColumn("TrackId");
+					idCol = results.findColumn("TagId");
 				}
 				Tag tag = new Tag(results.getString(nameCol), results.getInt(idCol));
 				tags.add(tag);
@@ -74,38 +74,25 @@ public class DbManager {
 	
 	public static Tag addTagToTrack(String tagName, Track track){
 		ResultSet existing = null;
+		Tag tag = null;
+		String queryString = "SELECT * FROM Tag WHERE Name = ?;";
 		try{
-			existing = safeQuery("SELECT * FROM Tag WHERE Name = ?;", tagName);
+			existing = safeQuery(queryString, tagName);
+			if(!existing.next()){
+				safeUpdate("INSERT INTO Tag(Name) VALUES( ? );", tagName);
+				existing = safeQuery(queryString, tagName);
+				existing.next();
+			}
+			int nameCol = existing.findColumn("Name");
+			int idCol = existing.findColumn("TagId");
+			tag = new Tag(existing.getString(nameCol), existing.getInt(idCol));
+			Statement stmt = connection.createStatement();
+			stmt.executeUpdate("INSERT INTO TrackTag(TrackId, TagId) VALUES( " + track.getTrackId() + ", " + tag.getTagId() + ");");
 		}
 		catch (SQLException e) {
-			if(e.getMessage().equals("Query does not return results")){
-				try{
-					existing = safeQuery("INSERT INTO Tag(Name) VALUES( ? );", tagName);
-					existing.next();
-				}
-				catch (SQLException ee) {
-					ee.printStackTrace();
-				}
-			}
-			else{
-				e.printStackTrace();
-			}
+			e.printStackTrace();
 		}
-		finally{
-			try{
-				if(existing != null) {
-					int nameCol = existing.findColumn("Name");
-					int idCol = existing.findColumn("TagId");
-					Tag tag = new Tag(existing.getString(nameCol), existing.getInt(idCol));
-					Statement stmt = connection.createStatement();
-					stmt.executeUpdate("INSERT INTO TrackTag(TrackId, TagId) VALUES( " + track.getTrackId() + ", " + tag.getTagId() + ");");
-				}
-			}
-			catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		return null;
+		return tag;
 	}
 	
 	public static ArrayList<Track> getLibrary(){
