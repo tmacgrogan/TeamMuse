@@ -16,11 +16,10 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jgoodies.forms.factories.DefaultComponentFactory;
-
 public class MainView {
 
-	public ArrayList<Track> activeTrackList;
+	public static ArrayList<Track> activeTrackList;
+	public static Track selectedTrack;
 	private static JFrame frmSnap;
 	private static Color frameBG = new Color(32, 32, 32);
 	private static Color sideBG = new Color(64, 64, 64);
@@ -34,17 +33,6 @@ public class MainView {
 	private static DefaultTableModel tagModel;
 	private static JTextField TagInfo;
 	private static JButton btnAddTag;
-	
-	/*************************************************************/
-	//REMOVE THIS SECTION LATER! (DUMMY DATA FOR TESTING)
-	/*************************************************************/
-	private static Tag tag1 = new Tag("one");
-	private static Tag tag2 = new Tag("two");
-	private static Tag tag3 = new Tag("three");
-	private static Tag tag4 = new Tag("four");
-	private static Tag tag5 = new Tag("five");
-	private static Tag tag6 = new Tag("six");
-	
 	public static ArrayList<Tag> tagArray = new ArrayList<Tag>();
 	private static JTextField AddTagField;
 	private static JTable TagTable;
@@ -63,16 +51,6 @@ public class MainView {
 				}
 			}
 		});
-		/*************************************************************/
-		//REMOVE THIS SECTION LATER! (DUMMY DATA FOR TESTING)
-		/*************************************************************/
-		tagArray.add(tag1);
-		tagArray.add(tag2);
-		tagArray.add(tag3);
-		tagArray.add(tag4);
-		tagArray.add(tag5);
-		tagArray.add(tag6);
-		/*************************************************************/
 	}
 	
 	/**
@@ -80,6 +58,15 @@ public class MainView {
 	 */
 	public static void SnapMain() {
 		initialize();
+		
+		activeTrackList = DbManager.getLibrary();
+		
+		trackModel = (DefaultTableModel) songTable.getModel();
+		
+		for(int i = 0; i < activeTrackList.size(); i++){
+			Track currTrack = activeTrackList.get(i);
+			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
+		}
 	}
 	
 	/**
@@ -179,6 +166,7 @@ public class MainView {
 		btnAddTag.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
 		btnAddTag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				selectedTrack.addTag(AddTagField.getText());
 			}
 		});
 		AddTagPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -298,6 +286,9 @@ public class MainView {
 		
 		songTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
+	        	
+	        	selectedTrack = activeTrackList.get(songTable.getSelectedRow());
+	        			
 	        	btnAddTag.setEnabled(true);
 	        	AddTagField.setEnabled(true);
 	        	
@@ -309,11 +300,12 @@ public class MainView {
 	        		tagModel.removeRow(i); 
 	        	}
 	        	
+	        	tagArray = selectedTrack.getTags();
+	        	
 	        	//populates rows with tags of selected track
 	        	for(int i = 0; i < tagArray.size(); i++){
 	        		tagModel.addRow(new Object[]{tagArray.get(i).getName()});
 	        	}
-	        	
 	        	
 	        	TagInfo.setText(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
 	            //System.out.println(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
@@ -324,14 +316,14 @@ public class MainView {
 		btnImport.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				ArrayList<Track> tracklist = TrackListController.importToSnap();
+				TrackListController.importToSnap();
 				
-				//activeTrackList = DbManager.getLibrary();
+				activeTrackList = DbManager.getLibrary();
 				
 				trackModel = (DefaultTableModel) songTable.getModel();
 				
-				for(int i = 0; i < tracklist.size(); i++){
-					Track currTrack = tracklist.get(i);
+				for(int i = 0; i < activeTrackList.size(); i++){
+					Track currTrack = activeTrackList.get(i);
 					trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
 				}
 			}
