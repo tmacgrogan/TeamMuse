@@ -12,6 +12,7 @@ public class Tag {
 	private String description;	
 	
 	//Tag pulled from the database
+	//and another comment
 	public Tag(String name, int id){
 		this(name);
 		this.id = id;
