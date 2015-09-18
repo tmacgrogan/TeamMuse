@@ -20,6 +20,7 @@ public class MainView {
 
 	public static ArrayList<Track> activeTrackList;
 	public static Track selectedTrack;
+	public static Tag selectedTag;
 	private static JFrame frmSnap;
 	private static Color frameBG = new Color(32, 32, 32);
 	private static Color sideBG = new Color(64, 64, 64);
@@ -33,9 +34,10 @@ public class MainView {
 	private static DefaultTableModel tagModel;
 	private static JTextField TagInfo;
 	private static JButton btnAddTag;
-	public static ArrayList<Tag> tagArray = new ArrayList<Tag>();
+	public static ArrayList<Tag> activeTagList = new ArrayList<Tag>();
 	private static JTextField AddTagField;
 	private static JTable TagTable;
+	private static JButton btnDeleteTag;
 	/*************************************************************/
 	
 	public static void main(String[] args) {
@@ -227,7 +229,31 @@ public class MainView {
 		TagTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		TagTable.setShowVerticalLines(false);
 		TagInfoPanel.add(TagTable, BorderLayout.CENTER);
+		
+		btnDeleteTag = new JButton("Delete Tag");
+		btnDeleteTag.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+	        	
+				selectedTag = activeTagList.get(TagTable.getSelectedRow());
+
+				selectedTrack.removeTag(selectedTag);
+				
+				updateTagTable();
+			}
+		});
+		btnDeleteTag.setEnabled(false);
+		TagInfoPanel.add(btnDeleteTag, BorderLayout.SOUTH);
 		middlePanel.setLayout(new BorderLayout(0, 0));
+		
+		TagTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+	        public void valueChanged(ListSelectionEvent event) {
+	        			
+	        	btnDeleteTag.setEnabled(true);
+	        	
+	            //System.out.println(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
+	        }
+	    });
 		
 		JPanel searchPanel = new JPanel();
 		searchPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -366,11 +392,11 @@ public class MainView {
     		tagModel.removeRow(i); 
     	}
     	
-    	tagArray = selectedTrack.getTags();
+    	activeTagList = selectedTrack.getTags();
     	
     	//populates rows with tags of selected track
-    	for(int i = 0; i < tagArray.size(); i++){
-    		tagModel.addRow(new Object[]{tagArray.get(i).getName()});
+    	for(int i = 0; i < activeTagList.size(); i++){
+    		tagModel.addRow(new Object[]{activeTagList.get(i).getName()});
     	}
     	
     	TagInfo.setText(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
