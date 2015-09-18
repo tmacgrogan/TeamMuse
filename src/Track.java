@@ -17,7 +17,8 @@ import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
  * Avoid duplicating metadata stored by the audio file itself.
  */
 public class Track {
-			
+	
+	private int id;
 	private String Album;
 	private String Artist;
 	
@@ -29,6 +30,11 @@ public class Track {
 	private Tag tag;
 	
 	private String Title;
+	
+	public Track(String location, int trackId){
+		this(location);
+		this.id = trackId;
+	}
 	
 	public Track(String location){
 		Location = location;
@@ -162,6 +168,13 @@ public class Track {
 		return null;		
 	}
 	
+	public void setTrackId(int id){
+		this.id = id;
+	}
+	
+	public int getTrackId(){
+		return id;
+	}
 	
 	/** Need some sort of plan for doing this.
 	 * @param args

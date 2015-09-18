@@ -7,9 +7,15 @@ import java.util.ArrayList;
  */
 public class Tag {
 	
+	private int id;
 	private String uniqueIdentifier; 
 	private String name;
 	private String description;	
+	
+	public Tag(String name, int id){
+		this(name);
+		this.id = id;
+	}
 	
 	public Tag(String name){
 		this.name = name;
@@ -79,6 +85,14 @@ public class Tag {
 	 */
 	public Tag[] getParents(){
 		return null;
+	}
+	
+	public int getTagId(){
+		return id;
+	}
+	
+	public void setTagId(int id){
+		this.id = id;
 	}
 	
 	/**Called upon Tag's creation. 
