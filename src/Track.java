@@ -85,7 +85,7 @@ public class Track {
 	 * @param tagBeingRemoved the Tag whose unique identifier is removed from ID3
 	 */
 	public void removeTag(Tag tagBeingRemoved){
-		
+		//DbManager.removeTagFromTrack(tagBeingRemoved, this);
 	}
 	
 	/**
