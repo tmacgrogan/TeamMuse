@@ -340,6 +340,11 @@ public class MainView {
 				
 				trackModel = (DefaultTableModel) songTable.getModel();
 				
+				int trows = trackModel.getRowCount(); 
+		    	for(int i = trows - 1; i >=0; i--){
+		    		trackModel.removeRow(i); 
+		    	}
+				
 				for(int i = 0; i < activeTrackList.size(); i++){
 					Track currTrack = activeTrackList.get(i);
 					trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
