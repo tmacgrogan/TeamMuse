@@ -27,7 +27,8 @@ public class DbManager {
 			}
 			stmt.close();
 			//connection.commit();
-		} catch (SQLException e) {
+		} 
+		catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
@@ -45,12 +46,71 @@ public class DbManager {
 		return trackList;
 	}
 	
-//	public ArrayList<Tag> getTags(Track track){
-//		
-//	}
+	public static ArrayList<Tag> getTags(Track track){
+		ArrayList<Tag> tags = new ArrayList<Tag>();
+		try {
+			Statement stmt = connection.createStatement();
+			String statementStr = readSql("./db/GetTagsForTrack.sql")[0];
+			ResultSet results = safeQuery(statementStr, Integer.toString(track.getTrackId()));
+			int nameCol = 0;
+			int idCol = 0;
+			while(results.next()){
+				if(nameCol == 0 || idCol == 0){
+					nameCol = results.findColumn("Name");
+					idCol = results.findColumn("TrackId");
+				}
+				Tag tag = new Tag(results.getString(nameCol), results.getInt(idCol));
+				tags.add(tag);
+			}
+			stmt.close();
+			//connection.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return tags;
+	}
 	
-	public void addTagToTrack(String tagName, Track track){
-		
+	public static Tag addTagToTrack(String tagName, Track track){
+		ResultSet existing;
+		try{
+			existing = safeQuery("SELECT * FROM Tag WHERE Name = ?;", tagName);
+			if(!existing.next()){   //if tag does not yet exist
+				existing = safeQuery("INSERT INTO Tag(Name) VALUES( ? );", tagName);
+				existing.next();
+			}
+			int nameCol = existing.findColumn("Name");
+			int idCol = existing.findColumn("TagId");
+			Tag tag = new Tag(existing.getString(nameCol), existing.getInt(idCol));
+			Statement stmt = connection.createStatement();
+			stmt.executeUpdate("INSERT INTO TrackTag(TrackId, TagId) VALUES( " + track.getTrackId() + ", " + tag.getTagId() + ");");
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static ArrayList<Track> getLibrary(){
+		ResultSet results;
+		ArrayList<Track> library = new ArrayList<Track>();
+		try{
+			Statement stmt = connection.createStatement();
+			results = stmt.executeQuery("SELECT TrackId, Location FROM Track;");
+			int locationCol = 0;
+			int idCol = 0;
+			while(results.next()){
+				if(locationCol == 0 || idCol == 0){
+					locationCol = results.findColumn("FileLocation");
+					idCol = results.findColumn("TrackId");
+				}
+				Track libTrack = new Track(results.getString(locationCol), results.getInt(idCol));
+				library.add(libTrack);
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return library;
 	}
 	
 	public void deleteTagFromTrack(String tagName, Track track){
@@ -92,6 +152,15 @@ public class DbManager {
 			statement.setString(i, args[i]);
 		}
 		statement.executeUpdate();
+		statement.close();
+	}
+	
+	private static ResultSet safeQuery(String ... args) throws SQLException{
+		PreparedStatement statement = connection.prepareStatement(args[0]);
+		for(int i = 1; i < args.length; i++){
+			statement.setString(i, args[i]);
+		}
+		return statement.executeQuery();
 	}
 	
 }
