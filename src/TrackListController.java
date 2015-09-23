@@ -14,7 +14,7 @@ public class TrackListController {
 	 * @param toMerge
 	 * @return a ArrayList<Track> that is the merge of all sets of toMerge
 	 */
-	public static ArrayList<Track> merge(ArrayList<Track>[] toMerge){
+	public static ArrayList<Track> merge(ArrayList<ArrayList<Track>> toMerge){
 		return null;
 	}
 	
@@ -22,7 +22,7 @@ public class TrackListController {
 	 * @param toIntersect
 	 * @return the intersection of every set of toIntersect
 	 */
-	public static ArrayList<Track> intersect(ArrayList<Track>[] toIntersect){
+	public static ArrayList<Track> intersect(ArrayList<ArrayList<Track>> toIntersect){
 		return null;
 	}
 	
