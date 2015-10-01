@@ -12,6 +12,7 @@ public class Tag {
 	public Tag(String name, int id){
 		this(name);
 		this.id = id;
+		//TODO Add Tag validation in database here
 	}
 	
 	public Tag(String name){
