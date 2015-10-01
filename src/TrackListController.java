@@ -14,16 +14,56 @@ public class TrackListController {
 	 * @param toMerge
 	 * @return a ArrayList<Track> that is the merge of all sets of toMerge
 	 */
-	public static ArrayList<Track> merge(ArrayList<Track>[] toMerge){
-		return null;
+	public static ArrayList<Track> merge(ArrayList<ArrayList<Track>> toMerge){
+		int hashSize = 0;
+		
+		for (ArrayList<Track> trackList : toMerge){ hashSize += trackList.size(); }
+		
+		Hashtable<Integer, Track> hashOfMerge = new Hashtable<Integer, Track>(hashSize, (float) 1.0);
+		
+		for (ArrayList<Track> trackList : toMerge){
+			
+			for(Track track : trackList){
+				
+				if (!hashOfMerge.containsKey(track.getTrackId())){
+					hashOfMerge.put(track.getTrackId(), track);
+				}
+			}
+		}
+		
+		return new ArrayList<Track>(hashOfMerge.values());
 	}
 	
 	/**Returns 
 	 * @param toIntersect
 	 * @return the intersection of every set of toIntersect
 	 */
-	public static ArrayList<Track> intersect(ArrayList<Track>[] toIntersect){
-		return null;
+	public static ArrayList<Track> intersect(ArrayList<ArrayList<Track>> toIntersect){
+		ArrayList<Track> firstTrackList = toIntersect.remove(0);
+		
+		ArrayList<Hashtable<Integer, Track>> trackListHashes = new ArrayList<Hashtable<Integer, Track>>();
+		
+		for (ArrayList<Track> trackList : toIntersect){
+			Hashtable<Integer, Track> trackListHash = new Hashtable<Integer, Track>((int)(trackList.size() * 1.5));
+			
+			for (Track track : trackList){
+				trackListHash.put(track.getTrackId(), track);
+			}
+			trackListHashes.add(trackListHash);
+		}
+		
+		ArrayList<Track> toReturn = new ArrayList<Track>();
+		
+		for (Track track : firstTrackList){
+			boolean foundInAll = true;
+			
+			for (Hashtable<Integer, Track> table : trackListHashes){
+				foundInAll = foundInAll && table.containsKey(track.getTrackId());
+			}
+			if( foundInAll ){ toReturn.add(track); }
+		}
+		
+		return toReturn;
 	}
 	
 	/**
@@ -32,7 +72,20 @@ public class TrackListController {
 	 * @return a ArrayList<Track> containing every member that is in mustBe and is not in cantBe
 	 */
 	public static ArrayList<Track> exclude(ArrayList<Track> mustBe, ArrayList<Track> cantBe){
-		return null;
+		Hashtable<Integer, Track> excludeHash = new Hashtable<Integer, Track>((int) (cantBe.size() * 1.5));
+		for(Track track : cantBe){
+			excludeHash.put(track.getTrackId(), track);
+		}
+		
+		
+		ArrayList<Track> toReturn = new ArrayList<Track>();
+		for(Track track : mustBe){
+			if( !excludeHash.containsKey( track.getTrackId() ) ){
+				toReturn.add(track);
+			}
+			
+		}
+		return toReturn;
 	}
 	
 	public static ArrayList<Track> importToSnap()
