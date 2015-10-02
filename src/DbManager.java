@@ -34,15 +34,15 @@ public class DbManager {
 	}
 	
 	public static ArrayList<Track> importTracks(ArrayList<Track> trackList){
-		try {
-			String updateStr = "INSERT INTO Track ( Name, FileLocation ) VALUES ( ?, ?);";
-			for(Track t : trackList){
+		String updateStr = "INSERT INTO Track ( Name, FileLocation ) VALUES ( ?, ?);";
+		for(Track t : trackList){
+			try {
 				safeUpdate(updateStr, t.getTitle(), t.getTrackLocation());
 			}
-		}
-		catch (SQLException e) {
-			if(!e.getMessage().equals("[SQLITE_CONSTRAINT]  Abort due to constraint violation (UNIQUE constraint failed: Track.FileLocation)")) {
-				e.printStackTrace();
+			catch (SQLException e) {
+				if(!e.getMessage().equals("[SQLITE_CONSTRAINT]  Abort due to constraint violation (UNIQUE constraint failed: Track.FileLocation)")) {
+					e.printStackTrace();
+				}
 			}
 		}
 		return trackList;
@@ -72,10 +72,55 @@ public class DbManager {
 		return tags;
 	}
 	
+	public static ArrayList<Track> getTracks(Tag tag){
+		ArrayList<Track> tracks = new ArrayList<Track>();
+		try {
+			Statement stmt = connection.createStatement();
+			String statementStr = readSql("./db/GetTracksWithTag.sql")[0];
+			ResultSet results = safeQuery(statementStr, Integer.toString(tag.getTagId()));
+			int nameCol = 0;
+			int idCol = 0;
+			while(results.next()){
+				if(nameCol == 0 || idCol == 0){
+					nameCol = results.findColumn("Name");
+					idCol = results.findColumn("TrackId");
+				}
+				Track track = new Track(results.getString(nameCol), results.getInt(idCol));
+				tracks.add(track);
+			}
+			stmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return tracks;
+	}
+	
+	public static int getTagId(String tagName){
+		int id = 0;
+		ResultSet existing = null;
+		String queryString = "SELECT * FROM Tag WHERE Name LIKE ?;";
+		try{
+			existing = safeQuery(queryString, tagName);
+			if(!existing.next()){
+				id = -1;
+			}
+			else{
+				int idCol = existing.findColumn("TagId");
+				id = existing.getInt(idCol);
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return id;
+	}
+	
+	//TODO split this into component functions
+	//disallow [space] -atTheBeginning ( ) not
 	public static Tag addTagToTrack(String tagName, Track track){
 		ResultSet existing = null;
 		Tag tag = null;
-		String queryString = "SELECT * FROM Tag WHERE Name = ?;";
+		String queryString = "SELECT * FROM Tag WHERE Name LIKE ?;";
 		try{
 			existing = safeQuery(queryString, tagName);
 			if(!existing.next()){

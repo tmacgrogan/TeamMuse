@@ -12,7 +12,6 @@ public class Tag {
 	private String description;	
 	
 	//Tag pulled from the database
-	//and another comment
 	public Tag(String name, int id){
 		this(name);
 		this.id = id;
@@ -20,7 +19,7 @@ public class Tag {
 	
 	public Tag(String name){
 		this.name = name;
-		description = "y u no change this";
+		this.id = DbManager.getTagId(name);
 	}
 	
 	/**creates a TrackList containing every Track listed under This in the database, 
