@@ -122,7 +122,7 @@ public class TrackListController {
 						 
 						if( fileInDir.getAbsolutePath().contains("mp3")){
 							trackList.add( new Track( fileInDir.getAbsolutePath() ) );
-							System.out.println(fileInDir.toString() );
+							//System.out.println(fileInDir.toString() );
 						}
 						
 					}

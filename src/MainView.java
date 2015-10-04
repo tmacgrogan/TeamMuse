@@ -97,6 +97,10 @@ public class MainView {
 	 * Initialize the contents of the frame.
 	 */
 	private static void initialize() {
+		/** Make dummy mp3s */
+		//Util_DemoMP3.copyMP3(int numOfCopies );
+		
+		
 		DbManager.setupConnection();
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		frmSnap = new JFrame();
