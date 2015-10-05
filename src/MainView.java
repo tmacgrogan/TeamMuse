@@ -344,7 +344,7 @@ public class MainView {
 		scrollPane.setViewportView(trackTable);
 		scrollPane.setOpaque(true);
 		scrollPane.setBackground(middleBG);
-		scrollPane.getViewport().setBackground(middleBG);
+		scrollPane.setBorder(BorderFactory.createEmptyBorder());
 		
 		trackTable.setAlignmentY(Component.TOP_ALIGNMENT);
 		trackTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -375,8 +375,10 @@ public class MainView {
 		
 		trackTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
-	        	
-	        	selectedTrack = activeTrackList.get(trackTable.getSelectedRow());
+	        	if (trackTable.getSelectedRows().length == 1){
+	        		selectedTrack = activeTrackList.get(trackTable.getSelectedRow());
+	        		updateTagTable();
+	        	}
 	        			
 	        	btnAddTag.setEnabled(true);
 	        	addTagField.setEnabled(true);
@@ -385,6 +387,9 @@ public class MainView {
 	            //System.out.println(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
 	        }
 	    });
+		
+		trackTable.setRowSelectionAllowed(true);
+		trackTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
 		header = trackTable.getTableHeader();
 	    header.setBackground(middleBG);
