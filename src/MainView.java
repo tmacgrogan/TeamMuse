@@ -1,5 +1,4 @@
 import java.awt.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -10,66 +9,81 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-//import java.lang.reflect.Array;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-//import java.util.List;
-
+import java.util.List;
 
 public class MainView {
 
 	public static ArrayList<Track> activeTrackList;
+	public static ArrayList<Tag> activeTagList = new ArrayList<Tag>();
+	
+	private static Dimension listSize = new Dimension(610, 445);
+	
 	public static Track selectedTrack;
 	public static Tag selectedTag;
+	
 	private static JFrame frmSnap;
+	
 	private static Color frameBG = new Color(32, 32, 32);
 	private static Color sideBG = new Color(64, 64, 64);
 	private static Color middleBG = new Color(38,38,38);
-	//private static Dimension listSize = new Dimension(610, 445);
+	
 	private static int width = 1000;
 	private static int height = 600;
+	
+	private static JTextField tagInfo;
 	private static JTextField searchField;
-	private static JTable songTable;
+	private static JTextField addTagField;
+	
+	private static JTable trackTable;
+	private static JTable tagTable;
+	private static JTableHeader header;
+	
+	private static JPanel leftPanel;
+	private static JPanel middlePanel;
+	private static JPanel rightPanel;
+	private static JPanel addTagPanel;
+	private static JPanel tagInfoPanel;
+	private static JPanel searchPanel;
+	private static JPanel playerPanel;
+	private static JPanel songPanel;
+	
 	private static DefaultTableModel trackModel;
 	private static DefaultTableModel tagModel;
-	private static JTextField TagInfo;
+	
+	private static JButton btnImport;
 	private static JButton btnAddTag;
-	public static ArrayList<Tag> activeTagList = new ArrayList<Tag>();
-	private static JTextField AddTagField;
-	private static JTable TagTable;
 	private static JButton btnDeleteTag;
+	private static JButton btnMusicPlayer;
+	private static JButton btnSave;
+
+	private static JLabel lblMenu;
+	private static JLabel lblSongList;
+	private static JLabel lblDetails;
+	private static JLabel lblTagName;
+	private static JLabel lblSearch;
+	
+	private static GroupLayout groupLayout;
+	private static GroupLayout gl_leftPanel;
+	
+	private static JScrollPane scrollPane;
+	
+	
 	/*************************************************************/
-	
-	
 	
 	public static void main(String[] args) {
 		SnapMain();
 		
-		
-//		ArrayList<Tag> testTagList = new ArrayList<Tag>();
-//		for(int i = 0; i<226; i++){
-//			testTagList.add(new Tag(""+i));
-//			System.out.println(""+i+testTagList.get(i).getUniqueIdentifier());
-//		}
-//		System.out.println(testTagList.get(222).getUniqueIdentifier());
-//		System.out.println(testTagList.get(223).getUniqueIdentifier());
-//		System.out.println(testTagList.get(224).getUniqueIdentifier());
-//		System.out.println(testTagList.get(225).getUniqueIdentifier());
-//		Tag tag = new Tag("pop");
-//		System.out.println( "First tag: " + tag.getUniqueIdentifier()  );
-//		
-//		Tag tag1 = new Tag("rap");
-//		System.out.println("Second tag: " + tag1.getUniqueIdentifier() );
-		
-		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					//MainView window = new MainView();
-					//window.frmSnap.setVisible(true);
-					MainView.frmSnap.setVisible(true);
+					MainView window = new MainView();
+					window.frmSnap.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -85,7 +99,7 @@ public class MainView {
 		
 		activeTrackList = DbManager.getLibrary();
 		
-		trackModel = (DefaultTableModel) songTable.getModel();
+		trackModel = (DefaultTableModel) trackTable.getModel();
 		
 		for(int i = 0; i < activeTrackList.size(); i++){
 			Track currTrack = activeTrackList.get(i);
@@ -97,49 +111,74 @@ public class MainView {
 	 * Initialize the contents of the frame.
 	 */
 	private static void initialize() {
-		/** Make dummy mp3s */
+        /** Make dummy mp3s */
 		//Util_DemoMP3.copyMP3(int numOfCopies );
-		
-		
+        
 		DbManager.setupConnection();
+		
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+		
 		frmSnap = new JFrame();
+		tagTable = new JTable();
+		
+		lblMenu = new JLabel("Menu");
+		lblSongList = new JLabel("Song List");
+		lblDetails = new JLabel("Details");
+		
+		leftPanel = new JPanel();
+		middlePanel = new JPanel();
+		rightPanel = new JPanel();
+		addTagPanel = new JPanel();
+		tagInfoPanel = new JPanel();
+		searchPanel = new JPanel();
+		songPanel = new JPanel();
+		playerPanel = new JPanel();
+		
+		lblTagName = new JLabel("Tag Information");
+		lblSearch = new JLabel("Search");
+		
+		btnAddTag = new JButton("Add Tag");
+		btnDeleteTag = new JButton("Delete Tag");
+		btnImport = new JButton("Import");
+		btnSave = new JButton("Save");
+		btnMusicPlayer = new JButton("Music Player");
+		
+		addTagField = new JTextField();
+		tagInfo = new JTextField();
+		searchField = new JTextField();
+		
+		gl_leftPanel = new GroupLayout(leftPanel);
+		groupLayout = new GroupLayout(frmSnap.getContentPane());
+		
 		frmSnap.setTitle("Snap");
 		frmSnap.getContentPane().setBackground(frameBG);
 		
-		JLabel lblMenu = new JLabel("Menu");
 		lblMenu.setHorizontalAlignment(SwingConstants.LEFT);
 		lblMenu.setBackground(Color.GRAY);
 		lblMenu.setFont(new Font("Lucida Sans", Font.PLAIN, 13));
 		lblMenu.setForeground(Color.WHITE);
 		lblMenu.setOpaque(true);
 		
-		JLabel lblSongList = new JLabel("Song List");
 		lblSongList.setHorizontalAlignment(SwingConstants.CENTER);
 		lblSongList.setBackground(Color.GRAY);
 		lblSongList.setFont(new Font("Lucida Sans", Font.PLAIN, 13));
 		lblSongList.setForeground(Color.WHITE);
 		lblSongList.setOpaque(true);
 		
-		JLabel lblDetails = new JLabel("Details");
 		lblDetails.setOpaque(true);
 		lblDetails.setHorizontalAlignment(SwingConstants.LEFT);
 		lblDetails.setForeground(Color.WHITE);
 		lblDetails.setFont(new Font("Lucida Sans", Font.PLAIN, 13));
 		lblDetails.setBackground(Color.GRAY);
 		
-		JPanel leftPanel = new JPanel();
 		leftPanel.setBackground(sideBG);
 		
-		JPanel middlePanel = new JPanel();
 		middlePanel.setBorder(new LineBorder(Color.DARK_GRAY));
 		middlePanel.setForeground(Color.WHITE);
 		middlePanel.setBackground(frameBG);
 		
-		JPanel rightPanel = new JPanel();
 		rightPanel.setBackground(sideBG);
 		
-		GroupLayout groupLayout = new GroupLayout(frmSnap.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
@@ -177,68 +216,61 @@ public class MainView {
 		);
 		rightPanel.setLayout(new BorderLayout(0, 0));
 		
-		JLabel lblTagName = new JLabel("Tag Information");
 		lblTagName.setForeground(Color.LIGHT_GRAY);
 		lblTagName.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 		lblTagName.setHorizontalAlignment(SwingConstants.CENTER);
 		rightPanel.add(lblTagName, BorderLayout.NORTH);
 		
-		JPanel AddTagPanel = new JPanel();
-		AddTagPanel.setForeground(Color.WHITE);
-		AddTagPanel.setBackground(Color.DARK_GRAY);
-		rightPanel.add(AddTagPanel, BorderLayout.SOUTH);
+		addTagPanel.setForeground(Color.WHITE);
+		addTagPanel.setBackground(Color.DARK_GRAY);
+		rightPanel.add(addTagPanel, BorderLayout.SOUTH);
 		
-		btnAddTag = new JButton("Add Tag");
 		btnAddTag.setEnabled(false);
 		btnAddTag.setForeground(Color.BLACK);
 		btnAddTag.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
 		btnAddTag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				selectedTrack.addTag(AddTagField.getText());
+				selectedTrack.addTag(addTagField.getText());
 				updateTagTable();
-				AddTagField.setText("");
+				addTagField.setText("");
 			}
 		});
-		AddTagPanel.setLayout(new BorderLayout(0, 0));
+		addTagPanel.setLayout(new BorderLayout(0, 0));
 		
-		AddTagField = new JTextField();
-		AddTagField.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
-		AddTagField.setHorizontalAlignment(SwingConstants.CENTER);
-		AddTagField.setEnabled(false);
-		AddTagField.setColumns(10);
-		AddTagPanel.add(AddTagField);
+		addTagField.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
+		addTagField.setHorizontalAlignment(SwingConstants.CENTER);
+		addTagField.setEnabled(false);
+		addTagField.setColumns(10);
+		addTagPanel.add(addTagField);
 		btnAddTag.setPreferredSize(new Dimension(60, 30));
 		btnAddTag.setBackground(Color.DARK_GRAY);
-		AddTagPanel.add(btnAddTag, BorderLayout.SOUTH);
+		addTagPanel.add(btnAddTag, BorderLayout.SOUTH);
 		
-		JPanel TagInfoPanel = new JPanel();
-		TagInfoPanel.setForeground(Color.WHITE);
-		TagInfoPanel.setBackground(Color.DARK_GRAY);
-		rightPanel.add(TagInfoPanel, BorderLayout.CENTER);
-		TagInfoPanel.setLayout(new BorderLayout(0, 0));
+		tagInfoPanel.setForeground(Color.WHITE);
+		tagInfoPanel.setBackground(Color.DARK_GRAY);
+		rightPanel.add(tagInfoPanel, BorderLayout.CENTER);
+		tagInfoPanel.setLayout(new BorderLayout(0, 0));
 		
-		TagInfo = new JTextField();
-		TagInfo.setHorizontalAlignment(SwingConstants.CENTER);
-		TagInfo.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		TagInfoPanel.add(TagInfo, BorderLayout.NORTH);
-		TagInfo.setForeground(Color.WHITE);
-		TagInfo.setBackground(Color.DARK_GRAY);
-		TagInfo.setColumns(13);
-		TagInfo.setEditable(false);
+		tagInfo.setHorizontalAlignment(SwingConstants.CENTER);
+		tagInfo.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		tagInfoPanel.add(tagInfo, BorderLayout.NORTH);
+		tagInfo.setForeground(Color.WHITE);
+		tagInfo.setBackground(Color.DARK_GRAY);
+		tagInfo.setColumns(13);
+		tagInfo.setEditable(false);
 		
-		TagTable = new JTable();
-		TagTable.setShowGrid(false);
-		TagTable.setForeground(Color.LIGHT_GRAY);
-		TagTable.setModel(new DefaultTableModel(new Object[][]{},new String[]{"Tag"}) {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-			
-			@SuppressWarnings("rawtypes")
-			Class[] columnTypes = new Class[]{String.class};
-			
-			@SuppressWarnings({ "rawtypes", "unchecked" })
+		tagTable.setShowGrid(false);
+		tagTable.setForeground(Color.LIGHT_GRAY);
+		tagTable.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"Tag"
+			}
+		) {
+			Class[] columnTypes = new Class[] {
+				String.class
+			};
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
@@ -249,35 +281,31 @@ public class MainView {
 				return columnEditables[column];
 			}
 		});
-		TagTable.getColumnModel().getColumn(0).setResizable(false);
-		TagTable.getColumnModel().getColumn(0).setMaxWidth(2147483599);
-		TagTable.setBackground(Color.DARK_GRAY);
-		TagTable.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-		TagTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		TagTable.setShowVerticalLines(false);
-		TagInfoPanel.add(TagTable, BorderLayout.CENTER);
+		tagTable.getColumnModel().getColumn(0).setResizable(false);
+		tagTable.getColumnModel().getColumn(0).setMaxWidth(2147483599);
+		tagTable.setBackground(Color.DARK_GRAY);
+		tagTable.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		tagTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tagTable.setShowVerticalLines(false);
+		tagInfoPanel.add(tagTable, BorderLayout.CENTER);
 		
-		btnDeleteTag = new JButton("Delete Tag");
-		btnDeleteTag.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
+		btnDeleteTag.setEnabled(false);
 		btnDeleteTag.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 	        	
-				selectedTag = activeTagList.get(TagTable.getSelectedRow());
+				selectedTag = activeTagList.get(tagTable.getSelectedRow());
 
 				selectedTrack.removeTag(selectedTag);
 				
 				updateTagTable();
 			}
 		});
-		btnDeleteTag.setEnabled(false);
-		TagInfoPanel.add(btnDeleteTag, BorderLayout.SOUTH);
+		
+		tagInfoPanel.add(btnDeleteTag, BorderLayout.SOUTH);
 		middlePanel.setLayout(new BorderLayout(0, 0));
 		
-		TagTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+		tagTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
 	        			
 	        	btnDeleteTag.setEnabled(true);
@@ -286,102 +314,88 @@ public class MainView {
 	        }
 	    });
 		
-		JPanel searchPanel = new JPanel();
 		searchPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		searchPanel.setBackground(middleBG);
-		middlePanel.add(searchPanel, BorderLayout.NORTH);
 		searchPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		middlePanel.add(searchPanel, BorderLayout.NORTH);
 		
-		searchField = new JTextField();
-		searchPanel.add(searchField);
 		searchField.setColumns(30);
+		searchPanel.add(searchField);
 		
-		JLabel lblSearch = new JLabel("Search");
-		searchPanel.add(lblSearch);
 		lblSearch.setForeground(Color.GRAY);
+		searchPanel.add(lblSearch);
 		
-		JPanel playerPanel = new JPanel();
 		playerPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		playerPanel.setBackground(middleBG);
 		middlePanel.add(playerPanel, BorderLayout.SOUTH);
 		
-		JButton btnMusicPlayer = new JButton("Music Player");
 		playerPanel.add(btnMusicPlayer);
 		
-		JPanel songPanel = new JPanel();
 		middlePanel.add(songPanel, BorderLayout.CENTER);
 		
-		songTable = new JTable();
-		songTable.setAlignmentY(Component.TOP_ALIGNMENT);
-		songTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		songTable.setShowVerticalLines(false);
-		songTable.setShowHorizontalLines(false);
-		songTable.setShowGrid(false);
-		songTable.setForeground(Color.WHITE);
-		songTable.setModel(new DefaultTableModel(
+		songPanel.setOpaque(true);
+		songPanel.setBackground(middleBG);
+		songPanel.setLayout(new BoxLayout(songPanel, BoxLayout.X_AXIS));
+		
+		scrollPane = new JScrollPane();
+		songPanel.add(scrollPane);
+		
+		trackTable = new JTable();
+		scrollPane.setViewportView(trackTable);
+		scrollPane.setOpaque(true);
+		scrollPane.setBackground(middleBG);
+		scrollPane.getViewport().setBackground(middleBG);
+		
+		trackTable.setAlignmentY(Component.TOP_ALIGNMENT);
+		trackTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		trackTable.setShowVerticalLines(false);
+		trackTable.setShowHorizontalLines(false);
+		trackTable.setShowGrid(false);
+		trackTable.setForeground(Color.WHITE);
+		trackTable.setModel(new DefaultTableModel(
 			new Object[][] {
 			},
 			new String[] {
 				"Name", "Artist", "Album", "Genre"
 			}
 		) {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-			
-			@SuppressWarnings("rawtypes")
 			Class[] columnTypes = new Class[] {
 				String.class, String.class, String.class, String.class
 			};
-			@SuppressWarnings({ "rawtypes", "unchecked" })
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
 		});
-		songTable.getColumnModel().getColumn(0).setPreferredWidth(180);
-		songTable.getColumnModel().getColumn(1).setPreferredWidth(150);
-		songTable.getColumnModel().getColumn(2).setPreferredWidth(150);
-		songTable.getColumnModel().getColumn(3).setPreferredWidth(100);
-		songTable.setOpaque(true);
-		songTable.setBackground(middleBG);
-		songPanel.setOpaque(true);
-		songPanel.setBackground(middleBG);
-		songPanel.setLayout(new BoxLayout(songPanel, BoxLayout.X_AXIS));
-		songPanel.add(songTable);
+		trackTable.getColumnModel().getColumn(0).setPreferredWidth(180);
+		trackTable.getColumnModel().getColumn(1).setPreferredWidth(150);
+		trackTable.getColumnModel().getColumn(2).setPreferredWidth(150);
+		trackTable.getColumnModel().getColumn(3).setPreferredWidth(100);
+		trackTable.setOpaque(true);
+		trackTable.setBackground(middleBG);
 		
-		songTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+		trackTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
 	        	
-	        	selectedTrack = activeTrackList.get(songTable.getSelectedRow());
+	        	selectedTrack = activeTrackList.get(trackTable.getSelectedRow());
 	        			
 	        	btnAddTag.setEnabled(true);
-	        	AddTagField.setEnabled(true);
+	        	addTagField.setEnabled(true);
 	        	
 	        	updateTagTable();
 	            //System.out.println(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
 	        }
 	    });
 		
-		JButton btnImport = new JButton("Import");
+		header = trackTable.getTableHeader();
+	    header.setBackground(middleBG);
+	    header.setForeground(Color.white);
+		
+		
 		btnImport.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				TrackListController.importToSnap();
-				
-				activeTrackList = DbManager.getLibrary();
-				
-				trackModel = (DefaultTableModel) songTable.getModel();
-				
-				int trows = trackModel.getRowCount(); 
-		    	for(int i = trows - 1; i >=0; i--){
-		    		trackModel.removeRow(i); 
-		    	}
-				
-				for(int i = 0; i < activeTrackList.size(); i++){
-					Track currTrack = activeTrackList.get(i);
-					trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
-				}
+				updateTrackTable();
 			}
 		});
 		btnImport.setForeground(Color.GRAY);
@@ -389,11 +403,10 @@ public class MainView {
 		btnImport.setHorizontalAlignment(SwingConstants.LEFT);
 		btnImport.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		
-		JButton btnSave = new JButton("Save");
 		btnSave.setForeground(Color.GRAY);
 		btnSave.setHorizontalAlignment(SwingConstants.LEFT);
 		btnSave.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-		GroupLayout gl_leftPanel = new GroupLayout(leftPanel);
+		
 		gl_leftPanel.setHorizontalGroup(
 			gl_leftPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_leftPanel.createSequentialGroup()
@@ -413,22 +426,27 @@ public class MainView {
 					.addGap(487))
 		);
 		leftPanel.setLayout(gl_leftPanel);
-		btnImport.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
 		frmSnap.getContentPane().setLayout(groupLayout);
 		frmSnap.setBounds((screen.width/2)-(width/2), (screen.height/2)-(height/2), width, height);
 		frmSnap.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 	}
 	
-
+	private static void updateTrackTable(){
+		
+		activeTrackList = DbManager.getLibrary();
+		
+		clearTable(trackTable);
+		
+		for(int i = 0; i < activeTrackList.size(); i++){
+			Track currTrack = activeTrackList.get(i);
+			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
+		}
+	}
+	
 	private static void updateTagTable() {
 		// TODO Auto-generated method stub
-		tagModel = (DefaultTableModel) TagTable.getModel();
+		tagModel = (DefaultTableModel) tagTable.getModel();
     	
     	//clears row to be ready to display new set of tags
     	int rows = tagModel.getRowCount(); 
@@ -443,29 +461,41 @@ public class MainView {
     		tagModel.addRow(new Object[]{activeTagList.get(i).getName()});
     	}
     	
-    	TagInfo.setText(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
+    	tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
 	}
-
+	
+	/**
+	 * Clears all rows of table
+	 * @param T 
+	 */
+	private static void clearTable(JTable T){
+		
+		DefaultTableModel currModel = (DefaultTableModel) T.getModel();
+		
+		int rows = currModel.getRowCount(); 
+    	for(int i = rows - 1; i >=0; i--){
+    		currModel.removeRow(i); 
+    	}	
+	}
 	
 	/** Adds all .mp3 files in specified folder into the Library and updates activeTrackList
 	 * @param folderLocation location of folder containing files to import 
 	 */
-//	private void importFiles(String folderLocation){
-//		
-//	}
-	
+	private void importFiles(String folderLocation){
+		
+	}
 	
 	/**Converts the search parameters passed by the user into a Search object and then sets the activeTracklist to the results of executing the search
 	 * @param searchParams
 	 */
-//	private void search(String searchParams){
-//		
-//	}	
+	private void search(String searchParams){
+		
+	}	
 	
 	/**resets the activeTrackList to the whole Library
 	 * 
 	 */
-//	private void clearSearch(){
-//		
-//	}
+	private void clearSearch(){
+		
+	}
 }
