@@ -375,9 +375,22 @@ public class MainView {
 		
 		trackTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
-	        	if (trackTable.getSelectedRows().length == 1){
-	        		selectedTrack = activeTrackList.get(trackTable.getSelectedRow());
-	        		updateTagTable();
+	        	if ( !event.getValueIsAdjusting()) {  
+		        	if (trackTable.getSelectedRows().length == 1){
+		        		selectedTrack = activeTrackList.get(trackTable.getSelectedRow());
+		        		updateTagTable();
+		        	}else if(trackTable.getSelectedRows().length > 1){
+		        		int[] selectedRows = trackTable.getSelectedRows();
+		        		Track[] selectedTracks = new Track[selectedRows.length];
+		        		ArrayList<ArrayList<Tag>> selectedTagArray = new ArrayList<ArrayList<Tag>>();
+		        		//adds tag array of each track to selectedTagArray
+		        		for (int i = 0; i < selectedRows.length; i++){
+		        			selectedTracks[i] = activeTrackList.get(i);
+		        			selectedTagArray.add(selectedTracks[i].getTags());
+		        			System.out.println(selectedTracks[i].getTitle());
+		        		}
+		        		//**finding shared tags go here**//
+		        	}
 	        	}
 	        			
 	        	btnAddTag.setEnabled(true);
