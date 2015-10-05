@@ -20,11 +20,11 @@ import java.util.List;
 public class MainView {
 
 	public static ArrayList<Track> activeTrackList;
-	public static ArrayList<Tag> activeTagList = new ArrayList<Tag>();
+	public static ArrayList<Tag> activeTags = new ArrayList<Tag>();
 	
 	private static Dimension listSize = new Dimension(610, 445);
 	
-	public static Track selectedTrack;
+	public static ArrayList<Track> selectedTracks = new ArrayList<Track>();
 	public static Tag selectedTag;
 	
 	private static JFrame frmSnap;
@@ -230,7 +230,9 @@ public class MainView {
 		btnAddTag.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
 		btnAddTag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				selectedTrack.addTag(addTagField.getText());
+				for(Track track : selectedTracks){
+					track.addTag(addTagField.getText());
+				}
 				updateTagTable();
 				addTagField.setText("");
 			}
@@ -294,9 +296,12 @@ public class MainView {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 	        	
-				selectedTag = activeTagList.get(tagTable.getSelectedRow());
-
-				selectedTrack.removeTag(selectedTag);
+				selectedTag = activeTags.get(tagTable.getSelectedRow());
+				
+				
+				for(Track track : selectedTracks){
+					track.removeTag(selectedTag);
+				}
 				
 				updateTagTable();
 			}
@@ -375,28 +380,20 @@ public class MainView {
 		
 		trackTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
-	        	if ( !event.getValueIsAdjusting()) {  
-		        	if (trackTable.getSelectedRows().length == 1){
-		        		selectedTrack = activeTrackList.get(trackTable.getSelectedRow());
-		        		updateTagTable();
-		        	}else if(trackTable.getSelectedRows().length > 1){
-		        		int[] selectedRows = trackTable.getSelectedRows();
-		        		Track[] selectedTracks = new Track[selectedRows.length];
-		        		ArrayList<ArrayList<Tag>> selectedTagArray = new ArrayList<ArrayList<Tag>>();
-		        		//adds tag array of each track to selectedTagArray
-		        		for (int i = 0; i < selectedRows.length; i++){
-		        			selectedTracks[i] = activeTrackList.get(i);
-		        			selectedTagArray.add(selectedTracks[i].getTags());
-		        			System.out.println(selectedTracks[i].getTitle());
-		        		}
-		        		//**finding shared tags go here**//
-		        	}
+
+	        	if ( !event.getValueIsAdjusting()) {	        		
+	        		selectedTracks.clear();
+	        		
+	        		for(int row : trackTable.getSelectedRows()){
+	        			System.out.println("row: " +row);
+	        			
+	        			selectedTracks.add(activeTrackList.get(row));
+	        		}
+	        		updateTagTable();
 	        	}
 	        			
 	        	btnAddTag.setEnabled(true);
 	        	addTagField.setEnabled(true);
-	        	
-	        	updateTagTable();
 	            //System.out.println(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
 	        }
 	    });
@@ -472,15 +469,17 @@ public class MainView {
     		tagModel.removeRow(i); 
     	}
     	
-    	activeTagList = selectedTrack.getTags();
+    
+    	activeTags = selectedTracks.get(0).getTags();
     	
     	//populates rows with tags of selected track
-    	for(int i = 0; i < activeTagList.size(); i++){
-    		tagModel.addRow(new Object[]{activeTagList.get(i).getName()});
+    	for(int i = 0; i < activeTags.size(); i++){
+    		tagModel.addRow(new Object[]{activeTags.get(i).getName()});
     	}
     	
     	tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
 	}
+	
 	
 	/**
 	 * Clears all rows of table
