@@ -470,7 +470,7 @@ public class MainView {
     	}
     	
     
-    	activeTags = selectedTracks.get(0).getTags();
+    	activeTags = TrackListController.getCommonTags(selectedTracks);
     	
     	//populates rows with tags of selected track
     	for(int i = 0; i < activeTags.size(); i++){
