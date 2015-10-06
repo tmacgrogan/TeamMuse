@@ -98,6 +98,21 @@ public class DbManager {
 		return tracks;
 	}
 		
+	
+	//TODO getTrackId, maybe
+	public static int getTrackId(String tagName){
+		return 0;
+	}
+	
+	public static void setTagName(String newName, int tagId){
+		try{
+			safeUpdate("UPDATE Tag SET Name = ? WHERE TagId = " + tagId, newName);
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	//TODO split this into component functions
 	//disallow [space] -atTheBeginning ( ) not
 	public static Tag addTagToTrack(String tagName, Track track){
