@@ -26,9 +26,7 @@ public class Track {
 	
 	//private String Genre;
 	private String Location;//Absolute path
-	
-	//private Tag tag;
-	
+
 	//private String Title;
 	
 	public Track(String location, int trackId){
