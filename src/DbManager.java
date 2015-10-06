@@ -1,10 +1,12 @@
 import java.io.BufferedReader;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 
 public class DbManager {
+	//TODO Refactor with abstraction because to singleton.
 	
 	private static Connection connection;
 	
@@ -32,6 +34,7 @@ public class DbManager {
 			e.printStackTrace();
 		}
 	}
+	
 	
 	public static ArrayList<Track> importTracks(ArrayList<Track> trackList){
 		String updateStr = "INSERT INTO Track ( Name, FileLocation ) VALUES ( ?, ?);";
@@ -94,27 +97,7 @@ public class DbManager {
 		}
 		return tracks;
 	}
-	
-	public static int getTagId(String tagName){
-		int id = 0;
-		ResultSet existing = null;
-		String queryString = "SELECT * FROM Tag WHERE Name LIKE ?;";
-		try{
-			existing = safeQuery(queryString, tagName);
-			if(!existing.next()){
-				id = -1;
-			}
-			else{
-				int idCol = existing.findColumn("TagId");
-				id = existing.getInt(idCol);
-			}
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return id;
-	}
-	
+		
 	//TODO split this into component functions
 	//disallow [space] -atTheBeginning ( ) not
 	public static Tag addTagToTrack(String tagName, Track track){
@@ -163,16 +146,66 @@ public class DbManager {
 		return library;
 	}
 	
-	public static void removeTagFromTrack(Tag tag, Track track){
+	public static int getTagId(String tagName){
+		int id = 0;
+		ResultSet existing = null;
+		String queryString = "SELECT * FROM Tag WHERE Name LIKE ?;";
 		try{
-			//System.out.println("Removing tag " + tag.getName() + " (" + tag.getTagId() + ")");
-			Statement stmt = connection.createStatement();
-			stmt.executeUpdate("DELETE FROM TrackTag WHERE TrackId = " + track.getTrackId() + " AND TagId = " + tag.getTagId() + ";");
-			stmt.close();
+			existing = safeQuery(queryString, tagName);
+			if(!existing.next()){
+				id = -1;
+			}
+			else{
+				int idCol = existing.findColumn("TagId");
+				id = existing.getInt(idCol);
+			}
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return id;
+	}
+	
+	/**
+	 * Attaches parent tag to child tag.
+	 * 
+	 * 
+	 * @param parentTagID
+	 * @param childTagID
+	 * @throws SQLException
+	 */
+	//Catch SQLException in caller and prompt user that parent already attached to this child
+	public static void insertParentTagLink(int parentTagID, int childTagID) throws SQLException{
+		String insert = ( "INSERT INTO ParentTagLink(ParentTagId, ChildTagId) VALUES(" + parentTagID + "," + childTagID + ");" );
+		
+			Statement stmt = connection.createStatement();
+			stmt.executeUpdate(insert);
+		
+	}
+	
+	/**
+	 * Inserts tagName into Tag table and returns the tag object.
+	 * 
+	 * @param tagName
+	 * @return Tag
+	 */
+	public static Tag insertTag(String tagName){
+		
+		ResultSet existing = null;
+		Tag tag = null;
+		try {
+			safeUpdate("INSERT INTO Tag(Name) VALUES( ? );", tagName);
+			existing = safeQuery( "SELECT * FROM Tag WHERE Name LIKE ?;", tagName);
+			existing.next();
+			
+			int idCol = existing.findColumn("TagId");
+			tag = new Tag( tagName, existing.getInt(idCol) );
+			
+			
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return tag;
 	}
 	
 	//returns list of executable statements
@@ -203,6 +236,20 @@ public class DbManager {
 		}
 		return result.split("(?<=;)"); //separate by statement
 	}
+	
+	public static void removeTagFromTrack(Tag tag, Track track){
+		try{
+			//System.out.println("Removing tag " + tag.getName() + " (" + tag.getTagId() + ")");
+			Statement stmt = connection.createStatement();
+			stmt.executeUpdate("DELETE FROM TrackTag WHERE TrackId = " + track.getTrackId() + " AND TagId = " + tag.getTagId() + ";");
+			stmt.close();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+
 	
 	private static void safeUpdate(String ... args) throws SQLException{
 		PreparedStatement statement = connection.prepareStatement(args[0]);

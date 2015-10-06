@@ -5,7 +5,7 @@
 		
 	CREATE TABLE IF NOT EXISTS Tag(
 		TagId INTEGER PRIMARY KEY,
-		Name TEXT UNIQUE NOT NULL
+		Name TEXT UNIQUE NOT NULL,
 		Description TEXT);
 		
 	CREATE TABLE IF NOT EXISTS TrackTag(
@@ -18,4 +18,5 @@
 		ParentTagId INTEGER,
 		ChildTagId INTEGER,
 		FOREIGN KEY(ParentTagId) REFERENCES Tag(TagId),
-		FOREIGN KEY(ChildTagId) REFERENCES Tag(TagId));
+		FOREIGN KEY(ChildTagId) REFERENCES Tag(TagId),
+		PRIMARY KEY(ParentTagId, ChildTagId) );
