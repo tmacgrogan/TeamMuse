@@ -89,7 +89,34 @@ public class TrackListController {
 	}
 	
 	public static ArrayList<Tag> getCommonTags(ArrayList<Track> tracks){
-		return new ArrayList<Tag>();
+		System.out.println("getCommonTags passed arraylist size: "+tracks.size());
+		ArrayList<Tag> firstTagList = tracks.remove(0).getTags();
+		System.out.println("reached");
+		ArrayList<Hashtable<Integer,Tag>> tagListHashes = new ArrayList<Hashtable<Integer, Tag>>();
+		
+		for (Track track : tracks){
+			ArrayList<Tag> tagList = track.getTags();
+			
+			Hashtable<Integer, Tag> tagListHash = new Hashtable<Integer, Tag>((int)(tagList.size() * 1.5));
+			
+			for (Tag tag : tagList){
+				tagListHash.put(tag.getTagId(), tag);
+			}
+			tagListHashes.add(tagListHash);
+		}
+		
+		ArrayList<Tag> toReturn = new ArrayList<Tag>();
+		
+		for (Tag tag : firstTagList){
+			boolean foundInAll = true;
+			
+			for (Hashtable<Integer, Tag> table : tagListHashes){
+				foundInAll = foundInAll && table.containsKey(tag.getTagId());
+			}
+			if( foundInAll ){ toReturn.add(tag); }
+		}
+		
+		return toReturn;
 	}
 	
 	public static ArrayList<Track> importToSnap()
