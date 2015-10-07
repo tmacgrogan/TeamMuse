@@ -89,7 +89,7 @@ public class TrackListController {
 	}
 	
 	public static ArrayList<Tag> getCommonTags(ArrayList<Track> tracks){
-		return null;
+		return new ArrayList<Tag>();
 	}
 	
 	public static ArrayList<Track> importToSnap()
