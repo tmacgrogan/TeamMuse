@@ -230,7 +230,6 @@ public class MainView {
 		btnAddTag.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
 		btnAddTag.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("selectedTracks size in btnAddTag: " + selectedTracks.size());
 				for(Track track : selectedTracks){
 					track.addTag(addTagField.getText());
 				}
@@ -299,7 +298,6 @@ public class MainView {
 	        	
 				selectedTag = activeTags.get(tagTable.getSelectedRow());
 				
-				
 				for(Track track : selectedTracks){
 					track.removeTag(selectedTag);
 				}
@@ -313,7 +311,6 @@ public class MainView {
 		
 		tagTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
-	        			
 	        	btnDeleteTag.setEnabled(true);
 	        	
 	            //System.out.println(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
@@ -384,9 +381,7 @@ public class MainView {
 
 	        	if ( !event.getValueIsAdjusting()) {	        		
 	        		selectedTracks.clear();
-	        		System.out.println("selectedTracks cleared");
 	        		for(int row : trackTable.getSelectedRows()){
-	        			System.out.println("row: " +row);
 	        			
 	        			selectedTracks.add(activeTrackList.get(row));
 	        		}
@@ -470,7 +465,6 @@ public class MainView {
     		tagModel.removeRow(i); 
     	}
     	
-    	System.out.println("selectedTracks size: " + selectedTracks.size());
     	activeTags = TrackListController.getCommonTags(selectedTracks);
     	
     	//populates rows with tags of selected track
