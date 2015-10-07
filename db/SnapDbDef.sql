@@ -18,4 +18,5 @@
 		ParentTagId INTEGER,
 		ChildTagId INTEGER,
 		FOREIGN KEY(ParentTagId) REFERENCES Tag(TagId),
-		FOREIGN KEY(ChildTagId) REFERENCES Tag(TagId));
+		FOREIGN KEY(ChildTagId) REFERENCES Tag(TagId),
+		PRIMARY KEY(ParentTagId, ChildTagId) );

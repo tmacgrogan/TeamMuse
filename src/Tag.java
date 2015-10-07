@@ -1,3 +1,4 @@
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Tag {
@@ -9,9 +10,9 @@ public class Tag {
 	
 	//Tag pulled from the database
 	public Tag(String name, int id){
+		//TODO Sanitize tag names
 		this(name);
 		this.id = id;
-		//TODO Add Tag validation in database here
 	}
 	
 	public Tag(String name){
@@ -25,6 +26,28 @@ public class Tag {
 	 */
 	public ArrayList<Track> getTracks(){
 		return null;
+	}
+	
+	/**
+	 * Add a parent tag to this tag. If tag not created. 
+	 * 
+	 * @param parent
+	 * @throws SQLException 
+	 */
+	//Catch SQLException in caller and prompt user that parent already attached to this child
+	public void addParent(String parent) throws SQLException{
+
+		Tag parentTag;
+		if( DbManager.getTagId(parent) == -1 ){
+			parentTag = DbManager.insertTag(parent);
+			DbManager.insertParentTagLink(parentTag.id, id);
+		
+		}else{ 
+			parentTag = new Tag(parent);
+			DbManager.insertParentTagLink(parentTag.id, id);			
+		}
+		
+		
 	}
 	
 	/** see Track.addTag
@@ -107,5 +130,21 @@ public class Tag {
 	public void setDescription(String newDescription){
 		description = newDescription;
 	}
+	
+	/*
+	public static void main(String[] args){
+		DbManager.setupConnection();
+		
+		Tag childTag = new Tag("Krump");
+		
+		//Tag parenTag = new Tag("HipHop");
+		try{
+		childTag.addParent("parentTag");
+		}catch(SQLException e){
+			System.out.println("Parent and child assoc. already in database");
+			
+		}
+	}
+	*/
 
 }

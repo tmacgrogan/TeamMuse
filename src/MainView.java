@@ -72,7 +72,7 @@ public class MainView {
 	private static GroupLayout gl_leftPanel;
 	
 	private static JScrollPane scrollPane;
-	
+	//I'm here
 	
 	/*************************************************************/
 	
@@ -112,7 +112,7 @@ public class MainView {
 	 */
 	private static void initialize() {
         /** Make dummy mp3s */
-		//Util_DemoMP3.copyMP3(int numOfCopies );
+		Util_DemoMP3.copyMP3(100 );
         
 		DbManager.setupConnection();
 		
@@ -516,3 +516,4 @@ public class MainView {
 		
 	}
 }
+
