@@ -251,23 +251,58 @@ public class MainView {
 		
 		btnEditTag = new JButton("Edit Tag");
 		btnEditTag.addActionListener(new ActionListener() {
+			@SuppressWarnings("unchecked")
 			public void actionPerformed(ActionEvent e) {
 				selectedTag = activeTags.get(tagTable.getSelectedRow());
+				ArrayList<Tag> parents = selectedTag.getParents();
+				ArrayList<Tag> children = selectedTag.getChildren();
+				
+				JPanel editTagPanel = new JPanel();
 				JTextField newTagNameField = new JTextField();
+				DefaultListModel parentModel = new DefaultListModel();
+				String[] parentString = new String[parents.size()];
+				
 				JTextField newParentField = new JTextField();
+				String[] childrenString = new String[children.size()];
+				
+				DefaultListModel childModel = new DefaultListModel();
 				JTextField newChildField = new JTextField();
+				
+				for(int i = 0; i < parents.size(); i++){
+					parentString[i] = parents.get(i).getName();
+					System.out.println(parentString[i]);
+				}
+				
+				for(int i = 0; i < children.size(); i++){
+					childrenString[i] = children.get(i).getName();
+					System.out.println(childrenString[i]);
+				}
+			
+				JList parentList = new JList(parentString);
+				JList childrenList = new JList(childrenString);
+				
 				
 				Object[] message = {
 				    "", newTagNameField,
 				    "Add parent tag:", newParentField,
-				    "Add child tag:", newChildField
+				    "Parents:",parentList,
+				    "Add child tag:", newChildField,
+				    "Children:",childrenList
 				};
+				
+//				editTagPanel.add(newTagNameField);
+//				editTagPanel.add(parentList);
+//				editTagPanel.add(newParentField);
+//				editTagPanel.add(childrenList);
+//				editTagPanel.add(newChildField);
+				
 
 				int option = JOptionPane.showConfirmDialog(null, message, "Edit Tag", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				if (option == JOptionPane.OK_OPTION) {
 				    if (selectedTag.setName(newTagNameField.getText())) {
 				        System.out.println("successful");
 				    } else if (selectedTag.addParent(newParentField.getText())){
+				    	
 				        
 				    } else if (selectedTag.addChild(newChildField.getText())){
 				    	
