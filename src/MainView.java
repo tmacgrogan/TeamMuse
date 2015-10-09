@@ -21,6 +21,8 @@ public class MainView {
 
 	public static ArrayList<Track> activeTrackList;
 	public static ArrayList<Tag> activeTags = new ArrayList<Tag>();
+	public static ArrayList<Tag> parents;
+	public static ArrayList<Tag> children;
 	
 	private static Dimension listSize = new Dimension(610, 445);
 	
@@ -73,7 +75,9 @@ public class MainView {
 	private static JScrollPane scrollPane;
 	private static JButton btnEditTag;
 	private static JButton searchButton;
-	//I'm here
+	
+	private static JList parentList;
+	private static JList childrenList;
 	
 	/*************************************************************/
 	
@@ -253,13 +257,13 @@ public class MainView {
 			@SuppressWarnings("unchecked")
 			public void actionPerformed(ActionEvent e) {
 				selectedTag = activeTags.get(tagTable.getSelectedRow());
-				ArrayList<Tag> parents = selectedTag.getParents();
-				ArrayList<Tag> children = selectedTag.getChildren();
+				parents = selectedTag.getParents();
+				children = selectedTag.getChildren();
 				
 				JPanel editTagPanel = new JPanel();
 				JTextField newTagNameField = new JTextField();
 				DefaultListModel parentModel = new DefaultListModel();
-				String[] parentString = new String[parents.size()];
+				final String[] parentString = new String[parents.size()];
 				
 				JTextField newParentField = new JTextField();
 				String[] childrenString = new String[children.size()];
@@ -269,16 +273,14 @@ public class MainView {
 				
 				for(int i = 0; i < parents.size(); i++){
 					parentString[i] = parents.get(i).getName();
-					System.out.println(parentString[i]);
 				}
 				
 				for(int i = 0; i < children.size(); i++){
 					childrenString[i] = children.get(i).getName();
-					System.out.println(childrenString[i]);
 				}
 			
-				JList parentList = new JList(parentString);
-				JList childrenList = new JList(childrenString);
+				parentList = new JList(parentString);
+				childrenList = new JList(childrenString);
 				
 				parentList.addMouseListener(new MouseAdapter() {
 				    public void mouseClicked(MouseEvent evt) {
@@ -303,17 +305,12 @@ public class MainView {
 				
 				Object[] message = {
 				    "", newTagNameField,
+				    "Double click to remove parent",parentList,
 				    "Add parent tag:", newParentField,
-				    "Parents:",parentList,
-				    "Add child tag:", newChildField,
-				    "Children:",childrenList
+				    "Double click to remove child",childrenList,
+				    "Add child tag:", newChildField
+				    
 				};
-				
-//				editTagPanel.add(newTagNameField);
-//				editTagPanel.add(parentList);
-//				editTagPanel.add(newParentField);
-//				editTagPanel.add(childrenList);
-//				editTagPanel.add(newChildField);
 				
 
 				int option = JOptionPane.showConfirmDialog(null, message, "Edit Tag", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
