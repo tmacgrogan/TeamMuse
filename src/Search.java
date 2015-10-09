@@ -24,8 +24,8 @@ public class Search {
 		
 		searchString = searchString.trim();
 		
-		ArrayList<String> includeTagStrings = new ArrayList<String>();
-		ArrayList<String> excludeTagStrings = new ArrayList<String>();
+		//ArrayList<String> includeTagStrings = new ArrayList<String>();
+		//ArrayList<String> excludeTagStrings = new ArrayList<String>();
 		
 		String[] splitStrings = searchString.split("\\s");
 		
