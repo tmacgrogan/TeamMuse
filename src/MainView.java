@@ -280,6 +280,26 @@ public class MainView {
 				JList parentList = new JList(parentString);
 				JList childrenList = new JList(childrenString);
 				
+				parentList.addMouseListener(new MouseAdapter() {
+				    public void mouseClicked(MouseEvent evt) {
+				    	System.out.println("Tag " + parents.get(parentList.getSelectedIndex()).getName());
+				        if (evt.getClickCount() == 2) {
+				            // Double-click detected
+				        	selectedTag.removeParent(parents.get(parentList.getSelectedIndex()));
+				        	
+				        }
+				    }
+				});
+				
+				childrenList.addMouseListener(new MouseAdapter() {
+				    public void mouseClicked(MouseEvent evt) {
+				    	System.out.println("Tag " + children.get(childrenList.getSelectedIndex()).getName());
+				        if (evt.getClickCount() == 2) {
+				            // Double-click detected
+				        	selectedTag.removeChild(children.get(childrenList.getSelectedIndex()));
+				        }
+				    }
+				});
 				
 				Object[] message = {
 				    "", newTagNameField,
@@ -300,10 +320,12 @@ public class MainView {
 				if (option == JOptionPane.OK_OPTION) {
 				    if (selectedTag.setName(newTagNameField.getText())) {
 				        System.out.println("successful");
-				    } else if (selectedTag.addParent(newParentField.getText())){
+				    }
+				    if (selectedTag.addParent(newParentField.getText())){
 				    	
 				        
-				    } else if (selectedTag.addChild(newChildField.getText())){
+				    }
+				    if (selectedTag.addChild(newChildField.getText())){
 				    	
 				    }
 				} else {
