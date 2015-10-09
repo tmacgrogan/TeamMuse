@@ -17,7 +17,7 @@ public class Tag {
 	
 	public Tag(String name){
 		this.name = name;
-		this.id = DbManager.getTagId(name);
+		this.id = getTagId();
 	}
 	
 	/**creates a TrackList containing every Track listed under This in the database, 
@@ -32,22 +32,13 @@ public class Tag {
 	 * Add a parent tag to this tag. If tag not created. 
 	 * 
 	 * @param parent
-	 * @throws SQLException 
 	 */
-	//Catch SQLException in caller and prompt user that parent already attached to this child
-	public void addParent(String parent) throws SQLException{
-
-		Tag parentTag;
-		if( DbManager.getTagId(parent) == -1 ){
-			parentTag = DbManager.insertTag(parent);
-			DbManager.insertParentTagLink(parentTag.id, id);
-		
-		}else{ 
-			parentTag = new Tag(parent);
-			DbManager.insertParentTagLink(parentTag.id, id);			
+	public void addParent(String parent){
+		int parentID = DbManager.getTagId(parent);
+		if( parentID == -1 ){
+			DbManager.insertTag(parent);
 		}
-		
-		
+		DbManager.insertParentTagLink(parentID, id);					
 	}
 	
 	/** see Track.addTag
@@ -107,20 +98,22 @@ public class Tag {
 	}
 	
 	public int getTagId(){
-		return id;
+		return DbManager.getTagId(name);
 	}
-	
-	public void setTagId(int id){
-		this.id = id;
-	}
-	
 	
 	public String getName(){
 		return name;
 	}
 	
-	public void setName(String newName){
-		name = newName;
+	public boolean setName(String newName){
+		//TODO implement validation
+		if(nameIsValid(newName)){
+			name = newName;
+			DbManager.setTagName(newName, id);
+			return true;
+		}
+		else
+			return false;
 	}
 	
 	public String getDescription(){
@@ -129,6 +122,11 @@ public class Tag {
 	
 	public void setDescription(String newDescription){
 		description = newDescription;
+	}
+	
+	private boolean nameIsValid(String name){
+		//space, comma, dash, "not", parentheses, empty/whitespace
+		return false;
 	}
 	
 	/*

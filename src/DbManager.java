@@ -190,11 +190,41 @@ public class DbManager {
 	 * @throws SQLException
 	 */
 	//Catch SQLException in caller and prompt user that parent already attached to this child
-	public static void insertParentTagLink(int parentTagID, int childTagID) throws SQLException{
-		String insert = ( "INSERT INTO ParentTagLink(ParentTagId, ChildTagId) VALUES(" + parentTagID + "," + childTagID + ");" );
-		
+	public static void insertParentTagLink(int parentTagID, int childTagID){
+		try{
+			String insert = ( "INSERT INTO ParentTagLink(ParentTagId, ChildTagId) VALUES(" + parentTagID + "," + childTagID + ");" );
 			Statement stmt = connection.createStatement();
 			stmt.executeUpdate(insert);
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void removeParent(int parentTagId, int childTagId){
+		try{
+			String delete = "DELETE FROM ParentTagLink WHERE ParentTagId = " + parentTagId + " AND ChildTagId = " + childTagId + ";";
+			Statement stmt = connection.createStatement();
+			stmt.executeUpdate(delete);
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void getParents(int tagId){
+//		String query = readSql("./db/GetParents.sql")[0];
+//		ResultSet result;
+//		try{
+//			Statement stmt = connection.createStatement();
+//			stmt.safeQuery(query, Integer.toString(tagId));
+//		}
+//		catch(SQLException e){
+//			e.printStackTrace();
+//		}
+	}
+	
+	public static void getChildren(int tagId){
 		
 	}
 	
