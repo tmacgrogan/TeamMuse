@@ -422,6 +422,7 @@ public class MainView {
 			public void mouseClicked(MouseEvent arg0) {
 				Search search = new Search(searchField.getText());
 				activeTrackList = search.executeSearch();
+				System.out.println("activeTrackList size: "+activeTrackList.size());
 				updateTrackTable();
 			}
 		});
@@ -481,6 +482,7 @@ public class MainView {
 
 	        	if ( !event.getValueIsAdjusting()) {	        		
 	        		selectedTracks.clear();
+	        		System.out.println("trackTable.getSelectedRows size: "+ trackTable.getSelectedRows().length);
 	        		for(int row : trackTable.getSelectedRows()){
 	        			
 	        			selectedTracks.add(activeTrackList.get(row));
@@ -572,7 +574,7 @@ public class MainView {
     		tagModel.addRow(new Object[]{activeTags.get(i).getName()});
     	}
     	
-    	tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
+    	//tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
 	}
 	
 	

@@ -91,12 +91,18 @@ public class TrackListController {
 	
 	@SuppressWarnings("unchecked")
 	public static ArrayList<Tag> getCommonTags(ArrayList<Track> tracksIn){
+		if(tracksIn.size() == 0) return new ArrayList<Tag>();
 		ArrayList<Track> tracks = (ArrayList<Track>) tracksIn.clone();
-		ArrayList<Tag> firstTagList = tracks.remove(0).getTags();
+		
+		System.out.println(tracks.toString());
+		System.out.println(tracks.size());
+		
+		ArrayList<Tag> firstTagList = (tracks.remove(0)).getTags();
 		ArrayList<Hashtable<Integer,Tag>> tagListHashes = new ArrayList<Hashtable<Integer, Tag>>();
 		
 		for (Track track : tracks){
-			//System.out.println(track.)
+			
+			
 			ArrayList<Tag> tagList = track.getTags();
 			
 			Hashtable<Integer, Tag> tagListHash = new Hashtable<Integer, Tag>((int)(tagList.size() * 1.5));
