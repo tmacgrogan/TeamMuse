@@ -13,7 +13,7 @@ public class Tag {
 		//TODO Sanitize tag names
 		this.name = name;
 		this.id = id;
-		if(!nameIsValid()){
+		if(!nameIsValid(name)){
 			throw new IllegalArgumentException("Tag name invalid: \"" + name + "\"");
 		}
 	}
@@ -141,30 +141,32 @@ public class Tag {
 		description = newDescription;
 	}
 	
-
 	private static boolean nameIsValid(String name){
 		//space, comma, dash, "not", parentheses, empty/whitespace
+		String trimName = name.trim();
 		
-		return true;
-	}
-	
-	private boolean nameIsValid(){
-		return nameIsValid(this.name);
+		String regex = "^[^(not|NOT|Not|NOt|nOt|noT)]{1}[^(\\s\\,\\(\\)\\-)]+$";
+		return trimName.matches(regex);
 	}
 	
 	/*
 	public static void main(String[] args){
-		DbManager.setupConnection();
+		//DbManager.setupConnection();
 		
-		Tag childTag = new Tag("Krump");
+		//rock, fast, pants, pop-punk, 
+		System.out.println("nameisValid: " + "rock" + "=" + nameIsValid("rock"));
 		
-		//Tag parenTag = new Tag("HipHop");
-		try{
-		childTag.addParent("parentTag");
-		}catch(SQLException e){
-			System.out.println("Parent and child assoc. already in database");
-			
-		}
+		System.out.println("nameisValid: " + "fast" + "=" + nameIsValid("fast"));
+		
+		System.out.println("nameisValid: " + "pop-punk" + "=" + nameIsValid("pop-punk"));
+		
+		System.out.println("nameisValid: " + "rock" + "=" + nameIsValid("rock"));
+		
+		System.out.println("nameisValid: " + "<empty-String>" + "=" + nameIsValid(""));
+		
+		System.out.println("nameisValid: " + "not" + "=" + nameIsValid("not"));
+		
+		
 	}
 	*/
 
