@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class Tag {
 
-	
+	//TODO possible structures to hold children and parents
 	private int id;
 	private String name;
 	private String description;	
@@ -27,28 +27,34 @@ public class Tag {
 	public ArrayList<Track> getTracks(){
 		return null;
 	}
+	//TODO addChild method
+	public boolean addChild(String child){
+		int childID = DbManager.getTagId(child);
+		if( childID == -1 ){
+			DbManager.insertTag(child);
+		}
+		boolean status = DbManager.insertParentTagLink(id, childID);	
+		return status;
+	}
 	
 	/**
 	 * Add a parent tag to this tag. If tag not created. 
 	 * 
 	 * @param parent
-	 * @throws SQLException 
+	 * @return status
+	 * 
 	 */
-	//Catch SQLException in caller and prompt user that parent already attached to this child
-	public void addParent(String parent) throws SQLException{
-
-		Tag parentTag;
-		if( DbManager.getTagId(parent) == -1 ){
-			parentTag = DbManager.insertTag(parent);
-			DbManager.insertParentTagLink(parentTag.id, id);
+	public boolean addParent(String parent){
 		
-		}else{ 
-			parentTag = new Tag(parent);
-			DbManager.insertParentTagLink(parentTag.id, id);			
+		int parentID = DbManager.getTagId(parent);
+		if( parentID == -1 ){
+			DbManager.insertTag(parent);
 		}
-		
-		
+		boolean status = DbManager.insertParentTagLink(parentID, id);	
+		return status;
 	}
+	
+	//TODO delete Parent and child tags
 	
 	/** see Track.addTag
 	 * avoid calling this method
@@ -130,6 +136,8 @@ public class Tag {
 	public void setDescription(String newDescription){
 		description = newDescription;
 	}
+	
+	
 	
 	/*
 	public static void main(String[] args){

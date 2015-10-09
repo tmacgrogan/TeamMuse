@@ -90,7 +90,10 @@ public class TrackListController {
 	
 	public static ArrayList<Tag> getCommonTags(ArrayList<Track> tracks){
 		System.out.println("getCommonTags passed arraylist size: "+tracks.size());
-		ArrayList<Tag> firstTagList = tracks.remove(0).getTags();
+		ArrayList<Tag> firstTagList = tracks.remove(0).getTags();//Before here tracks doesn't have anything?
+		
+		System.out.println(tracks.toString());
+		
 		System.out.println("reached");
 		ArrayList<Hashtable<Integer,Tag>> tagListHashes = new ArrayList<Hashtable<Integer, Tag>>();
 		

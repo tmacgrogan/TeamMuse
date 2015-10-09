@@ -97,11 +97,31 @@ public class DbManager {
 		}
 		return tracks;
 	}
-		
 	
+	
+	/**
+	 * 
+	 * @param trackName - file location
+	 * @return
+	 */
 	//TODO getTrackId, maybe
-	public static int getTrackId(String tagName){
-		return 0;
+	public static int getTrackId(String trackName){
+		int id = 0;
+		ResultSet existing;
+		String queryString = "SELECT * FROM Track WHERE Name LIKE ?;";
+		try{
+			existing = safeQuery(queryString, trackName);
+			if(!existing.next()){
+				id = -1;
+			}else{
+				int idCol = existing.findColumn("TrackId");
+				id = existing.getInt(idCol);
+			}
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return id;
 	}
 	
 	public static void setTagName(String newName, int tagId){
@@ -190,13 +210,22 @@ public class DbManager {
 	 * @throws SQLException
 	 */
 	//Catch SQLException in caller and prompt user that parent already attached to this child
-	public static void insertParentTagLink(int parentTagID, int childTagID) throws SQLException{
+	public static boolean insertParentTagLink(int parentTagID, int childTagID){
 		String insert = ( "INSERT INTO ParentTagLink(ParentTagId, ChildTagId) VALUES(" + parentTagID + "," + childTagID + ");" );
 		
-			Statement stmt = connection.createStatement();
-			stmt.executeUpdate(insert);
-		
+			Statement stmt;
+			boolean status = false;
+			try {
+				stmt = connection.createStatement();
+				stmt.executeUpdate(insert);
+				status = true;
+			} catch (SQLException e) {
+				//Silent 
+			}
+			return status;	
 	}
+	
+	
 	
 	/**
 	 * Inserts tagName into Tag table and returns the tag object.
