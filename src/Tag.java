@@ -35,7 +35,7 @@ public class Tag {
 			return false;
 		int childID = DbManager.getTagId(child);
 		if( childID == -1 ){
-			DbManager.insertTag(child);
+			childID = (DbManager.insertTag(child)).getTagId();
 		}
 		boolean status = DbManager.insertParentTagLink(id, childID);	
 		return status;
@@ -53,7 +53,7 @@ public class Tag {
 			return false;
 		int parentID = DbManager.getTagId(parent);
 		if( parentID == -1 ){
-			DbManager.insertTag(parent);
+			parentID = (DbManager.insertTag(parent)).getTagId();
 		}
 		boolean status = DbManager.insertParentTagLink(parentID, id);	
 		return status;
