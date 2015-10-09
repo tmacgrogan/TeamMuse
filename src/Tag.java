@@ -142,8 +142,9 @@ public class Tag {
 	}
 	
 
-	private boolean nameIsValid(String name){
+	private static boolean nameIsValid(String name){
 		//space, comma, dash, "not", parentheses, empty/whitespace
+		
 		return true;
 	}
 	

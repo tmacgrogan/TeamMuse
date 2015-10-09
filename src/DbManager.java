@@ -323,10 +323,14 @@ public class DbManager {
 	}
 	
 	private static ArrayList<Tag> tagListFromResult(ResultSet results) throws SQLException{
-		int nameCol = results.findColumn("Name");
-		int idCol = results.findColumn("TagId");
+		int nameCol = 0;
+		int idCol = 0;
 		ArrayList<Tag> tags = new ArrayList<Tag>();
 		while(results.next()){
+			if(nameCol == 0 || idCol == 0){
+				nameCol = results.findColumn("Name");
+				idCol = results.findColumn("TagId");
+			}
 			Tag tag = new Tag(results.getString(nameCol), results.getInt(idCol));
 			tags.add(tag);
 		}
