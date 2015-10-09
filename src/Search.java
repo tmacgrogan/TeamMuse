@@ -6,14 +6,87 @@ import java.util.ArrayList;
  */
 public class Search {
 	//default search terms
-	private Tag[] tagsToIntersect;
-	private Tag[] tagsToExclude;
+	private ArrayList<Tag> tagsToIntersect;
+	private ArrayList<Tag> tagsToExclude;
 	
-	public Search(Tag[] tagsToIntersect, Tag[] tagsToExclude){
+	public Search(ArrayList<Tag> tagsToIntersect, ArrayList<Tag> tagsToExclude){
 		this.tagsToIntersect = tagsToIntersect;
 		this.tagsToExclude = tagsToExclude;
 	}
 	
+	public Search(String searchString){
+		tagsToIntersect = new ArrayList<Tag>();
+		tagsToExclude = new ArrayList<Tag>();
+		parse(searchString);
+	}
+	
+	private void parse(String searchString){
+		
+		searchString = searchString.trim();
+		
+		ArrayList<String> includeTagStrings = new ArrayList<String>();
+		ArrayList<String> excludeTagStrings = new ArrayList<String>();
+		
+		String[] splitStrings = searchString.split("\\s");
+		
+		for(String curr : splitStrings){
+			if(curr.length() > 0){
+				if(curr.charAt(0)=='-'){
+					curr = curr.substring(1,(curr.length()));
+					
+					Tag currTag = new Tag(curr);
+					
+					if(currTag.getTagId() < 0 ){
+						System.out.println("Search term \""+ curr + "\" is not an existing tag");
+					}
+					else{
+						tagsToExclude.add(currTag);
+					}				
+				}else{
+					Tag currTag = new Tag(curr);
+	
+					if(currTag.getTagId() < 0 ){
+						System.out.println("Search term \""+ curr + "\" is not an existing tag");
+					}
+					else{
+						tagsToIntersect.add(currTag);
+					}				
+				}
+			}
+		}
+	}
+	
+	public void print(){
+		String toPrint = "";
+		for(Tag curr : tagsToIntersect){
+			toPrint += curr.getName() + " ";
+		}
+		System.out.println("Tags to intersect: "+toPrint);
+		
+		toPrint = "";
+		for(Tag curr : tagsToExclude){
+			toPrint += curr.getName() + " ";
+		}
+		System.out.println("Tags to exclude: "+toPrint);
+	}
+	
+	public static void test(){
+		Search testSearch = new Search("cat bat scat rat fat mat");
+		testSearch.print();
+		testSearch = new Search("cat bat scat -rat fat -mat");
+		testSearch.print();
+		testSearch = new Search(" cat bat scat -rat fat -mat");
+		testSearch.print();
+		testSearch = new Search(" cat bat scAT 	       -rat fat -mat");
+		testSearch.print();
+		testSearch = new Search(" cat bat scAT 	 afsdfak; elj489qy2pt5huo    fa  -rat fat -mat");
+		testSearch.print();
+
+//		testSearch = new Search("  -cat	 bat scAT  RAT   FAT -mat");
+//		testSearch.print();
+//		System.out.println("reached");
+	}
+		
 	/**Creates the intersection of all of the TrackLists returned by getTracks for every Tag in tagsToIntersect
 	 * Merges all of the TrackLists returned by getTracks for every Tag in tagsToExclude
 	 * @return a TrackList containing every Track found in all of the tagsToIntersect and in none of the tagsToExclude
@@ -36,19 +109,19 @@ public class Search {
 		
 	}
 	
-	public Tag[] getTagsToIntersect(){
+	public ArrayList<Tag> getTagsToIntersect(){
 		return tagsToIntersect;
 	}
 	
-	public void setTagsToIntersect(Tag[] tagsToIntersect){
+	public void setTagsToIntersect(ArrayList<Tag> tagsToIntersect){
 		this.tagsToIntersect = tagsToIntersect;
 	}
 	
-	public Tag[] getTagsToExclude(){
+	public ArrayList<Tag> getTagsToExclude(){
 		return tagsToExclude;
 	}
 	
-	public void setTagsToExclude(Tag[] tagsToExclude){
+	public void setTagsToExclude(ArrayList<Tag> tagsToExclude){
 		this.tagsToIntersect = tagsToExclude;
 	}
 }

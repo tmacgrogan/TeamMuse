@@ -72,6 +72,7 @@ public class MainView {
 	private static GroupLayout gl_leftPanel;
 	
 	private static JScrollPane scrollPane;
+	private static JButton btnEditTag;
 	//I'm here
 	
 	/*************************************************************/
@@ -112,7 +113,7 @@ public class MainView {
 	 */
 	private static void initialize() {
         /** Make dummy mp3s */
-		Util_DemoMP3.copyMP3(100 );
+		//Util_DemoMP3.copyMP3(100 );
         
 		DbManager.setupConnection();
 		
@@ -248,6 +249,44 @@ public class MainView {
 		btnAddTag.setBackground(Color.DARK_GRAY);
 		addTagPanel.add(btnAddTag, BorderLayout.SOUTH);
 		
+		btnEditTag = new JButton("Edit Tag");
+		btnEditTag.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selectedTag = activeTags.get(tagTable.getSelectedRow());
+				JTextField newTagNameField = new JTextField();
+				JTextField newParentField = new JTextField();
+				JTextField newChildField = new JTextField();
+				
+				Object[] message = {
+				    "", newTagNameField,
+				    "Add parent tag:", newParentField,
+				    "Add child tag:", newChildField
+				};
+
+				int option = JOptionPane.showConfirmDialog(null, message, "Edit Tag", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+				if (option == JOptionPane.OK_OPTION) {
+				    if (selectedTag.setName(newTagNameField.getText())) {
+				        System.out.println("successful");
+				    } else if (selectedTag.addParent(newParentField.getText())){
+				        
+				    } else if (selectedTag.addChild(newChildField.getText())){
+				    	
+				    }
+				} else {
+				    System.out.println("canceled");
+				}
+				
+				updateTagTable();
+//				
+//				String input = JOptionPane.showInputDialog("Rename " + selectedTag.getName() + " to: ");
+//				if(input.length() > 0){
+//					selectedTag.setName(input);
+//				}
+			}
+		});
+		btnEditTag.setEnabled(false);
+		addTagPanel.add(btnEditTag, BorderLayout.NORTH);
+		
 		tagInfoPanel.setForeground(Color.WHITE);
 		tagInfoPanel.setBackground(Color.DARK_GRAY);
 		rightPanel.add(tagInfoPanel, BorderLayout.CENTER);
@@ -312,8 +351,7 @@ public class MainView {
 		tagTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
 	        	btnDeleteTag.setEnabled(true);
-	        	
-	            //System.out.println(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
+	        	btnEditTag.setEnabled(true);
 	        }
 	    });
 		
@@ -341,6 +379,7 @@ public class MainView {
 		songPanel.setLayout(new BoxLayout(songPanel, BoxLayout.X_AXIS));
 		
 		scrollPane = new JScrollPane();
+		scrollPane.setOpaque(true);
 		songPanel.add(scrollPane);
 		
 		trackTable = new JTable();

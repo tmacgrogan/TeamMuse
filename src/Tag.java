@@ -9,15 +9,17 @@ public class Tag {
 	private String description;	
 	
 	//Tag pulled from the database
-	public Tag(String name, int id){
+	public Tag(String name, int id) throws IllegalArgumentException{ 
 		//TODO Sanitize tag names
-		this(name);
+		this.name = name;
 		this.id = id;
+		if(!nameIsValid(name)){
+			throw new IllegalArgumentException("Tag name invalid: \"" + name + "\"");
+		}
 	}
 	
-	public Tag(String name){
-		this.name = name;
-		this.id = getTagId();
+	public Tag(String name) throws IllegalArgumentException{
+		this(name, DbManager.getTagId(name));
 	}
 	
 	/**creates a TrackList containing every Track listed under This in the database, 
@@ -101,19 +103,19 @@ public class Tag {
 	/**
 	 * @return any Tags listed as children of This in the database.
 	 */
-	public Tag[] getChildren(){
-		return null;		
+	public ArrayList<Tag> getChildren(){
+		return DbManager.getChildren(id);		
 	}
 	
 	/**
 	 * @return any Tags listed as parents of This in the database.
 	 */
-	public Tag[] getParents(){
-		return null;
+	public ArrayList<Tag> getParents(){
+		return DbManager.getParents(id);
 	}
 	
 	public int getTagId(){
-		return DbManager.getTagId(name);
+		return id;
 	}
 	
 	public String getName(){
@@ -139,7 +141,6 @@ public class Tag {
 		description = newDescription;
 	}
 	
-	//TODO remove static
 	private static boolean nameIsValid(String name){
 		//space, comma, dash, "not", parentheses, empty/whitespace
 		String trimName = name.trim();
