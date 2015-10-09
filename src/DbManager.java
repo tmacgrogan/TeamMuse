@@ -127,13 +127,22 @@ public class DbManager {
 	//disallow [space] -atTheBeginning ( ) not
 	public static Tag addTagToTrack(String tagName, Track track){
 		
-		//space, comma, dash, "not", parentheses, empty/whitespace
+		//VALIDATION: space, comma, dash, "not", parentheses, empty/whitespace
 		String trimName = tagName.trim();
-				
-		String regex = "^[^(not|NOT|Not|NOt|nOt|noT)]{1}[^(\\s\\,\\(\\)\\-)]+$";
-		
-		if( !tagName.matches(regex) )
+		if(trimName.equalsIgnoreCase("not") || trimName.equalsIgnoreCase("") )
 			return null;
+		
+		String regex_begin ="[\\(,\\-\\s\\)].+"; 
+		String regex_middle = ".+[\\s\\,\\(\\)].+";
+		String regex_end = ".+[\\,\\(\\)]$";
+		
+		if(trimName.matches(regex_begin))
+			return null;
+		else if(trimName.matches(regex_middle))
+				return null;
+		else if(trimName.matches(regex_end))
+			return null;
+		//END VALIDATION
 		
 		ResultSet existing = null;
 		Tag tag = null;

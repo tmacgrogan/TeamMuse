@@ -1,4 +1,3 @@
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class Tag {
@@ -152,15 +151,15 @@ public class Tag {
 		description = newDescription;
 	}
 	
-	private static boolean nameIsValid(String name){
+	private boolean nameIsValid(String name){
 		//space, comma, dash, "not", parentheses, empty/whitespace
 		String trimName = name.trim();
 		if(name.equalsIgnoreCase("not") || name.equalsIgnoreCase("") )
 			return false;
 		
-		String regex_begin ="(,|-|\\s).+"; //"[\\,\\-\\(\\)\\s]";
+		String regex_begin ="[\\(,\\-\\s\\)].+"; 
 		String regex_middle = ".+[\\s\\,\\(\\)].+";
-		String regex_end = "[\\,\\(\\)]+$";
+		String regex_end = ".+[\\,\\(\\)]$";
 		
 		if(trimName.matches(regex_begin))
 			return false;
@@ -204,8 +203,17 @@ public class Tag {
 		System.out.println("nameisValid: " + "()" + "=" + nameIsValid("()"));
 		
 		System.out.println("nameisValid: " + "pop--" + "=" + nameIsValid("pop--"));	
+		
+		System.out.println("nameisValid: " + "pot-luck" + "=" + nameIsValid("pot-luck"));
+		
+		System.out.println("nameisValid: " + "(lookhere" + "=" + nameIsValid("(lookhere"));
+		
+		System.out.println("nameisValid: " + "lookhere)" + "=" + nameIsValid("lookhere)"));
+		
+		
 	}
 	*/
+	
 	
 
 }
