@@ -53,7 +53,7 @@ public class Tag {
 			return false;
 		int parentID = DbManager.getTagId(parent);
 		if( parentID == -1 ){
-			parentID = (DbManager.insertTag(parent)).getTagId();
+			parentID = DbManager.insertTag(parent).getTagId();
 		}
 		boolean status = DbManager.insertParentTagLink(parentID, id);	
 		return status;
@@ -75,6 +75,14 @@ public class Tag {
 	 */
 	public void removeTrack(Track trackBeingRemoved){
 		trackBeingRemoved.removeTag(this);
+	}
+	
+	public void removeParent(Tag parent){
+		DbManager.removeParentTagLink(parent.getTagId(), this.id);
+	}
+	
+	public void removeChild(Tag child){
+		DbManager.removeParentTagLink(this.id, child.getTagId());
 	}
 	
 	/**Searches the database to return the Tag whose name matches the passed String

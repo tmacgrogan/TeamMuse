@@ -21,6 +21,8 @@ public class MainView {
 
 	public static ArrayList<Track> activeTrackList;
 	public static ArrayList<Tag> activeTags = new ArrayList<Tag>();
+	public static ArrayList<Tag> parents;
+	public static ArrayList<Tag> children;
 	
 	private static Dimension listSize = new Dimension(610, 445);
 	
@@ -66,14 +68,16 @@ public class MainView {
 	private static JLabel lblSongList;
 	private static JLabel lblDetails;
 	private static JLabel lblTagName;
-	private static JLabel lblSearch;
 	
 	private static GroupLayout groupLayout;
 	private static GroupLayout gl_leftPanel;
 	
 	private static JScrollPane scrollPane;
 	private static JButton btnEditTag;
-	//I'm here
+	private static JButton searchButton;
+	
+	private static JList parentList;
+	private static JList childrenList;
 	
 	/*************************************************************/
 	
@@ -136,7 +140,6 @@ public class MainView {
 		playerPanel = new JPanel();
 		
 		lblTagName = new JLabel("Tag Information");
-		lblSearch = new JLabel("Search");
 		
 		btnAddTag = new JButton("Add Tag");
 		btnDeleteTag = new JButton("Delete Tag");
@@ -254,13 +257,13 @@ public class MainView {
 			@SuppressWarnings("unchecked")
 			public void actionPerformed(ActionEvent e) {
 				selectedTag = activeTags.get(tagTable.getSelectedRow());
-				ArrayList<Tag> parents = selectedTag.getParents();
-				ArrayList<Tag> children = selectedTag.getChildren();
+				parents = selectedTag.getParents();
+				children = selectedTag.getChildren();
 				
 				JPanel editTagPanel = new JPanel();
 				JTextField newTagNameField = new JTextField();
 				DefaultListModel parentModel = new DefaultListModel();
-				String[] parentString = new String[parents.size()];
+				final String[] parentString = new String[parents.size()];
 				
 				JTextField newParentField = new JTextField();
 				String[] childrenString = new String[children.size()];
@@ -270,41 +273,56 @@ public class MainView {
 				
 				for(int i = 0; i < parents.size(); i++){
 					parentString[i] = parents.get(i).getName();
-					System.out.println(parentString[i]);
 				}
 				
 				for(int i = 0; i < children.size(); i++){
 					childrenString[i] = children.get(i).getName();
-					System.out.println(childrenString[i]);
 				}
 			
-				JList parentList = new JList(parentString);
-				JList childrenList = new JList(childrenString);
+				parentList = new JList(parentString);
+				childrenList = new JList(childrenString);
 				
+				parentList.addMouseListener(new MouseAdapter() {
+				    public void mouseClicked(MouseEvent evt) {
+				    	System.out.println("Tag " + parents.get(parentList.getSelectedIndex()).getName());
+				        if (evt.getClickCount() == 2) {
+				            // Double-click detected
+				        	selectedTag.removeParent(parents.get(parentList.getSelectedIndex()));
+				        	
+				        }
+				    }
+				});
+				
+				childrenList.addMouseListener(new MouseAdapter() {
+				    public void mouseClicked(MouseEvent evt) {
+				    	System.out.println("Tag " + children.get(childrenList.getSelectedIndex()).getName());
+				        if (evt.getClickCount() == 2) {
+				            // Double-click detected
+				        	selectedTag.removeChild(children.get(childrenList.getSelectedIndex()));
+				        }
+				    }
+				});
 				
 				Object[] message = {
-				    "", newTagNameField,
+				    "Rename tag:", newTagNameField,
+				    "Double click to remove parent",parentList,
 				    "Add parent tag:", newParentField,
-				    "Parents:",parentList,
-				    "Add child tag:", newChildField,
-				    "Children:",childrenList
+				    "Double click to remove child",childrenList,
+				    "Add child tag:", newChildField
+				    
 				};
-				
-//				editTagPanel.add(newTagNameField);
-//				editTagPanel.add(parentList);
-//				editTagPanel.add(newParentField);
-//				editTagPanel.add(childrenList);
-//				editTagPanel.add(newChildField);
 				
 
 				int option = JOptionPane.showConfirmDialog(null, message, "Edit Tag", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				if (option == JOptionPane.OK_OPTION) {
 				    if (selectedTag.setName(newTagNameField.getText())) {
 				        System.out.println("successful");
-				    } else if (selectedTag.addParent(newParentField.getText())){
+				    }
+				    if (selectedTag.addParent(newParentField.getText())){
 				    	
 				        
-				    } else if (selectedTag.addChild(newChildField.getText())){
+				    }
+				    if (selectedTag.addChild(newChildField.getText())){
 				    	
 				    }
 				} else {
@@ -398,8 +416,16 @@ public class MainView {
 		searchField.setColumns(30);
 		searchPanel.add(searchField);
 		
-		lblSearch.setForeground(Color.GRAY);
-		searchPanel.add(lblSearch);
+		searchButton = new JButton("Search");
+		searchButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				Search search = new Search(searchField.getText());
+				activeTrackList = search.executeSearch();
+				updateTrackTable();
+			}
+		});
+		searchPanel.add(searchButton);
 		
 		playerPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		playerPanel.setBackground(middleBG);
