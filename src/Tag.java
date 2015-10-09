@@ -26,7 +26,7 @@ public class Tag {
 	 * @return 
 	 */
 	public ArrayList<Track> getTracks(){
-		return null;
+		return DbManager.getTracks(this);
 	}
 	//TODO addChild method
 	public boolean addChild(String child){
