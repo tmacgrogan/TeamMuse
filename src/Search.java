@@ -92,7 +92,31 @@ public class Search {
 	 * @return a TrackList containing every Track found in all of the tagsToIntersect and in none of the tagsToExclude
 	 */
 	public ArrayList<Track> executeSearch(){
-		return null;
+		ArrayList<ArrayList<Track>> intersectTrackLists = new ArrayList<ArrayList<Track>>();
+		
+		for(Tag tag : tagsToIntersect){
+			System.out.println(""+tag.getName());
+			if(tag.getTracks()==null){
+				System.out.println("trackList is null");
+			}
+			else{
+				System.out.println("not null");
+			}
+
+			intersectTrackLists.add(tag.getTracks());
+		}
+		
+		ArrayList<Track> mustBe = TrackListController.intersect(intersectTrackLists);
+		
+		ArrayList<ArrayList<Track>> excludeTrackLists = new ArrayList<ArrayList<Track>>();
+		
+		for(Tag tag : tagsToExclude){
+			excludeTrackLists.add(tag.getTracks());
+		}
+		
+		ArrayList<Track> cantBe = TrackListController.merge(excludeTrackLists);
+		
+		return TrackListController.exclude(mustBe, cantBe);		
 	}
 	
 	/**exports the results of performSearch by writing to a document to be read as a playlist by compatible programs
