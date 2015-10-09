@@ -3,21 +3,23 @@ import java.util.ArrayList;
 
 public class Tag {
 
-	
+	//TODO possible structures to hold children and parents
 	private int id;
 	private String name;
 	private String description;	
 	
 	//Tag pulled from the database
-	public Tag(String name, int id){
+	public Tag(String name, int id) throws IllegalArgumentException{ 
 		//TODO Sanitize tag names
-		this(name);
+		this.name = name;
 		this.id = id;
+		if(!nameIsValid()){
+			throw new IllegalArgumentException("Tag name invalid: \"" + name + "\"");
+		}
 	}
 	
-	public Tag(String name){
-		this.name = name;
-		this.id = getTagId();
+	public Tag(String name) throws IllegalArgumentException{
+		this(name, DbManager.getTagId(name));
 	}
 	
 	/**creates a TrackList containing every Track listed under This in the database, 
@@ -27,19 +29,34 @@ public class Tag {
 	public ArrayList<Track> getTracks(){
 		return null;
 	}
+	//TODO addChild method
+	public boolean addChild(String child){
+		int childID = DbManager.getTagId(child);
+		if( childID == -1 ){
+			DbManager.insertTag(child);
+		}
+		boolean status = DbManager.insertParentTagLink(id, childID);	
+		return status;
+	}
 	
 	/**
 	 * Add a parent tag to this tag. If tag not created. 
 	 * 
 	 * @param parent
+	 * @return status
+	 * 
 	 */
-	public void addParent(String parent){
+	public boolean addParent(String parent){
+
 		int parentID = DbManager.getTagId(parent);
 		if( parentID == -1 ){
 			DbManager.insertTag(parent);
 		}
-		DbManager.insertParentTagLink(parentID, id);					
+		boolean status = DbManager.insertParentTagLink(parentID, id);	
+		return status;
 	}
+	
+	//TODO delete Parent and child tags
 	
 	/** see Track.addTag
 	 * avoid calling this method
@@ -86,19 +103,19 @@ public class Tag {
 	/**
 	 * @return any Tags listed as children of This in the database.
 	 */
-	public Tag[] getChildren(){
-		return null;		
+	public ArrayList<Tag> getChildren(){
+		return DbManager.getChildren(id);		
 	}
 	
 	/**
 	 * @return any Tags listed as parents of This in the database.
 	 */
-	public Tag[] getParents(){
-		return null;
+	public ArrayList<Tag> getParents(){
+		return DbManager.getParents(id);
 	}
 	
 	public int getTagId(){
-		return DbManager.getTagId(name);
+		return id;
 	}
 	
 	public String getName(){
@@ -124,9 +141,14 @@ public class Tag {
 		description = newDescription;
 	}
 	
+
 	private boolean nameIsValid(String name){
 		//space, comma, dash, "not", parentheses, empty/whitespace
-		return false;
+		return true;
+	}
+	
+	private boolean nameIsValid(){
+		return nameIsValid(this.name);
 	}
 	
 	/*

@@ -88,6 +88,7 @@ public class TrackListController {
 		return toReturn;
 	}
 	
+	
 	public static ArrayList<Tag> getCommonTags(ArrayList<Track> tracksIn){
 		ArrayList<Track> tracks = (ArrayList<Track>) tracksIn.clone();
 		ArrayList<Tag> firstTagList = tracks.remove(0).getTags();
