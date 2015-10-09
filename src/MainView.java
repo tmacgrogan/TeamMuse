@@ -66,13 +66,13 @@ public class MainView {
 	private static JLabel lblSongList;
 	private static JLabel lblDetails;
 	private static JLabel lblTagName;
-	private static JLabel lblSearch;
 	
 	private static GroupLayout groupLayout;
 	private static GroupLayout gl_leftPanel;
 	
 	private static JScrollPane scrollPane;
 	private static JButton btnEditTag;
+	private static JButton searchButton;
 	//I'm here
 	
 	/*************************************************************/
@@ -136,7 +136,6 @@ public class MainView {
 		playerPanel = new JPanel();
 		
 		lblTagName = new JLabel("Tag Information");
-		lblSearch = new JLabel("Search");
 		
 		btnAddTag = new JButton("Add Tag");
 		btnDeleteTag = new JButton("Delete Tag");
@@ -398,8 +397,16 @@ public class MainView {
 		searchField.setColumns(30);
 		searchPanel.add(searchField);
 		
-		lblSearch.setForeground(Color.GRAY);
-		searchPanel.add(lblSearch);
+		searchButton = new JButton("Search");
+		searchButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				Search search = new Search(searchField.getText());
+				activeTrackList = search.executeSearch();
+				updateTrackTable();
+			}
+		});
+		searchPanel.add(searchButton);
 		
 		playerPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		playerPanel.setBackground(middleBG);
