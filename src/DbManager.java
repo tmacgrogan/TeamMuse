@@ -126,6 +126,15 @@ public class DbManager {
 	//TODO split this into component functions
 	//disallow [space] -atTheBeginning ( ) not
 	public static Tag addTagToTrack(String tagName, Track track){
+		
+		//space, comma, dash, "not", parentheses, empty/whitespace
+		String trimName = tagName.trim();
+				
+		String regex = "^[^(not|NOT|Not|NOt|nOt|noT)]{1}[^(\\s\\,\\(\\)\\-)]+$";
+		
+		if( !tagName.matches(regex) )
+			return null;
+		
 		ResultSet existing = null;
 		Tag tag = null;
 		String queryString = "SELECT * FROM Tag WHERE Name LIKE ?;";

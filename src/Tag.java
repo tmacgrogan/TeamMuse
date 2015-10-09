@@ -31,6 +31,8 @@ public class Tag {
 	}
 	//TODO addChild method
 	public boolean addChild(String child){
+		if( !nameIsValid(child) )
+			return false;
 		int childID = DbManager.getTagId(child);
 		if( childID == -1 ){
 			DbManager.insertTag(child);
@@ -47,7 +49,8 @@ public class Tag {
 	 * 
 	 */
 	public boolean addParent(String parent){
-
+		if( !nameIsValid(parent) )
+			return false;
 		int parentID = DbManager.getTagId(parent);
 		if( parentID == -1 ){
 			DbManager.insertTag(parent);
