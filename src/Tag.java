@@ -147,9 +147,21 @@ public class Tag {
 	private static boolean nameIsValid(String name){
 		//space, comma, dash, "not", parentheses, empty/whitespace
 		String trimName = name.trim();
+		if(name.equalsIgnoreCase("not") || name.equalsIgnoreCase("") )
+			return false;
 		
-		String regex = "^[^(not|NOT|Not|NOt|nOt|noT)]{1}[^(\\s\\,\\(\\)\\-)]+$";
-		return trimName.matches(regex);
+		String regex_begin ="(,|-|\\s).+"; //"[\\,\\-\\(\\)\\s]";
+		String regex_middle = ".+[\\s\\,\\(\\)].+";
+		String regex_end = "[\\,\\(\\)]+$";
+		
+		if(trimName.matches(regex_begin))
+			return false;
+		else if(trimName.matches(regex_middle))
+				return false;
+		else if(trimName.matches(regex_end))
+			return false;
+		
+		return true;
 	}
 	
 	/*
@@ -169,8 +181,23 @@ public class Tag {
 		
 		System.out.println("nameisValid: " + "not" + "=" + nameIsValid("not"));
 		
+		System.out.println("nameisValid: " + "trip" + "=" + nameIsValid("trip"));
 		
+		System.out.println("nameisValid: " + "NoT" + "=" + nameIsValid("NoT"));
+		
+		System.out.println("nameisValid: " + "-EMO" + "=" + nameIsValid("-EMO"));
+		
+		System.out.println("nameisValid: " + ",me" + "=" + nameIsValid(",me"));
+		
+		System.out.println("nameisValid: " + "my,name" + "=" + nameIsValid("my,name"));
+		
+		System.out.println("nameisValid: " + "---Hi-me" + "=" + nameIsValid("---Hi-me"));
+		
+		System.out.println("nameisValid: " + "()" + "=" + nameIsValid("()"));
+		
+		System.out.println("nameisValid: " + "pop--" + "=" + nameIsValid("pop--"));	
 	}
 	*/
+	
 
 }
