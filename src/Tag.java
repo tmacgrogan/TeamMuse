@@ -17,7 +17,7 @@ public class Tag {
 	
 	public Tag(String name){
 		this.name = name;
-		this.id = DbManager.getTagId(name);
+		this.id = getTagId();
 	}
 	
 	/**creates a TrackList containing every Track listed under This in the database, 
@@ -45,7 +45,7 @@ public class Tag {
 	 * 
 	 */
 	public boolean addParent(String parent){
-		
+
 		int parentID = DbManager.getTagId(parent);
 		if( parentID == -1 ){
 			DbManager.insertTag(parent);
@@ -113,20 +113,22 @@ public class Tag {
 	}
 	
 	public int getTagId(){
-		return id;
+		return DbManager.getTagId(name);
 	}
-	
-	public void setTagId(int id){
-		this.id = id;
-	}
-	
 	
 	public String getName(){
 		return name;
 	}
 	
-	public void setName(String newName){
-		name = newName;
+	public boolean setName(String newName){
+		//TODO implement validation
+		if(nameIsValid(newName)){
+			name = newName;
+			DbManager.setTagName(newName, id);
+			return true;
+		}
+		else
+			return false;
 	}
 	
 	public String getDescription(){
@@ -137,7 +139,12 @@ public class Tag {
 		description = newDescription;
 	}
 	
-	
+
+	private boolean nameIsValid(String name){
+		//space, comma, dash, "not", parentheses, empty/whitespace
+		
+		return false;
+	}
 	
 	/*
 	public static void main(String[] args){

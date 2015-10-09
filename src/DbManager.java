@@ -225,6 +225,23 @@ public class DbManager {
 			return status;	
 	}
 	
+	public static void removeParent(int parentTagId, int childTagId){
+		try{
+			String delete = "DELETE FROM ParentTagLink WHERE ParentTagId = " + parentTagId + " AND ChildTagId = " + childTagId + ";";
+			Statement stmt = connection.createStatement();
+			stmt.executeUpdate(delete);
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+
+	
+	public static void getChildren(int tagId){
+	
+	}
+	
 	
 	
 	/**

@@ -88,13 +88,10 @@ public class TrackListController {
 		return toReturn;
 	}
 	
-	public static ArrayList<Tag> getCommonTags(ArrayList<Track> tracks){
-		System.out.println("getCommonTags passed arraylist size: "+tracks.size());
-		ArrayList<Tag> firstTagList = tracks.remove(0).getTags();//Before here tracks doesn't have anything?
-		
-		System.out.println(tracks.toString());
-		
-		System.out.println("reached");
+	
+	public static ArrayList<Tag> getCommonTags(ArrayList<Track> tracksIn){
+		ArrayList<Track> tracks = (ArrayList<Track>) tracksIn.clone();
+		ArrayList<Tag> firstTagList = tracks.remove(0).getTags();
 		ArrayList<Hashtable<Integer,Tag>> tagListHashes = new ArrayList<Hashtable<Integer, Tag>>();
 		
 		for (Track track : tracks){
