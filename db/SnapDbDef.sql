@@ -12,7 +12,8 @@
 		TrackId INTEGER,
 		TagId INTEGER,
 		FOREIGN KEY(TrackId) REFERENCES Track(TrackId),
-		FOREIGN KEY(TagId) REFERENCES Tag(TagId));
+		FOREIGN KEY(TagId) REFERENCES Tag(TagId)
+		PRIMARY KEY(TrackId, TagId));
 		
 	CREATE TABLE IF NOT EXISTS ParentTagLink(
 		ParentTagId INTEGER,

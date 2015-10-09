@@ -35,7 +35,6 @@ public class DbManager {
 		}
 	}
 	
-	
 	public static ArrayList<Track> importTracks(ArrayList<Track> trackList){
 		String updateStr = "INSERT INTO Track ( Name, FileLocation ) VALUES ( ?, ?);";
 		for(Track t : trackList){
@@ -57,16 +56,7 @@ public class DbManager {
 			Statement stmt = connection.createStatement();
 			String statementStr = readSql("./db/GetTagsForTrack.sql")[0];
 			ResultSet results = safeQuery(statementStr, Integer.toString(track.getTrackId()));
-			int nameCol = 0;
-			int idCol = 0;
-			while(results.next()){
-				if(nameCol == 0 || idCol == 0){
-					nameCol = results.findColumn("Name");
-					idCol = results.findColumn("TagId");
-				}
-				Tag tag = new Tag(results.getString(nameCol), results.getInt(idCol));
-				tags.add(tag);
-			}
+			tags = tagListFromResult(results);
 			stmt.close();
 			//connection.commit();
 		} catch (SQLException e) {
@@ -225,7 +215,7 @@ public class DbManager {
 			return status;	
 	}
 	
-	public static void removeParent(int parentTagId, int childTagId){
+	public static void removeParentTagLink(int parentTagId, int childTagId){
 		try{
 			String delete = "DELETE FROM ParentTagLink WHERE ParentTagId = " + parentTagId + " AND ChildTagId = " + childTagId + ";";
 			Statement stmt = connection.createStatement();
@@ -236,10 +226,32 @@ public class DbManager {
 		}
 	}
 	
-
+	public static ArrayList<Tag> getParents(int tagId){
+		String query = readSql("./db/GetParents.sql")[0];
+		ResultSet result = null;
+		ArrayList<Tag> parents = new ArrayList<Tag>();
+		try{
+			result = safeQuery(query, Integer.toString(tagId));
+			parents = tagListFromResult(result);
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+		}
+		return parents;
+	}
 	
-	public static void getChildren(int tagId){
-	
+	public static ArrayList<Tag> getChildren(int tagId){
+		String query = readSql("./db/GetChildren.sql")[0];
+		ResultSet result = null;
+		ArrayList<Tag> children = new ArrayList<Tag>();
+		try{
+			result = safeQuery(query, Integer.toString(tagId));
+			children = tagListFromResult(result);
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+		}
+		return children;
 	}
 	
 	
@@ -267,6 +279,18 @@ public class DbManager {
 			e.printStackTrace();
 		}
 		return tag;
+	}
+
+	public static void removeTagFromTrack(Tag tag, Track track){
+		try{
+			//System.out.println("Removing tag " + tag.getName() + " (" + tag.getTagId() + ")");
+			Statement stmt = connection.createStatement();
+			stmt.executeUpdate("DELETE FROM TrackTag WHERE TrackId = " + track.getTrackId() + " AND TagId = " + tag.getTagId() + ";");
+			stmt.close();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	//returns list of executable statements
@@ -298,19 +322,16 @@ public class DbManager {
 		return result.split("(?<=;)"); //separate by statement
 	}
 	
-	public static void removeTagFromTrack(Tag tag, Track track){
-		try{
-			//System.out.println("Removing tag " + tag.getName() + " (" + tag.getTagId() + ")");
-			Statement stmt = connection.createStatement();
-			stmt.executeUpdate("DELETE FROM TrackTag WHERE TrackId = " + track.getTrackId() + " AND TagId = " + tag.getTagId() + ";");
-			stmt.close();
+	private static ArrayList<Tag> tagListFromResult(ResultSet results) throws SQLException{
+		int nameCol = results.findColumn("Name");
+		int idCol = results.findColumn("TagId");
+		ArrayList<Tag> tags = new ArrayList<Tag>();
+		while(results.next()){
+			Tag tag = new Tag(results.getString(nameCol), results.getInt(idCol));
+			tags.add(tag);
 		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
+		return tags;
 	}
-	
-
 	
 	private static void safeUpdate(String ... args) throws SQLException{
 		PreparedStatement statement = connection.prepareStatement(args[0]);
