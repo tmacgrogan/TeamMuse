@@ -304,7 +304,7 @@ public class MainView {
 				});
 				
 				Object[] message = {
-				    "", newTagNameField,
+				    "Rename tag:", newTagNameField,
 				    "Double click to remove parent",parentList,
 				    "Add parent tag:", newParentField,
 				    "Double click to remove child",childrenList,
