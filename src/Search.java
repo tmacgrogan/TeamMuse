@@ -96,11 +96,15 @@ public class Search {
 		
 		for(Tag tag : tagsToIntersect){
 			System.out.println(""+tag.getName());
+			
 			if(tag.getTracks()==null){
-				System.out.println("trackList is null");
+				/*******************DEBUG****************************************/
+				System.out.println("Tag: " + tag.getName());
+				System.out.println("Search:executeSearch: tag has no tracks and getTracks() returns null");
 			}
 			else{
-				System.out.println("not null");
+				/*******************DEBUG****************************************/
+				System.out.println("Search:executeSearch: tag has tracks & getTracks() does not return null");
 			}
 
 			intersectTrackLists.add(tag.getTracks());

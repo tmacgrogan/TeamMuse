@@ -422,8 +422,9 @@ public class MainView {
 			public void mouseClicked(MouseEvent arg0) {
 				Search search = new Search(searchField.getText());
 				activeTrackList = search.executeSearch();
-				System.out.println("activeTrackList size: "+activeTrackList.size());
-				updateTrackTable();
+				System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+activeTrackList.size());
+				/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
+				updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
 			}
 		});
 		searchPanel.add(searchButton);
@@ -508,7 +509,7 @@ public class MainView {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				TrackListController.importToSnap();
-				updateTrackTable();
+				updateTrackTable(true);
 			}
 		});
 		btnImport.setForeground(Color.GRAY);
@@ -545,9 +546,18 @@ public class MainView {
 		
 	}
 	
-	private static void updateTrackTable(){
+	/***********************DEBUG:Added parameter for importToSnap button and Search button to both work using this call*********/
+	private static void updateTrackTable(boolean importToSnap){
+		/*********************DEBUG:PROBLEM DISPLAYING SEARCH RESULT*****************/
+		 //At this point activeTrackList was with searched result but you call getLibrary to overwrite that correct search.
+		 //Therefore, the search result isn't displayed to user
+		/******************DEBUG*************/
+		if(importToSnap)
+			activeTrackList = DbManager.getLibrary();
 		
-		activeTrackList = DbManager.getLibrary();
+		/****************************DEBUG*****************/
+		System.out.println("MainView:updateTrackTable: activeTrackList_Size: "+ activeTrackList.size());
+		System.out.println("MainView:updateTrackTable: activeTrackList_contents: "+ activeTrackList.toString()	);
 		
 		clearTable(trackTable);
 		

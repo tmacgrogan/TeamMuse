@@ -160,6 +160,9 @@ public class TrackListController {
 					{
 						 
 						if( fileInDir.getAbsolutePath().contains("mp3")){
+							/**************************DEBUG*****************************/
+							System.out.println("A file in directory: " + fileInDir.getAbsolutePath());
+							
 							trackList.add( new Track( fileInDir.getAbsolutePath() ) );
 							//System.out.println(fileInDir.toString() );
 						}
@@ -167,12 +170,19 @@ public class TrackListController {
 					}
 					
 				}else{//isFile
-					trackList.add( new Track(file.getAbsolutePath())	);
+					/**************************DEBUG*****************************/
+					System.out.println("Selected a regular file: " + file.getAbsolutePath());
+					
+					trackList.add( new Track(file.getAbsolutePath()));
+					
 				}  
 				
 			}
 			
 		}
+		/**************************DEBUG*****************************/
+		System.out.println("Importing to tracks");
+		
 		DbManager.importTracks(trackList);
 		return trackList;
 	}

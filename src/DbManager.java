@@ -39,6 +39,9 @@ public class DbManager {
 		String updateStr = "INSERT INTO Track ( Name, FileLocation ) VALUES ( ?, ?);";
 		for(Track t : trackList){
 			try {
+				/********************DEBUG******************************/
+				System.out.println("DbManager:importTracks: (before going into database) trackLocation: " + t.getTrackLocation());
+				 
 				safeUpdate(updateStr, t.getTitle(), t.getTrackLocation());
 			}
 			catch (SQLException e) {
@@ -75,10 +78,17 @@ public class DbManager {
 			int idCol = 0;
 			while(results.next()){
 				if(nameCol == 0 || idCol == 0){
-					nameCol = results.findColumn("Name");
+					/******************CHANGE HERE*************************************/
+					nameCol = results.findColumn("FileLocation");//nameCol = results.findColumn("Name");
+					
 					idCol = results.findColumn("TrackId");
 				}
-				Track track = new Track(results.getString(nameCol), results.getInt(idCol));
+				/*********************DEBUG*********************************************/
+				String theResult = results.getString(nameCol);
+				System.out.println("DbManager:getTracks: (after imported to database)this track name: " + theResult);
+						
+						
+				Track track = new Track(theResult, results.getInt(idCol)); ;// new Track(results.getString(nameCol), results.getInt(idCol));
 				tracks.add(track);
 			}
 			stmt.close();
