@@ -94,23 +94,19 @@ public class Search {
 	public ArrayList<Track> executeSearch(){
 		ArrayList<ArrayList<Track>> intersectTrackLists = new ArrayList<ArrayList<Track>>();
 		
-		for(Tag tag : tagsToIntersect){
-			System.out.println(""+tag.getName());
-			
-			if(tag.getTracks()==null){
-				/*******************DEBUG****************************************/
-				System.out.println("Tag: " + tag.getName());
-				System.out.println("Search:executeSearch: tag has no tracks and getTracks() returns null");
+		ArrayList<Track> mustBe;
+		
+		if(tagsToIntersect.isEmpty()){
+			mustBe = DbManager.getLibrary();
+		}
+		else{
+			for(Tag tag : tagsToIntersect){
+				intersectTrackLists.add(tag.getTracks());
+				System.out.println(""+tag.getName());
 			}
-			else{
-				/*******************DEBUG****************************************/
-				System.out.println("Search:executeSearch: tag has tracks & getTracks() does not return null");
-			}
-
-			intersectTrackLists.add(tag.getTracks());
+			mustBe = TrackListController.intersect(intersectTrackLists);
 		}
 		
-		ArrayList<Track> mustBe = TrackListController.intersect(intersectTrackLists);
 		
 		ArrayList<ArrayList<Track>> excludeTrackLists = new ArrayList<ArrayList<Track>>();
 		

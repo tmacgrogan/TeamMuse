@@ -39,7 +39,11 @@ public class TrackListController {
 	 * @return the intersection of every set of toIntersect
 	 */
 	public static ArrayList<Track> intersect(ArrayList<ArrayList<Track>> toIntersect){
-		ArrayList<Track> firstTrackList = toIntersect.remove(0);
+		ArrayList<Track> firstTrackList = new ArrayList<Track>();
+		
+		if(!toIntersect.isEmpty()){
+			firstTrackList = toIntersect.remove(0);
+		}
 		
 		ArrayList<Hashtable<Integer, Track>> trackListHashes = new ArrayList<Hashtable<Integer, Track>>();
 		
