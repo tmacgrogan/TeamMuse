@@ -6,6 +6,7 @@ public class Tag {
 	private int id;
 	private String name;
 	private String description;	
+	private boolean searched; 
 	
 	//Tag pulled from the database
 	public Tag(String name, int id) throws IllegalArgumentException{ 
@@ -26,8 +27,36 @@ public class Tag {
 	 * @return 
 	 */
 	public ArrayList<Track> getTracks(){
-		return DbManager.getTracks(this);
+		ArrayList<Integer> visitedTags = new ArrayList<Integer>();
+		return this.getTracks(visitedTags);
+//		ArrayList<ArrayList<Track>> allTrackLists = new ArrayList<ArrayList<Track>>();
+//		ArrayList<Tag> visitedTags = new ArrayList<Tag>();
+//		
+//		allTrackLists.add(DbManager.getTracks(this));
+//		visitedTags.add(this);
+//		
+//		for(Tag child : this.getChildren()){
+//			allTrackLists.add(child.getTracks());			
+//		}
+//		return TrackListController.merge(allTrackLists);
 	}
+	
+	public ArrayList<Track> getTracks(ArrayList<Integer> visitedTags){
+		ArrayList<ArrayList<Track>> allTrackLists = new ArrayList<ArrayList<Track>>();
+		
+		allTrackLists.add(DbManager.getTracks(this));
+		visitedTags.add(this.getTagId());
+		
+		for(Tag child : this.getChildren()){
+			if(!visitedTags.contains(child.getTagId())){
+				allTrackLists.add(child.getTracks(visitedTags));
+				visitedTags.add(child.getTagId());
+			}						
+		}
+		
+		return TrackListController.merge(allTrackLists);
+	}
+	
 	//TODO addChild method
 	public boolean addChild(String child){
 		if( !nameIsValid(child) )
@@ -83,6 +112,7 @@ public class Tag {
 	public void removeChild(Tag child){
 		DbManager.removeParentTagLink(this.id, child.getTagId());
 	}
+	
 	
 	/**Searches the database to return the Tag whose name matches the passed String
 	 * If there are multiple matches, return the first and throw exception
