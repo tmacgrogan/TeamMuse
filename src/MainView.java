@@ -141,13 +141,29 @@ public class MainView {
 		
 		lblTagName = new JLabel("Tag Information");
 		
-		btnAddTag = new JButton("Add Tag");
+		btnAddTag = new JButton("+");
 		btnDeleteTag = new JButton("Delete Tag");
 		btnImport = new JButton("Import");
 		btnSave = new JButton("Save");
 		btnMusicPlayer = new JButton("Music Player");
 		
+		Action addTagaction = new AbstractAction()
+		{
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+				for(Track track : selectedTracks){
+					track.addTag(addTagField.getText());
+				}
+				updateTagTable();
+				addTagField.setText("");
+			}
+		};
+		
 		addTagField = new JTextField();
+		addTagField.addActionListener(addTagaction);
+		
+		
+		
 		tagInfo = new JTextField();
 		searchField = new JTextField();
 		
@@ -232,15 +248,7 @@ public class MainView {
 		btnAddTag.setEnabled(false);
 		btnAddTag.setForeground(Color.BLACK);
 		btnAddTag.setFont(new Font("Lucida Grande", Font.PLAIN, 14));
-		btnAddTag.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				for(Track track : selectedTracks){
-					track.addTag(addTagField.getText());
-				}
-				updateTagTable();
-				addTagField.setText("");
-			}
-		});
+		btnAddTag.addActionListener(addTagaction);
 		addTagPanel.setLayout(new BorderLayout(0, 0));
 		
 		addTagField.setFont(new Font("Lucida Grande", Font.PLAIN, 15));
@@ -250,7 +258,7 @@ public class MainView {
 		addTagPanel.add(addTagField);
 		btnAddTag.setPreferredSize(new Dimension(60, 30));
 		btnAddTag.setBackground(Color.DARK_GRAY);
-		addTagPanel.add(btnAddTag, BorderLayout.SOUTH);
+		addTagPanel.add(btnAddTag, BorderLayout.EAST);
 		
 		btnEditTag = new JButton("Edit Tag");
 		btnEditTag.addActionListener(new ActionListener() {
@@ -586,6 +594,7 @@ public class MainView {
     	
     	//tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
 	}
+	
 	
 	
 	/**
