@@ -448,6 +448,8 @@ public class MainView {
 		btnX.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				searchField.setText("");
+				activeTrackList = DbManager.getLibrary();
+				updateTrackTable(true);
 			}
 		});
 		searchPanel.add(btnX);
