@@ -78,6 +78,7 @@ public class MainView {
 	
 	private static JList parentList;
 	private static JList childrenList;
+	private static JButton btnX;
 	
 	/*************************************************************/
 	
@@ -166,6 +167,7 @@ public class MainView {
 		
 		tagInfo = new JTextField();
 		searchField = new JTextField();
+		
 		
 		gl_leftPanel = new GroupLayout(leftPanel);
 		groupLayout = new GroupLayout(frmSnap.getContentPane());
@@ -424,18 +426,31 @@ public class MainView {
 		searchField.setColumns(30);
 		searchPanel.add(searchField);
 		
-		searchButton = new JButton("Search");
-		searchButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				Search search = new Search(searchField.getText());
+		Action searchAction = new AbstractAction()
+		{
+		    @Override
+		    public void actionPerformed(ActionEvent e) {
+		    	Search search = new Search(searchField.getText());
 				activeTrackList = search.executeSearch();
 				System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+activeTrackList.size());
 				/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
 				updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
 			}
-		});
+		};
+		
+		searchField.addActionListener(searchAction);
+		
+		searchButton = new JButton("Search");
+		searchButton.addActionListener(searchAction);
 		searchPanel.add(searchButton);
+		
+		btnX = new JButton("X");
+		btnX.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				searchField.setText("");
+			}
+		});
+		searchPanel.add(btnX);
 		
 		playerPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		playerPanel.setBackground(middleBG);
