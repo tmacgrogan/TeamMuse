@@ -17,6 +17,11 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+/**********Java FX****************/
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+
 public class MainView {
 
 	public static ArrayList<Track> activeTrackList;
@@ -75,14 +80,14 @@ public class MainView {
 	private static JScrollPane scrollPane;
 	private static JButton searchButton;
 	
+	//TODO: Paremeterize
 	private static JList parentList;
 	private static JList childrenList;
 	private static JButton btnX;
 	
-	/*************************************************************/
-	
 	public static void main(String[] args) {
 		SnapMain();
+		JFXPanel fxPanel = new JFXPanel();
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -94,6 +99,17 @@ public class MainView {
 				}
 			}
 		});
+		
+		Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+            	//initFX(fxPanel);
+            	Scene scene =  PlayBackApplication.snapPlayBackSetup(activeTrackList, trackTable);
+        		fxPanel.setScene(scene);                
+                middlePanel.add( fxPanel, BorderLayout.SOUTH);
+            }
+       });
+
 	}
 	
 	/**
@@ -137,7 +153,7 @@ public class MainView {
 		tagInfoPanel = new JPanel();
 		searchPanel = new JPanel();
 		songPanel = new JPanel();
-		playerPanel = new JPanel();
+		//playerPanel = new JPanel();
 		
 		lblTagName = new JLabel("Tag Information");
 		
@@ -447,11 +463,11 @@ public class MainView {
 		});
 		searchPanel.add(btnX);
 		
-		playerPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		playerPanel.setBackground(middleBG);
-		middlePanel.add(playerPanel, BorderLayout.SOUTH);
+		//playerPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		//playerPanel.setBackground(middleBG);
+		//middlePanel.add(playerPanel, BorderLayout.SOUTH);
 		
-		playerPanel.add(btnMusicPlayer);
+		//playerPanel.add(btnMusicPlayer);
 		
 		middlePanel.add(songPanel, BorderLayout.CENTER);
 		
@@ -563,6 +579,10 @@ public class MainView {
 		frmSnap.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 	}
+	
+	
+	
+	
 	
 	/***********************DEBUG:Added parameter for importToSnap button and Search button to both work using this call*********/
 	private static void updateTrackTable(boolean importToSnap){
