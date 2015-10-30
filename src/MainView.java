@@ -643,7 +643,6 @@ public class MainView {
     	}
     	
     	//tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
-    	//jsomehoklsdjflaskjdf
 	}
 	
 	
