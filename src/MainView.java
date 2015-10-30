@@ -7,22 +7,16 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.*;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
-/**********Java FX****************/
-import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
 
 public class MainView {
 
@@ -35,6 +29,8 @@ public class MainView {
 	
 	public static ArrayList<Track> selectedTracks = new ArrayList<Track>();
 	public static Tag selectedTag;
+	
+	public static MetadataComparator trackComparator = new MetadataComparator("Name");
 	
 	private static JFrame frmSnap;
 	
@@ -453,6 +449,7 @@ public class MainView {
 		    public void actionPerformed(ActionEvent e) {
 		    	Search search = new Search(searchField.getText());
 				activeTrackList = search.executeSearch();
+				Collections.sort(activeTrackList, trackComparator);
 				System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+activeTrackList.size());
 				/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
 				updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
@@ -529,7 +526,7 @@ public class MainView {
 
 	        	if ( !event.getValueIsAdjusting()) {	        		
 	        		selectedTracks.clear();
-	        		System.out.println("trackTable.getSelectedRows size: "+ trackTable.getSelectedRows().length);
+	        		//System.out.println("trackTable.getSelectedRows size: "+ trackTable.getSelectedRows().length);
 	        		for(int row : trackTable.getSelectedRows()){
 	        			
 	        			selectedTracks.add(activeTrackList.get(row));
@@ -545,11 +542,17 @@ public class MainView {
 		
 		trackTable.getTableHeader().addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e){
-				int column = trackTable.columnAtPoint(e.getPoint());
-				System.out.println("Clicked column: " + trackTable.getModel().getColumnName(column));
+				String field = trackTable.getModel().getColumnName(trackTable.columnAtPoint(e.getPoint()));
+				
+				System.out.println("Clicked column: " + field);
+				
+				trackComparator.setField(field);
+				
+				updateTrackTable(false);				
 			}
 		});
 				
+		
 		trackTable.setRowSelectionAllowed(true);
 		trackTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
@@ -613,11 +616,12 @@ public class MainView {
 			activeTrackList = DbManager.getLibrary();
 		
 		/****************************DEBUG*****************/
-		System.out.println("MainView:updateTrackTable: activeTrackList_Size: "+ activeTrackList.size());
-		System.out.println("MainView:updateTrackTable: activeTrackList_contents: "+ activeTrackList.toString()	);
+//		System.out.println("MainView:updateTrackTable: activeTrackList_Size: "+ activeTrackList.size());
+//		System.out.println("MainView:updateTrackTable: activeTrackList_contents: "+ activeTrackList.toString()	);
 		
 		clearTable(trackTable);
 		
+		Collections.sort(activeTrackList, trackComparator);
 		for(int i = 0; i < activeTrackList.size(); i++){
 			Track currTrack = activeTrackList.get(i);
 			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
