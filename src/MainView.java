@@ -1,4 +1,5 @@
 import java.awt.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -16,15 +17,17 @@ import java.awt.event.MouseEvent;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 /**********Java FX****************/
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
+import java.util.function.*;
 public class MainView {
 
-	public static ArrayList<Track> activeTrackList;
+	public volatile static ArrayList<Track> activeTrackList;//volatile is thread safe
 	public static ArrayList<Tag> activeTags = new ArrayList<Tag>();
 	public static ArrayList<Tag> parents;
 	public static ArrayList<Tag> children;
@@ -47,7 +50,7 @@ public class MainView {
 	private static JTextField searchField;
 	private static JTextField addTagField;
 	
-	private static JTable trackTable;
+	private static volatile JTable trackTable;//volatile is thread safe
 	private static JTable tagTable;
 	private static JTableHeader header;
 	
@@ -89,6 +92,8 @@ public class MainView {
 		SnapMain();
 		JFXPanel fxPanel = new JFXPanel();
 		
+		
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -99,18 +104,21 @@ public class MainView {
 				}
 			}
 		});
-		
 		Platform.runLater(new Runnable() {
+			
             @Override
             public void run() {
-            	//initFX(fxPanel);
-            	Scene scene =  PlayBackApplication.snapPlayBackSetup(activeTrackList, trackTable);
+            	PlayBackApplication snapPlayBack = new PlayBackApplication();
+            	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, activeTrackList, selectedTracks);
+            	
         		fxPanel.setScene(scene);                
                 middlePanel.add( fxPanel, BorderLayout.SOUTH);
             }
        });
 
 	}
+	
+	
 	
 	/**
 	 * Create the application.
@@ -518,9 +526,18 @@ public class MainView {
 	        	if ( !event.getValueIsAdjusting()) {	        		
 	        		selectedTracks.clear();
 	        		System.out.println("trackTable.getSelectedRows size: "+ trackTable.getSelectedRows().length);
+	        		
+	        		for(int i = 0; i < trackTable.getSelectedRows().length; i++ ){
+	        			System.out.println("MainView: Selected rows indices from trackTable variable: " + trackTable.getSelectedRows()[i] );
+	        		}
+	        		
+	        		 
+	        		
+	        		//((Vector)getDataVector().elementAt(1)).elementAt(5););
 	        		for(int row : trackTable.getSelectedRows()){
-	        			
+	        			System.out.println("MainView: Songs in selected rows (accessed via trackmodel): " + ((Vector)trackModel.getDataVector().elementAt(row)).elementAt(0)) ;
 	        			selectedTracks.add(activeTrackList.get(row));
+	        			System.out.println("MainView: Songs in Selected Rows via activeTrackList: " + activeTrackList.get(row).getTitle());
 	        		}
 	        		updateTagTable();
 	        	}
@@ -602,6 +619,10 @@ public class MainView {
 		for(int i = 0; i < activeTrackList.size(); i++){
 			Track currTrack = activeTrackList.get(i);
 			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
+			
+			System.out.println("MainView: trackModel #rows: " + trackModel.getRowCount());//ME
+			
+			
 		}
 	}
 	
@@ -639,6 +660,14 @@ public class MainView {
     	for(int i = rows - 1; i >=0; i--){
     		currModel.removeRow(i); 
     	}	
+	}
+	
+	public ArrayList<Track> getActiveTrackList(){
+		return activeTrackList;
+	}
+	
+	public JTable getTrackTable(){
+		return trackTable;
 	}
 	
 	/** Adds all .mp3 files in specified folder into the Library and updates activeTrackList

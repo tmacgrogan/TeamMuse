@@ -1,10 +1,12 @@
 import java.io.File;
-
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 import javafx.application.Application;
 import javafx.embed.swing.JFXPanel;
@@ -30,27 +32,41 @@ import javafx.geometry.Pos;
 
 
 final class PlayBackApplication{//Inherently package private	
+	private MediaPlayer mediaPlayer;
+	private Media media;
+	//int  count = 0; 
+	
 	
 	
 	/**
 	 * Sets up play, stop, pause buttons and actions.
 	 * 
 	 */
-	public static Scene snapPlayBackSetup(ArrayList<Track> activeTrackList, JTable trackTable){
+	public Scene snapPlayBackSetup(DefaultTableModel trackModel, JTable trackTable, ArrayList<Track> activeTrackList, ArrayList<Track> selectedTracks){
 		//TODO change image loading to be platform independent
 		
 		//Set up buttons
-		Image playButtonImage = new Image(new File("Default_Play.png").toURI().toString());
-	    Image pauseButtonImage = new Image(new File("Default_Pause.png").toURI().toString());
-	    Image stopButtonImage = new Image(new File("Default_Stop").toURI().toString());
+		InputStream playImageInput = getClass().getResourceAsStream("Default_Play.png");
+		Image playButtonImage = new Image(playImageInput);//new File("Default_Play.png").toURI().toString());
+		
+		InputStream pauseImageInput = getClass().getResourceAsStream("Default_Pause.png");
+	    Image pauseButtonImage = new Image(pauseImageInput);//new File("Default_Pause.png").toURI().toString());
+	    
+	    InputStream stopImageInput = getClass().getResourceAsStream("Default_Stop.png");
+	    Image stopButtonImage = new Image(stopImageInput);//new File("Default_Stop").toURI().toString());
 	    
 	    ImageView imageViewPlay = new ImageView(playButtonImage);
 	    ImageView imageViewPause = new ImageView(pauseButtonImage);
 	    ImageView imageViewStop = new ImageView(stopButtonImage);
 	    
-	    Button playButton = new Button("play",imageViewPlay);
-	    Button pauseButton = new Button("pause", imageViewPause);
-	    Button stopButton = new Button("stop", imageViewStop);
+	    Button playButton = new Button(); //new Button("play",imageViewPlay);
+	    playButton.setGraphic(imageViewPlay);
+	    
+	    Button pauseButton = new Button();//new Button("pause", imageViewPause);
+	    pauseButton.setGraphic(imageViewPause);
+	    
+	    Button stopButton = new Button();//new Button("stop", imageViewStop);
+	    stopButton.setGraphic(imageViewStop);
 	    
 	    HBox mediaBar = new HBox(5.0);
 	    mediaBar.setPadding(new Insets(5, 10, 5, 10));
@@ -58,133 +74,117 @@ final class PlayBackApplication{//Inherently package private
         
         
 		//Add action listeners to button
-       // MediaPlayer mediaPlayer;
-        
-        EventHandler<ActionEvent> evtHandler = (ActionEvent) -> {
-			//EventHandler<ActionEvent> eventHandler = new EventHandler<ActionEvent>(){
-			//@Override
-			//public void handle(ActionEvent event){
+        EventHandler<ActionEvent> evtHandler = (ActionEvent e) -> {
 				int songRow = trackTable.getSelectedRow(); //first index selected if multiple selected
-				if(songRow == -1){
+				
+				System.out.println("PlayBackApplication: trackTable has selected row int: " + songRow);
+				
+				if(songRow == -1){//-1 returned by trackTable if no row selected
 					return;//Nothing selected
 				}
-				String songAbsPath = activeTrackList.get(songRow).getTrackLocation();
+				String songAbsPath = selectedTracks.get(0).getTrackLocation();//(String)((Vector)trackModel.getDataVector().elementAt(songRow)).elementAt(0);
+				System.out.println("PlayBackApplication: activeTrackList: " + activeTrackList.get(songRow).getTrackLocation());
+				System.out.println("PlayBackApplication: selectedTracks: " + selectedTracks.get(0).getTrackLocation());
+				System.out.println("PlayBackApplicaiton: trackModel got: " + songAbsPath);
+				
 				
 				//Sanitize absolute path for compliance with JavaFX
 				songAbsPath = new File(songAbsPath).toURI().toString();
 				
-				Media media = new Media(songAbsPath);
-				MediaPlayer mediaPlayer = new MediaPlayer(media);
+				System.out.println("PlayBackApplication: Song being played after URI then toString (string from trackModel): " + songAbsPath);
 				
-				MediaPlayer.Status status = mediaPlayer.getStatus();
-	            if (status == MediaPlayer.Status.UNKNOWN || status == MediaPlayer.Status.HALTED){ 
-
-	            	System.out.println("PlayBackApplication: snapPlayBackSetup: (play)MediaPlayer.Status before play= " + status.toString());
-	            	mediaPlayer.play();
-	            	System.out.println("PlayBackApplication: snapPlayBackSetup: (play)MediaPlayer.Status after play = " + status.toString());
-	                //return;
-	            }
-	            else if(status == MediaPlayer.Status.READY)
-	            	System.out.println("PlayBackApplication: snapPlayBackSetup: (play)MediaPlayer.Status = " + status.toString());
-	            	//mediaPlayer.play();
-			//}
+				this.media = new Media(songAbsPath);
+				this.mediaPlayer = new MediaPlayer(media);
+				
+				
+				mediaPlayer.setOnReady(new Runnable(){
+					@Override
+					public void run(){
+						//System.out.println(media.getDuration());
+						//System.out.println(media.getDuration().toMinutes());
 					
-						
-		//};	
-		//return eventHandler;
-		};
+				
+						MediaPlayer.Status status = mediaPlayer.getStatus();
+				
+				
+						switch(status){
+							case UNKNOWN:
+								System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+								
+								//mediaPlayer.play();
+								//mediaPlayer.stop();
+								break;
+								
+							case READY:
+								System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+								mediaPlayer.play();
+								break;
+								
+							case PAUSED:
+								System.out.println("The new status: in paused" + mediaPlayer.getStatus());
+								System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+								if(e.getSource().equals(playButton))
+									mediaPlayer.play();
+								else if(e.getSource().equals(stopButton))
+									mediaPlayer.stop();
+								break;
+								
+							case PLAYING:
+								System.out.println("The new status: in playing  " + mediaPlayer.getStatus());
+								System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+								if(e.getSource().equals(pauseButton))
+									mediaPlayer.pause();
+								else if(e.getSource().equals(stopButton))
+									mediaPlayer.stop();
+								break;
+								
+							case STALLED:
+								System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+								if(e.getSource().equals(pauseButton))
+									mediaPlayer.pause();
+								else if(e.getSource().equals(playButton))
+									mediaPlayer.play();
+								break;
+								
+							case STOPPED:
+								System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+								if(e.getSource().equals(playButton))
+									mediaPlayer.play();
+								if(e.getSource().equals(pauseButton))
+									mediaPlayer.pause();	
+				}
+				/*
+				if(e.getSource().equals(playButton)){
+					System.out.println("playButton");
+					(this.mediaPlayer).play();
+				}
+				else if(e.getSource().equals(stopButton)){
+					System.out.println("stopButton");
+					(this.mediaPlayer).stop();
+				}
+				else if(e.getSource().equals(pauseButton)){
+					System.out.println("pauseButton");
+					(this.mediaPlayer).pause();
+				}
+				*/
+					}
+				});
+				
+		};//END lambda expression
         
-		playButton.setOnAction( evtHandler);
+		playButton.setOnAction(evtHandler);
 		mediaBar.getChildren().add(playButton);
 		
-		stopButton.setOnAction( new EventHandler<ActionEvent>(){
-			
-			@Override
-			public void handle(ActionEvent event){
-				int songRow = trackTable.getSelectedRow(); //first index selected if multiple selected
-				if(songRow == -1){
-					return;//Nothing selected
-				}
-				String songAbsPath = activeTrackList.get(songRow).getTrackLocation();
-				
-				//Sanitize absolute path for compliance with JavaFX
-				songAbsPath = new File(songAbsPath).toURI().toString();
-				
-				Media media = new Media(songAbsPath);
-				MediaPlayer mediaPlayer = new MediaPlayer(media);
-				
-				MediaPlayer.Status status = mediaPlayer.getStatus();
-	            if (status == MediaPlayer.Status.UNKNOWN || status == MediaPlayer.Status.HALTED){ 
-
-	            	System.out.println("PlayBackApplication: snapPlayBackSetup: (stop)MediaPlayer.Status before stop = " + status.toString());
-	            	mediaPlayer.stop();
-	            	System.out.println("PlayBackApplication: snapPlayBackSetup: (stop)MediaPlayer.Status after stop = " + status.toString());
-	                //return;
-	            }
-	            else if(status == MediaPlayer.Status.PLAYING || status == MediaPlayer.Status.PAUSED || status == MediaPlayer.Status.STALLED)
-	            	System.out.println("PlayBackApplication: snapPlayBackSetup: (stop)MediaPlayer.Status = " + status.toString());
-	            	//mediaPlayer.stop();
-			}
-						
-		});
+		stopButton.setOnAction(evtHandler);
 		mediaBar.getChildren().add(stopButton);
 		
-		pauseButton.setOnAction( new EventHandler<ActionEvent>(){
-			
-			@Override
-			public void handle(ActionEvent event){
-				int songRow = trackTable.getSelectedRow(); //first index selected if multiple selected
-				if(songRow == -1){
-					return;//Nothing selected
-				}
-				String songAbsPath = activeTrackList.get(songRow).getTrackLocation();
-				
-				//Sanitize absolute path for compliance with JavaFX
-				songAbsPath = new File(songAbsPath).toURI().toString();
-				
-				Media media = new Media(songAbsPath);
-				MediaPlayer mediaPlayer = new MediaPlayer(media);
-				
-				MediaPlayer.Status status = mediaPlayer.getStatus();
-	            if (status == MediaPlayer.Status.UNKNOWN || status == MediaPlayer.Status.HALTED){ 
-
-	            	System.out.println("PlayBackApplication: snapPlayBackSetup: (stop)MediaPlayer.Status before pause= " + status.toString());
-	            	mediaPlayer.pause();
-	            	System.out.println("PlayBackApplication: snapPlayBackSetup: (stop)MediaPlayer.Status after pause = " + status.toString());
-	                //return;
-	            }
-	            else if(status == MediaPlayer.Status.PLAYING || status == MediaPlayer.Status.STOPPED || status == MediaPlayer.Status.STALLED)
-	            	System.out.println("PlayBackApplication: snapPlayBackSetup: (stop)MediaPlayer.Status = " + status.toString());
-	            	//mediaPlayer.pause();
-			}
-						
-		});
+		pauseButton.setOnAction(evtHandler);
 		mediaBar.getChildren().add(pauseButton);
 		
 		BorderPane borderPane = new BorderPane(mediaBar);
 		Scene scene = new Scene(borderPane);
 			 
 		return scene;
-	}
-	
-	/**
-	 * JavaFX doesn't work with backslash.
-	 * Strips FILE protocol. Replaces back-slash with forward-slash
-	 */
-	//TODO make unicode safe 
-	private static String sanitizePath(String absPath){
-		String newAbsPath = "";
-		for(int i=3; i < absPath.length(); i++){
-			char c = absPath.charAt(i);
-			if(c == 92){//"\"
-				newAbsPath += "/";
-			}else{
-				newAbsPath += c;
-			}
-			
-		}
-		System.out.println("PlayBackApplication: sanitizePath call: " + newAbsPath);
-		return newAbsPath;	
 	}
 	
 }
