@@ -204,7 +204,7 @@ final class PlayBackApplication{//Inherently package private
 				//songAbsPath = selectedTracks.get(0).getTrackLocation();
 				//(String)((Vector)trackModel.getDataVector().elementAt(songRow)).elementAt(0);
 				
-				System.out.println("PlayBackApplication: activeTrackList: " + activeTrackList.get(songRow).getTrackLocation());
+				//System.out.println("PlayBackApplication: activeTrackList: " + activeTrackList.get(songRow).getTrackLocation());
 				System.out.println("PlayBackApplication: selectedTracks: " + selectedTracks.get(0).getTrackLocation());
 				System.out.println("PlayBackApplicaiton: trackModel got: " + songAbsPath);
 				System.out.println("PlayBackApplication: Song being played after URI then toString (string from trackModel): " + songAbsPath);
