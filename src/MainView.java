@@ -684,6 +684,7 @@ public class MainView {
 	public JTable getTrackTable(){
 		return trackTable;
 	}
+	
 	private static JButton addTagButton(Tag curTag){
 		Icon xIcon = new ImageIcon("/Users/TvO/School/Fall 2015/CS 4911/TeamMuseOld/src/xIcon.jpg");
 		JButton newTagButton = new JButton(xIcon);
@@ -693,11 +694,10 @@ public class MainView {
         final JPopupMenu popup = new JPopupMenu();
         popup.add(new JMenuItem(new AbstractAction("Delete") {
             public void actionPerformed(ActionEvent e) {
-            	selectedTag = activeTags.get(tagTable.getSelectedRow());
             	
 				
 				for(Track track : selectedTracks){
-					track.removeTag(selectedTag);
+					track.removeTag(curTag);
 				}
 				
 				updateTagTable();
