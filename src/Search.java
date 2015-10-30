@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * The Search class holds a group of Tags that correspond to the sets of songs associated with those Tag either intersected, excluded, or merged.
@@ -116,7 +117,18 @@ public class Search {
 		
 		ArrayList<Track> cantBe = TrackListController.merge(excludeTrackLists);
 		
-		return TrackListController.exclude(mustBe, cantBe);		
+		ArrayList<Track> finalList = TrackListController.exclude(mustBe, cantBe);
+		
+//		Collections.swap(finalList, 3, 9);
+//		Collections.swap(finalList, 0, 10);
+//		Collections.swap(finalList, 1, 9);
+//		Collections.swap(finalList, 2, 8);
+		
+//		Collections.reverse(finalList);
+//		
+//		Collections.sort(finalList, new MetadataComparator("Name"));
+			
+		return finalList;		
 	}
 	
 	/**exports the results of performSearch by writing to a document to be read as a playlist by compatible programs

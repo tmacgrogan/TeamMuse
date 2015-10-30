@@ -19,12 +19,10 @@ import com.sun.glass.ui.Application;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
 
-/**********Java FX****************/
+import java.util.Collections;
+
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -32,7 +30,7 @@ import javafx.scene.Scene;
 import java.util.function.*;
 public class MainView {
 
-	public volatile static ArrayList<Track> activeTrackList;//volatile is thread safe
+	public static ArrayList<Track> activeTrackList;
 	public static ArrayList<Tag> activeTags = new ArrayList<Tag>();
 	public static ArrayList<Tag> parents;
 	public static ArrayList<Tag> children;
@@ -41,6 +39,8 @@ public class MainView {
 	
 	public static ArrayList<Track> selectedTracks = new ArrayList<Track>();
 	public static Tag selectedTag;
+	
+	public static MetadataComparator trackComparator = new MetadataComparator("Name");
 	
 	private static JFrame frmSnap;
 	
@@ -55,7 +55,7 @@ public class MainView {
 	private static JTextField searchField;
 	private static JTextField addTagField;
 	
-	private static volatile JTable trackTable;//volatile is thread safe
+	private static JTable trackTable;
 	private static JTable tagTable;
 	private static JTableHeader header;
 	
@@ -469,6 +469,7 @@ public class MainView {
 		    public void actionPerformed(ActionEvent e) {
 		    	Search search = new Search(searchField.getText());
 				activeTrackList = search.executeSearch();
+				Collections.sort(activeTrackList, trackComparator);
 				System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+activeTrackList.size());
 				/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
 				updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
@@ -547,17 +548,8 @@ public class MainView {
 	        		selectedTracks.clear();
 	        		System.out.println("trackTable.getSelectedRows size: "+ trackTable.getSelectedRows().length);
 	        		
-	        		System.out.println("The selected column is: " + trackTable.getSelectedColumn());
-	        		
-	        		for(int i = 0; i < trackTable.getSelectedRows().length; i++ ){
-	        			System.out.println("MainView: Selected rows indices from trackTable variable: " + trackTable.getSelectedRows()[i] );
-	        		}
-	        		
-	        		 
-	        		
-	        		//((Vector)getDataVector().elementAt(1)).elementAt(5););
+
 	        		for(int row : trackTable.getSelectedRows()){
-	        			System.out.println("MainView: Songs in selected rows (accessed via trackmodel): " + ((Vector)trackModel.getDataVector().elementAt(row)).elementAt(0)) ;
 	        			selectedTracks.add(activeTrackList.get(row));
 	        			System.out.println("MainView: Songs in Selected Rows via activeTrackList: " + activeTrackList.get(row).getTitle());
 	        		}
@@ -569,6 +561,19 @@ public class MainView {
 	            //System.out.println(songTable.getValueAt(songTable.getSelectedRow(), 0).toString());
 	        }
 	    });
+		
+		trackTable.getTableHeader().addMouseListener(new MouseAdapter(){
+			public void mouseClicked(MouseEvent e){
+				String field = trackTable.getModel().getColumnName(trackTable.columnAtPoint(e.getPoint()));
+				
+				System.out.println("Clicked column: " + field);
+				
+				trackComparator.setField(field);
+				
+				updateTrackTable(false);				
+			}
+		});
+				
 		
 		trackTable.setRowSelectionAllowed(true);
 		trackTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -633,11 +638,12 @@ public class MainView {
 			activeTrackList = DbManager.getLibrary();
 		
 		/****************************DEBUG*****************/
-		System.out.println("MainView:updateTrackTable: activeTrackList_Size: "+ activeTrackList.size());
-		System.out.println("MainView:updateTrackTable: activeTrackList_contents: "+ activeTrackList.toString()	);
+//		System.out.println("MainView:updateTrackTable: activeTrackList_Size: "+ activeTrackList.size());
+//		System.out.println("MainView:updateTrackTable: activeTrackList_contents: "+ activeTrackList.toString()	);
 		
 		clearTable(trackTable);
 		
+		Collections.sort(activeTrackList, trackComparator);
 		for(int i = 0; i < activeTrackList.size(); i++){
 			Track currTrack = activeTrackList.get(i);
 			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
