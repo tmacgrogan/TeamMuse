@@ -34,6 +34,9 @@ import javafx.geometry.Pos;
 final class PlayBackApplication{//Inherently package private	
 	private MediaPlayer mediaPlayer;
 	private Media media;
+	private String songAbsPath;
+	private boolean firstPlay = true;
+	//private MediaPlayer.Status status;
 	
 	public PlayBackApplication(){
 		
@@ -82,34 +85,192 @@ final class PlayBackApplication{//Inherently package private
 				
 				System.out.println("PlayBackApplication: trackTable has selected row int: " + songRow);
 				
+				//Catch condition that no song is collected
 				if(songRow == -1){//-1 returned by trackTable if no row selected
 					return;//Nothing selected
 				}
-				String songAbsPath = selectedTracks.get(0).getTrackLocation();//(String)((Vector)trackModel.getDataVector().elementAt(songRow)).elementAt(0);
+				
+				/*************A Song is selected at this point*************/
+				String selectedSong = selectedTracks.get(0).getTrackLocation();
+				System.out.println("PlayBackApplication: SelectedSong: " + selectedSong);
+				
+				
+				//First ever initialization of songAbsPath instance. After this, it should always have a string
+				//First ever initialization of mediaPlayer instance. After this, it should always have a media
+				if((songAbsPath == null)){
+					System.out.println("PlayBackApplication: songAbsPath is null: " + (songAbsPath == null) );
+					//Sanitize absolute path for compliance with JavaFX
+					songAbsPath = new File(selectedSong).toURI().toString();
+					media = new Media(songAbsPath);
+					mediaPlayer = new MediaPlayer(media);
+				}
+				
+				System.out.println("PlayBackApplication: MediaPlayer Status after setting up since null: " + mediaPlayer.getStatus());
+				
+				String selectedSongURI = new File(selectedSong).toURI().toString();
+				
+				System.out.println("PlayBackApplicaiton: After if conditional, songAbsPath still null? " + (songAbsPath == null));
+				System.out.println("PlayBackApplication: selectedSongURI: " + selectedSongURI);
+				System.out.println("PlayBackApplication: songAbsPath: "+ songAbsPath);
+				System.out.println("PlayBackApplication: selectedSongURI is same as songAbsPath: " + songAbsPath.equals(selectedSongURI) );
+				
+				
+				System.out.println("PlayBackApplication: songAbsPath!= null: " + (songAbsPath != null) +": songAbsPath.equals(selectedSongURI): " + songAbsPath.equals(selectedSongURI));
+				//We have a previous song in instance and it is not equal to what is selected now
+				if( (songAbsPath != null)&& !(songAbsPath.equals(selectedSongURI)) ){
+					System.out.println("PlayBackApplication: songAbsPath equal to selectedSong: " + songAbsPath.equals(selectedSongURI) );
+					
+					System.out.println("PlayBackApplicaiton: Status: " + mediaPlayer.getStatus());
+					//Stop playing other song
+					mediaPlayer.stop();
+					
+					//Start working on THIS new selected song
+					
+					//Sanitize absolute path for compliance with JavaFX
+					songAbsPath = new File(selectedSong).toURI().toString();//Need to remember current selection globally
+					media = new Media(songAbsPath);
+					mediaPlayer = new MediaPlayer(media);
+				
+					System.out.println("PlayBackApplication: About to go to setOnReady call");
+					mediaPlayer.setOnReady(new Runnable(){
+						@Override
+						public void run(){
+					
+							MediaPlayer.Status status = mediaPlayer.getStatus();
+					
+							System.out.println("PlayBackApplicaiton: In setOnReady call: Status: " + status);
+							switch(status){
+								case UNKNOWN:
+									System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+									
+									//mediaPlayer.play();
+									//mediaPlayer.stop();
+									break;
+									
+								case READY:
+									System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+									mediaPlayer.play();
+									break;
+									
+								case PAUSED:
+									System.out.println("The new status: in paused" + mediaPlayer.getStatus());
+									System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+									if(e.getSource().equals(playButton))
+										mediaPlayer.play();
+									else if(e.getSource().equals(stopButton))
+										mediaPlayer.stop();
+									break;
+									
+								case PLAYING:
+									System.out.println("The new status: in playing  " + mediaPlayer.getStatus());
+									System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+									if(e.getSource().equals(pauseButton))
+										mediaPlayer.pause();
+									else if(e.getSource().equals(stopButton))
+										mediaPlayer.stop();
+									break;
+									
+								case STALLED:
+									System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+									if(e.getSource().equals(pauseButton))
+										mediaPlayer.pause();
+									else if(e.getSource().equals(playButton))
+										mediaPlayer.play();
+									break;
+									
+								case STOPPED:
+									System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+									if(e.getSource().equals(playButton))
+										mediaPlayer.play();
+									if(e.getSource().equals(pauseButton))
+										mediaPlayer.pause();	
+							}
+				
+						}
+					});
+					System.out.println("PlayBackApplicaiton: At end of if? ");
+					
+				}
+				//We have a song previously selected and the current song selected is that same song
+				
+				else if((songAbsPath != null) && (songAbsPath.equals(selectedSongURI))){
+					
+				
+					/*****Selected song is still same song mediaPlayer is playing****************/
+					
+				//songAbsPath = selectedTracks.get(0).getTrackLocation();
+				//(String)((Vector)trackModel.getDataVector().elementAt(songRow)).elementAt(0);
+				
 				System.out.println("PlayBackApplication: activeTrackList: " + activeTrackList.get(songRow).getTrackLocation());
 				System.out.println("PlayBackApplication: selectedTracks: " + selectedTracks.get(0).getTrackLocation());
 				System.out.println("PlayBackApplicaiton: trackModel got: " + songAbsPath);
-				
-				
-				//Sanitize absolute path for compliance with JavaFX
-				songAbsPath = new File(songAbsPath).toURI().toString();
-				
 				System.out.println("PlayBackApplication: Song being played after URI then toString (string from trackModel): " + songAbsPath);
 				
-				this.media = new Media(songAbsPath);
-				this.mediaPlayer = new MediaPlayer(media);
-				
-				//if(){}
-				mediaPlayer.setOnReady(new Runnable(){
-					@Override
-					public void run(){
-						//System.out.println(media.getDuration());
-						//System.out.println(media.getDuration().toMinutes());
+			
+				if(!firstPlay){
+					MediaPlayer.Status status = mediaPlayer.getStatus();
+					switch(status){
+					case UNKNOWN:
+						System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+						
+						//mediaPlayer.play();
+						//mediaPlayer.stop();
+						break;
+						
+					case READY:
+						System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+						mediaPlayer.play();
+						break;
+						
+					case PAUSED:
+						System.out.println("The new status: in paused" + mediaPlayer.getStatus());
+						System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+						if(e.getSource().equals(playButton))
+							mediaPlayer.play();
+						else if(e.getSource().equals(stopButton))
+							mediaPlayer.stop();
+						break;
+						
+					case PLAYING:
+						System.out.println("The new status: in playing  " + mediaPlayer.getStatus());
+						System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+						if(e.getSource().equals(pauseButton))
+							mediaPlayer.pause();
+						else if(e.getSource().equals(stopButton))
+							mediaPlayer.stop();
+						break;
+						
+					case STALLED:
+						System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+						if(e.getSource().equals(pauseButton))
+							mediaPlayer.pause();
+						else if(e.getSource().equals(playButton))
+							mediaPlayer.play();
+						break;
+						
+					case STOPPED:
+						System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+						if(e.getSource().equals(playButton))
+							mediaPlayer.play();
+						if(e.getSource().equals(pauseButton))
+							mediaPlayer.pause();	
+				}
 					
-				
+					
+			}//END !firstPlay conditional
+				else if(firstPlay){
+				mediaPlayer.setOnReady(new Runnable(){
+							
+
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+								
+						
+						
 						MediaPlayer.Status status = mediaPlayer.getStatus();
-				
-				
+						System.out.println("PlayBackApplication: Inside else statment. Status is: " + status);
+						
 						switch(status){
 							case UNKNOWN:
 								System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
@@ -155,24 +316,14 @@ final class PlayBackApplication{//Inherently package private
 									mediaPlayer.play();
 								if(e.getSource().equals(pauseButton))
 									mediaPlayer.pause();	
-				}
-				/*
-				if(e.getSource().equals(playButton)){
-					System.out.println("playButton");
-					(this.mediaPlayer).play();
-				}
-				else if(e.getSource().equals(stopButton)){
-					System.out.println("stopButton");
-					(this.mediaPlayer).stop();
-				}
-				else if(e.getSource().equals(pauseButton)){
-					System.out.println("pauseButton");
-					(this.mediaPlayer).pause();
-				}
-				*/
+						}
 					}
 				});
-				
+				firstPlay = false;
+				}//END firstPlay conditional
+					//}
+				//});
+			}	
 		};//END lambda expression
         
 		playButton.setOnAction(evtHandler);
