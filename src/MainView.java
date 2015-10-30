@@ -7,7 +7,9 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.*;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
@@ -541,6 +543,13 @@ public class MainView {
 	        }
 	    });
 		
+		trackTable.getTableHeader().addMouseListener(new MouseAdapter(){
+			public void mouseClicked(MouseEvent e){
+				int column = trackTable.columnAtPoint(e.getPoint());
+				System.out.println("Clicked column: " + trackTable.getModel().getColumnName(column));
+			}
+		});
+				
 		trackTable.setRowSelectionAllowed(true);
 		trackTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
