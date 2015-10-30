@@ -84,6 +84,7 @@ public class MainView {
 	private static JList parentList;
 	private static JList childrenList;
 	private static JButton btnX;
+	private static JPanel tagButtonPanel;
 	
 	public static void main(String[] args) {
 		SnapMain();
@@ -100,15 +101,15 @@ public class MainView {
 			}
 		});
 		
-		Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-            	//initFX(fxPanel);
-            	Scene scene =  PlayBackApplication.snapPlayBackSetup(activeTrackList, trackTable);
-        		fxPanel.setScene(scene);                
-                middlePanel.add( fxPanel, BorderLayout.SOUTH);
-            }
-       });
+//		Platform.runLater(new Runnable() {
+//            @Override
+//            public void run() {
+//            	//initFX(fxPanel);
+//            	Scene scene =  PlayBackApplication.snapPlayBackSetup(activeTrackList, trackTable);
+//        		fxPanel.setScene(scene);                
+//                middlePanel.add( fxPanel, BorderLayout.SOUTH);
+//            }
+//       });
 
 	}
 	
@@ -215,6 +216,7 @@ public class MainView {
 		middlePanel.setBackground(frameBG);
 		
 		rightPanel.setBackground(sideBG);
+		rightPanel.setPreferredSize(new Dimension(180, height));
 		
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -419,6 +421,14 @@ public class MainView {
 		});
 		
 		tagInfoPanel.add(btnDeleteTag, BorderLayout.SOUTH);
+		
+		tagButtonPanel = new JPanel();
+		tagButtonPanel.setOpaque(true);
+		tagButtonPanel.setBackground(Color.DARK_GRAY);
+		tagButtonPanel.setPreferredSize(new Dimension(100, height-100));
+		tagInfoPanel.add(tagButtonPanel, BorderLayout.WEST);
+		
+		Icon xIcon = new ImageIcon("xIcon.jpg");
 		middlePanel.setLayout(new BorderLayout(0, 0));
 		
 		tagTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
@@ -615,11 +625,15 @@ public class MainView {
     		tagModel.removeRow(i); 
     	}
     	
+    	tagButtonPanel.removeAll();
+    	
     	activeTags = TrackListController.getCommonTags(selectedTracks);
     	
     	//populates rows with tags of selected track
     	for(int i = 0; i < activeTags.size(); i++){
     		tagModel.addRow(new Object[]{activeTags.get(i).getName()});
+    		JButton newTagButton = addTagButton(activeTags.get(i));
+    		tagButtonPanel.add(newTagButton);
     	}
     	
     	//tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
@@ -640,6 +654,39 @@ public class MainView {
     		currModel.removeRow(i); 
     	}	
 	}
+	
+	private static JButton addTagButton(Tag curTag){
+		Icon xIcon = new ImageIcon("/Users/TvO/School/Fall 2015/CS 4911/TeamMuseOld/src/xIcon.jpg");
+		JButton newTagButton = new JButton(xIcon);
+		newTagButton.setText(curTag.getName());
+		
+		//Create the popup menu.
+        final JPopupMenu popup = new JPopupMenu();
+        popup.add(new JMenuItem(new AbstractAction("Delete") {
+            public void actionPerformed(ActionEvent e) {
+            	selectedTag = activeTags.get(tagTable.getSelectedRow());
+            	
+				
+				for(Track track : selectedTracks){
+					track.removeTag(selectedTag);
+				}
+				
+				updateTagTable();
+            }
+        }));
+
+		
+		newTagButton.addMouseListener(new MouseAdapter() {
+		    public void mousePressed(MouseEvent click) {
+		    	if (SwingUtilities.isRightMouseButton(click)){
+		    		popup.show(click.getComponent(), click.getX(), click.getY());
+		    	}
+		    }
+		});
+		
+		return newTagButton;
+	}
+	
 	
 	/** Adds all .mp3 files in specified folder into the Library and updates activeTrackList
 	 * @param folderLocation location of folder containing files to import 
