@@ -102,8 +102,7 @@ public class MainView {
 				}
 			}
 		});
-//		//Application.invokeLater(runnable);
-//		System.out.println(Platform.isFxApplicationThread());
+		
 //		Platform.runLater(new Runnable() {
 //            @Override
 //            public void run() {
@@ -433,8 +432,6 @@ public class MainView {
 		tagButtonPanel.setPreferredSize(new Dimension(100, height-100));
 		tagInfoPanel.add(tagButtonPanel, BorderLayout.EAST);
 		tagButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-		
-		
 		middlePanel.setLayout(new BorderLayout(0, 0));
 		
 		tagTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
