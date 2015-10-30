@@ -7,8 +7,11 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
@@ -335,6 +338,9 @@ public class MainView {
 		    public void mousePressed(MouseEvent click) {
 		        if (click.getClickCount() == 2) {
 		            System.out.println(tagTable.getSelectedRow());
+		            
+		            
+		            
 		            selectedTag = activeTags.get(tagTable.getSelectedRow());
 					parents = selectedTag.getParents();
 					children = selectedTag.getChildren();
@@ -537,6 +543,8 @@ public class MainView {
 	        	if ( !event.getValueIsAdjusting()) {	        		
 	        		selectedTracks.clear();
 	        		System.out.println("trackTable.getSelectedRows size: "+ trackTable.getSelectedRows().length);
+	        		
+	        		System.out.println("The selected column is: " + trackTable.getSelectedColumn());
 	        		
 	        		for(int i = 0; i < trackTable.getSelectedRows().length; i++ ){
 	        			System.out.println("MainView: Selected rows indices from trackTable variable: " + trackTable.getSelectedRows()[i] );

@@ -34,7 +34,10 @@ import javafx.geometry.Pos;
 final class PlayBackApplication{//Inherently package private	
 	private MediaPlayer mediaPlayer;
 	private Media media;
-	//int  count = 0; 
+	
+	public PlayBackApplication(){
+		
+	}
 	
 	
 	
@@ -96,7 +99,7 @@ final class PlayBackApplication{//Inherently package private
 				this.media = new Media(songAbsPath);
 				this.mediaPlayer = new MediaPlayer(media);
 				
-				
+				//if(){}
 				mediaPlayer.setOnReady(new Runnable(){
 					@Override
 					public void run(){
