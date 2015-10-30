@@ -118,6 +118,8 @@ final class PlayBackApplication{//Inherently package private
 				System.out.println("PlayBackApplication: songAbsPath!= null: " + (songAbsPath != null) +": songAbsPath.equals(selectedSongURI): " + songAbsPath.equals(selectedSongURI));
 				//We have a previous song in instance and it is not equal to what is selected now
 				if( (songAbsPath != null)&& !(songAbsPath.equals(selectedSongURI)) ){
+					System.out.println();
+					System.out.println("We have a previous song in instance and it is not equal to what is selected now");
 					System.out.println("PlayBackApplication: songAbsPath equal to selectedSong: " + songAbsPath.equals(selectedSongURI) );
 					
 					System.out.println("PlayBackApplicaiton: Status: " + mediaPlayer.getStatus());
@@ -194,7 +196,8 @@ final class PlayBackApplication{//Inherently package private
 				//We have a song previously selected and the current song selected is that same song
 				
 				else if((songAbsPath != null) && (songAbsPath.equals(selectedSongURI))){
-					
+					System.out.println();
+					System.out.println("We have a song previously selected and the current song selected is that same song");
 				
 					/*****Selected song is still same song mediaPlayer is playing****************/
 					
@@ -209,6 +212,7 @@ final class PlayBackApplication{//Inherently package private
 			
 				if(!firstPlay){
 					MediaPlayer.Status status = mediaPlayer.getStatus();
+					System.out.println("[PlayBackApplication: !firstPlay: " + !firstPlay);
 					switch(status){
 					case UNKNOWN:
 						System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
@@ -259,6 +263,7 @@ final class PlayBackApplication{//Inherently package private
 					
 			}//END !firstPlay conditional
 				else if(firstPlay){
+					System.out.println("PlayBackApplication: firstPlay: " + firstPlay);
 				mediaPlayer.setOnReady(new Runnable(){
 							
 
@@ -280,26 +285,37 @@ final class PlayBackApplication{//Inherently package private
 								break;
 								
 							case READY:
-								System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+								
 								mediaPlayer.play();
+								System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status after play)" + status);
 								break;
 								
 							case PAUSED:
-								System.out.println("The new status: in paused" + mediaPlayer.getStatus());
-								System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
-								if(e.getSource().equals(playButton))
+								System.out.println("PlayBackApplication: Status: in paused case: " + mediaPlayer.getStatus());
+								
+								if(e.getSource().equals(playButton)){
 									mediaPlayer.play();
-								else if(e.getSource().equals(stopButton))
+									System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+									System.out.println("PlayBackApplication: Status: in paused case: after play" + mediaPlayer.getStatus());
+								}
+								else if(e.getSource().equals(stopButton)){
 									mediaPlayer.stop();
+									System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
+									System.out.println("PlayBackApplication: Status: in paused case: after stop " + mediaPlayer.getStatus());
+								}
 								break;
 								
 							case PLAYING:
-								System.out.println("The new status: in playing  " + mediaPlayer.getStatus());
+								System.out.println("PlayBackApplication: Status : in playing:  " + mediaPlayer.getStatus());
 								System.out.println("PlayBackApplication: snapPlayBackSetup (source): " + e.getSource() + ": (status)" + status);
-								if(e.getSource().equals(pauseButton))
+								if(e.getSource().equals(pauseButton)){
 									mediaPlayer.pause();
-								else if(e.getSource().equals(stopButton))
+									System.out.println("PlayBackApplication: Status : in playing:  " + mediaPlayer.getStatus());
+								}
+								else if(e.getSource().equals(stopButton)){
 									mediaPlayer.stop();
+									System.out.println("PlayBackApplication: Status : in playing:  " + mediaPlayer.getStatus());
+								}
 								break;
 								
 							case STALLED:
