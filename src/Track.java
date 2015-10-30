@@ -13,167 +13,193 @@ import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
 
 /**
- * A Track references a single audio file in the Library.
- * Avoid duplicating metadata stored by the audio file itself.
+ * A Track references a single audio file in the Library. Avoid duplicating
+ * metadata stored by the audio file itself.
  */
 public class Track {
-	
-	private int id;
-	//private String Album;
-	//private String Artist;
-	
-	private MP3File mp3File;
-	
-	//private String Genre;
-	private String Location;//Absolute path
 
-	//private String Title;
-	
-	public Track(String location, int trackId){
+	private int id;
+	// private String Album;
+	// private String Artist;
+
+	private MP3File mp3File;
+	private Date importDate;
+	// private String Genre;
+	private String Location;// Absolute path
+
+	// private String Title;
+
+	public Track(String location, int trackId) {
 		this(location);
 		this.id = trackId;
 	}
-	
-	public Track(String location){
+
+	public Track(String location) {
 		Location = location;
-		
-		//AudioFile
+
+		// AudioFile
 		try {
-			
-			AudioFile audioFile = AudioFileIO.read(new File(location) );
+
+			AudioFile audioFile = AudioFileIO.read(new File(location));
 			mp3File = (MP3File) audioFile;
-			
-		}catch (CannotReadException e) {
-			
+
+		} catch (CannotReadException e) {
+
 			System.out.println("Cannot read the file");
 			e.printStackTrace();
-			
-		}catch (IOException e) {
-			
+
+		} catch (IOException e) {
+
 			e.printStackTrace();
-			
-		}catch (TagException e) {
-			
+
+		} catch (TagException e) {
+
 			System.out.println("Jaudiotagger reports tag exception");
 			e.printStackTrace();
-			
-		}catch (ReadOnlyFileException e) {
-			
+
+		} catch (ReadOnlyFileException e) {
+
 			System.out.println("Jaudiotagger reports read only exception");
 			e.printStackTrace();
-			
-		}catch (InvalidAudioFrameException e) {
-			
+
+		} catch (InvalidAudioFrameException e) {
+
 			System.out.println("Jaudiotagger reports invalid audio frame "
-					            + "exception");
-			
+					+ "exception");
+
 			e.printStackTrace();
 		}
-		
-		
+
 	}
 
-	
-	public void addTag(String name){
+	public void addTag(String name) {
 		DbManager.addTagToTrack(name, this);
 	}
-	
-	/**Removes tagBeingRemoved's unique identifier from the This's SNAP ID3 Frame.
-	 * Updates the database so This is not found when searching for tagBeingRemoved.
-	 * @param tagBeingRemoved the Tag whose unique identifier is removed from ID3
+
+	/**
+	 * Removes tagBeingRemoved's unique identifier from the This's SNAP ID3
+	 * Frame. Updates the database so This is not found when searching for
+	 * tagBeingRemoved.
+	 * 
+	 * @param tagBeingRemoved
+	 *            the Tag whose unique identifier is removed from ID3
 	 */
-	public void removeTag(Tag tagBeingRemoved){
+	public void removeTag(Tag tagBeingRemoved) {
 		DbManager.removeTagFromTrack(tagBeingRemoved, this);
 	}
-	
+
 	/**
-	 * Return Album of Track.
-	 * Return empty string if no Track info frame.
+	 * Return Album of Track. Return empty string if no Track info frame.
+	 * 
 	 * @return String
 	 */
-	public String getAlbum(){
+	public String getAlbum() {
 		AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
-		
-		//ID3v2.3 or ID3v2.4 so use abstract
+
+		// ID3v2.3 or ID3v2.4 so use abstract
 		String album = ID3v2Tag.getFirst(FieldKey.ALBUM);
 		return album;
 	}
-	
+
 	/**
-	 * Return artist of track. 
-	 * Return empty string if no artist info (i.e TOPE, TPE1 frame)
-	 * @return String 
+	 * Return artist of track. Return empty string if no artist info (i.e TOPE,
+	 * TPE1 frame)
+	 * 
+	 * @return String
 	 */
-	public String getArtist(){
+	public String getArtist() {
 		AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
-		
-		//ID3v2.3 or ID3v2.4 so use abstract
+
+		// ID3v2.3 or ID3v2.4 so use abstract
 		String artist = ID3v2Tag.getFirst(FieldKey.ARTIST);
 		return artist;
 	}
-	
+
 	/**
-	 * Return Genre of Track.
-	 * Return empty string if no genre frame (i.e TCON)
+	 * Return Genre of Track. Return empty string if no genre frame (i.e TCON)
+	 * 
 	 * @return String
 	 */
-	public String getGenre(){
+	public String getGenre() {
 		AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
-		
-		//ID3v2.3 or ID3v2.4 so use abstract
+
+		// ID3v2.3 or ID3v2.4 so use abstract
 		String genre = ID3v2Tag.getFirst(FieldKey.GENRE);
 		return genre;
 	}
-	
+
 	/**
 	 * Return absolute path of file
+	 * 
 	 * @return String
 	 */
-	public String getTrackLocation(){
+	public String getTrackLocation() {
 		return Location;
 	}
-	
-	/**Parses through audioFile's SNAP ID3 Frame to retrieve unique identifiers, then compares those identifiers with Tags in the AllTagsList
-	 * @return collection of all Tags found in audioFile's SNAP ID3 Frame. Returns an empty array if the Frame does not exist. 
+
+	/**
+	 * Parses through audioFile's SNAP ID3 Frame to retrieve unique identifiers,
+	 * then compares those identifiers with Tags in the AllTagsList
+	 * 
+	 * @return collection of all Tags found in audioFile's SNAP ID3 Frame.
+	 *         Returns an empty array if the Frame does not exist.
 	 */
-	public ArrayList<Tag> getTags(){
+	public ArrayList<Tag> getTags() {
 		return DbManager.getTags(this);
 	}
-	
+
 	/**
-	 * Return Track title.
-	 * Return relative file name if no title frame (i.e no TIT2)
+	 * Return Track title. Return relative file name if no title frame (i.e no
+	 * TIT2)
+	 * 
 	 * @return
 	 */
-	public String getTitle(){
+	public String getTitle() {
 		AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
-		
-		//ID3v2.3 or ID3v2.4 so use abstract
+
+		// ID3v2.3 or ID3v2.4 so use abstract
 		String title = ID3v2Tag.getFirst(FieldKey.TITLE);
-		if(title == ""){
-			return MP3File.getBaseFilename( mp3File.getFile() );
+		if (title == "") {
+			return MP3File.getBaseFilename(mp3File.getFile());
 		}
 		return title;
 	}
-	/**I don't really know how we should do this. Maybe make a separate ID3 class? 	 * 
+
+	/**
+	 * I don't really know how we should do this. Maybe make a separate ID3
+	 * class? *
+	 * 
 	 * @return
 	 */
-	public String[][] getID3(){
-		return null;		
+	public String[][] getID3() {
+		return null;
+	}
+
+	public void setImportDate(Date date){
+		importDate = date;
 	}
 	
-	public void setTrackId(int id){
+	public Date getImportDate(){
+		if(importDate == null){
+			importDate = DbManager.getTrackCreatedDate(id);
+		}
+		return importDate;
+	}
+	
+	public void setTrackId(int id) {
 		this.id = id;
 	}
-	
-	public int getTrackId(){
+
+	public int getTrackId() {
 		return id;
 	}
-	
-	/** Need some sort of plan for doing this.
+
+	/**
+	 * Need some sort of plan for doing this.
+	 * 
 	 * @param args
 	 */
-	public void editID3(String[] args){
-		
+	public void editID3(String[] args) {
+
 	}
 }
