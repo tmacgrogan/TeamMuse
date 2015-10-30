@@ -11,6 +11,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import com.sun.glass.ui.Application;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.lang.reflect.Array;
@@ -84,6 +86,7 @@ public class MainView {
 	private static JList parentList;
 	private static JList childrenList;
 	private static JButton btnX;
+	private static JPanel tagButtonPanel;
 	
 	public static void main(String[] args) {
 		SnapMain();
@@ -99,16 +102,17 @@ public class MainView {
 				}
 			}
 		});
-		
-		Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-            	//initFX(fxPanel);
-            	Scene scene =  PlayBackApplication.snapPlayBackSetup(activeTrackList, trackTable);
-        		fxPanel.setScene(scene);                
-                middlePanel.add( fxPanel, BorderLayout.SOUTH);
-            }
-       });
+//		//Application.invokeLater(runnable);
+//		System.out.println(Platform.isFxApplicationThread());
+//		Platform.runLater(new Runnable() {
+//            @Override
+//            public void run() {
+//            	//initFX(fxPanel);
+//            	Scene scene =  PlayBackApplication.snapPlayBackSetup(activeTrackList, trackTable);
+//        		fxPanel.setScene(scene);                
+//                middlePanel.add( fxPanel, BorderLayout.SOUTH);
+//            }
+//       });
 
 	}
 	
@@ -213,8 +217,10 @@ public class MainView {
 		middlePanel.setBorder(new LineBorder(Color.DARK_GRAY));
 		middlePanel.setForeground(Color.WHITE);
 		middlePanel.setBackground(frameBG);
+
 		
 		rightPanel.setBackground(sideBG);
+		rightPanel.setPreferredSize(new Dimension(180, height));
 		
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -313,11 +319,12 @@ public class MainView {
 			}
 		});
 		tagTable.getColumnModel().getColumn(0).setResizable(false);
-		tagTable.getColumnModel().getColumn(0).setMaxWidth(2147483599);
+		tagTable.getColumnModel().getColumn(0).setMaxWidth(100);
 		tagTable.setBackground(Color.DARK_GRAY);
 		tagTable.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		tagTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tagTable.setShowVerticalLines(false);
+		tagTable.setPreferredSize(new Dimension(180, height));
 		tagInfoPanel.add(tagTable, BorderLayout.CENTER);
 		
 		tagTable.addMouseListener(new MouseAdapter() {
@@ -419,6 +426,15 @@ public class MainView {
 		});
 		
 		tagInfoPanel.add(btnDeleteTag, BorderLayout.SOUTH);
+		
+		tagButtonPanel = new JPanel();
+		tagButtonPanel.setOpaque(true);
+		tagButtonPanel.setBackground(Color.DARK_GRAY);
+		tagButtonPanel.setPreferredSize(new Dimension(100, height-100));
+		tagInfoPanel.add(tagButtonPanel, BorderLayout.EAST);
+		tagButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		
 		middlePanel.setLayout(new BorderLayout(0, 0));
 		
 		tagTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
@@ -615,14 +631,19 @@ public class MainView {
     		tagModel.removeRow(i); 
     	}
     	
+    	tagButtonPanel.removeAll();
+    	
     	activeTags = TrackListController.getCommonTags(selectedTracks);
     	
     	//populates rows with tags of selected track
     	for(int i = 0; i < activeTags.size(); i++){
     		tagModel.addRow(new Object[]{activeTags.get(i).getName()});
+    		JButton newTagButton = addTagButton(activeTags.get(i));
+    		tagButtonPanel.add(newTagButton);
     	}
     	
     	//tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
+    	//jsomehoklsdjflaskjdf
 	}
 	
 	
@@ -635,11 +656,93 @@ public class MainView {
 		
 		DefaultTableModel currModel = (DefaultTableModel) T.getModel();
 		
+		tagButtonPanel.removeAll();
+		
 		int rows = currModel.getRowCount(); 
     	for(int i = rows - 1; i >=0; i--){
     		currModel.removeRow(i); 
     	}	
 	}
+	
+	private static JButton addTagButton(Tag curTag){
+		Icon xIcon = new ImageIcon("/Users/TvO/School/Fall 2015/CS 4911/TeamMuse/src/xIcon.jpg");
+		JButton newTagButton = new JButton(xIcon);
+		newTagButton.setText(curTag.getName());
+		
+		//Create the popup menu.
+        final JPopupMenu popup = new JPopupMenu();
+        popup.add(new JMenuItem(new AbstractAction("Delete") {
+            public void actionPerformed(ActionEvent e) {
+				
+				for(Track track : selectedTracks){
+					track.removeTag(curTag);
+				}
+				
+				updateTagTable();
+            }
+        }));
+
+		
+		newTagButton.addMouseListener(new MouseAdapter() {
+		    public void mousePressed(MouseEvent click) {
+		    	if (SwingUtilities.isRightMouseButton(click)){
+		    		popup.show(click.getComponent(), click.getX(), click.getY());
+		    	}else if (SwingUtilities.isLeftMouseButton(click)){
+					children = curTag.getChildren();
+					
+					JPanel editTagPanel = new JPanel();
+					JTextField newTagNameField = new JTextField();
+					newTagNameField.setText(curTag.getName());
+					
+					String[] childrenString = new String[children.size()];
+					
+					DefaultListModel childModel = new DefaultListModel();
+					JTextField newChildField = new JTextField();
+					
+					
+					for(int i = 0; i < children.size(); i++){
+						childrenString[i] = children.get(i).getName();
+					}
+					childrenList = new JList(childrenString);
+					
+					childrenList.addMouseListener(new MouseAdapter() {
+					    public void mouseClicked(MouseEvent evt) {
+					    	System.out.println("Tag " + children.get(childrenList.getSelectedIndex()).getName());
+					        if (evt.getClickCount() == 2) {
+					            // Double-click detected
+					        	curTag.removeChild(children.get(childrenList.getSelectedIndex()));
+					        }
+					    }
+					});
+					
+					Object[] message = {
+					    "Rename tag:", newTagNameField,
+					    "Double click to remove child",childrenList,
+					    "Add child tag:", newChildField
+					    
+					};
+					
+
+					int option = JOptionPane.showConfirmDialog(null, message, "Edit Tag", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+					if (option == JOptionPane.OK_OPTION) {
+					    if (curTag.setName(newTagNameField.getText())) {
+					        System.out.println("successful");
+					    }
+					    if (curTag.addChild(newChildField.getText())){
+					    	
+					    }
+					} else {
+					    System.out.println("canceled");
+					}
+					
+					updateTagTable();
+		    	}
+		    }
+		});
+		
+		return newTagButton;
+	}
+	
 	
 	/** Adds all .mp3 files in specified folder into the Library and updates activeTrackList
 	 * @param folderLocation location of folder containing files to import 
