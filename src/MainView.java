@@ -11,6 +11,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import com.sun.glass.ui.Application;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -212,6 +214,7 @@ public class MainView {
 		middlePanel.setBorder(new LineBorder(Color.DARK_GRAY));
 		middlePanel.setForeground(Color.WHITE);
 		middlePanel.setBackground(frameBG);
+
 		
 		rightPanel.setBackground(sideBG);
 		rightPanel.setPreferredSize(new Dimension(180, height));
@@ -313,11 +316,12 @@ public class MainView {
 			}
 		});
 		tagTable.getColumnModel().getColumn(0).setResizable(false);
-		tagTable.getColumnModel().getColumn(0).setMaxWidth(2147483599);
+		tagTable.getColumnModel().getColumn(0).setMaxWidth(100);
 		tagTable.setBackground(Color.DARK_GRAY);
 		tagTable.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		tagTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tagTable.setShowVerticalLines(false);
+		tagTable.setPreferredSize(new Dimension(180, height));
 		tagInfoPanel.add(tagTable, BorderLayout.CENTER);
 		
 		tagTable.addMouseListener(new MouseAdapter() {
@@ -424,9 +428,8 @@ public class MainView {
 		tagButtonPanel.setOpaque(true);
 		tagButtonPanel.setBackground(Color.DARK_GRAY);
 		tagButtonPanel.setPreferredSize(new Dimension(100, height-100));
-		tagInfoPanel.add(tagButtonPanel, BorderLayout.WEST);
-		
-		Icon xIcon = new ImageIcon("xIcon.jpg");
+		tagInfoPanel.add(tagButtonPanel, BorderLayout.EAST);
+		tagButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		middlePanel.setLayout(new BorderLayout(0, 0));
 		
 		tagTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
@@ -662,6 +665,8 @@ public class MainView {
 		
 		DefaultTableModel currModel = (DefaultTableModel) T.getModel();
 		
+		tagButtonPanel.removeAll();
+		
 		int rows = currModel.getRowCount(); 
     	for(int i = rows - 1; i >=0; i--){
     		currModel.removeRow(i); 
@@ -669,7 +674,7 @@ public class MainView {
 	}
 	
 	private static JButton addTagButton(Tag curTag){
-		Icon xIcon = new ImageIcon("/Users/TvO/School/Fall 2015/CS 4911/TeamMuseOld/src/xIcon.jpg");
+		Icon xIcon = new ImageIcon("/Users/TvO/School/Fall 2015/CS 4911/TeamMuse/src/xIcon.jpg");
 		JButton newTagButton = new JButton(xIcon);
 		newTagButton.setText(curTag.getName());
 		
@@ -677,11 +682,9 @@ public class MainView {
         final JPopupMenu popup = new JPopupMenu();
         popup.add(new JMenuItem(new AbstractAction("Delete") {
             public void actionPerformed(ActionEvent e) {
-            	selectedTag = activeTags.get(tagTable.getSelectedRow());
-            	
 				
 				for(Track track : selectedTracks){
-					track.removeTag(selectedTag);
+					track.removeTag(curTag);
 				}
 				
 				updateTagTable();
@@ -693,6 +696,55 @@ public class MainView {
 		    public void mousePressed(MouseEvent click) {
 		    	if (SwingUtilities.isRightMouseButton(click)){
 		    		popup.show(click.getComponent(), click.getX(), click.getY());
+		    	}else if (SwingUtilities.isLeftMouseButton(click)){
+					children = curTag.getChildren();
+					
+					JPanel editTagPanel = new JPanel();
+					JTextField newTagNameField = new JTextField();
+					newTagNameField.setText(curTag.getName());
+					
+					String[] childrenString = new String[children.size()];
+					
+					DefaultListModel childModel = new DefaultListModel();
+					JTextField newChildField = new JTextField();
+					
+					
+					for(int i = 0; i < children.size(); i++){
+						childrenString[i] = children.get(i).getName();
+					}
+					childrenList = new JList(childrenString);
+					
+					childrenList.addMouseListener(new MouseAdapter() {
+					    public void mouseClicked(MouseEvent evt) {
+					    	System.out.println("Tag " + children.get(childrenList.getSelectedIndex()).getName());
+					        if (evt.getClickCount() == 2) {
+					            // Double-click detected
+					        	curTag.removeChild(children.get(childrenList.getSelectedIndex()));
+					        }
+					    }
+					});
+					
+					Object[] message = {
+					    "Rename tag:", newTagNameField,
+					    "Double click to remove child",childrenList,
+					    "Add child tag:", newChildField
+					    
+					};
+					
+
+					int option = JOptionPane.showConfirmDialog(null, message, "Edit Tag", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+					if (option == JOptionPane.OK_OPTION) {
+					    if (curTag.setName(newTagNameField.getText())) {
+					        System.out.println("successful");
+					    }
+					    if (curTag.addChild(newChildField.getText())){
+					    	
+					    }
+					} else {
+					    System.out.println("canceled");
+					}
+					
+					updateTagTable();
 		    	}
 		    }
 		});
