@@ -9,19 +9,21 @@ public class Search {
 	//default search terms
 	private ArrayList<Tag> tagsToIntersect;
 	private ArrayList<Tag> tagsToExclude;
+	private String searchString;
 	
-	public Search(ArrayList<Tag> tagsToIntersect, ArrayList<Tag> tagsToExclude){
-		this.tagsToIntersect = tagsToIntersect;
-		this.tagsToExclude = tagsToExclude;
-	}
+//	public Search(ArrayList<Tag> tagsToIntersect, ArrayList<Tag> tagsToExclude){
+//		this.tagsToIntersect = tagsToIntersect;
+//		this.tagsToExclude = tagsToExclude;
+//	}
 	
 	public Search(String searchString){
+		this.searchString = searchString;
 		tagsToIntersect = new ArrayList<Tag>();
 		tagsToExclude = new ArrayList<Tag>();
-		parse(searchString);
+		parse();
 	}
 	
-	private void parse(String searchString){
+	private void parse(){
 		
 		searchString = searchString.trim();
 		
@@ -141,8 +143,8 @@ public class Search {
 	/**Saves this Search so it can be accessed later--saves to database so it can be found after closing and reopening
 	 * 
 	 */
-	public void favoriteThisSearch(){
-		
+	public void favoriteSearch(){
+		DbManager.saveSearch(searchString);
 	}
 	
 	public ArrayList<Tag> getTagsToIntersect(){

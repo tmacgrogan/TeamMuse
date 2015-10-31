@@ -166,8 +166,8 @@ public class Tag {
 		//TODO implement validation
 		if(nameIsValid(newName)){
 			name = newName;
-			DbManager.setTagName(newName, id);
-			return true;
+			boolean success = DbManager.setTagName(newName, id);
+			return success;
 		}
 		else
 			return false;
@@ -194,7 +194,7 @@ public class Tag {
 		if(trimName.matches(regex_begin))
 			return false;
 		else if(trimName.matches(regex_middle))
-				return false;
+			return false;
 		else if(trimName.matches(regex_end))
 			return false;
 		

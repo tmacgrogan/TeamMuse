@@ -162,6 +162,20 @@ public class MainView {
 		btnDeleteTag = new JButton("Delete Tag");
 		btnImport = new JButton("Import");
 		btnSave = new JButton("Save");
+		btnSave.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String text = searchField.getText();
+				if(text != null && !text.isEmpty()) {
+			    	Search search = new Search(text);
+					activeTrackList = search.executeSearch();
+					System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+activeTrackList.size());
+					/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
+					updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
+					search.favoriteSearch();
+				}
+			}
+		});
 		btnMusicPlayer = new JButton("Music Player");
 		
 		Action addTagaction = new AbstractAction()
