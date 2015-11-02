@@ -1,5 +1,6 @@
 import java.awt.*;
 
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -27,7 +28,9 @@ import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
+
 import java.util.function.*;
+
 public class MainView {
 
 	public static ArrayList<Track> activeTrackList;
@@ -101,28 +104,33 @@ public class MainView {
 		
 		
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					MainView window = new MainView();
 					window.frmSnap.setVisible(true);
+					
+					fxPanel.setOpaque(true);
+					fxPanel.setBackground(middleBG);
+					middlePanel.add(fxPanel, BorderLayout.SOUTH);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+		
 		Platform.runLater(new Runnable() {
 			
             @Override
             public void run() {
             	PlayBackApplication snapPlayBack = new PlayBackApplication();
-            	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, activeTrackList, selectedTracks);
+            	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, selectedTracks);
             	
-        		fxPanel.setScene(scene);                
-                middlePanel.add( fxPanel, BorderLayout.SOUTH);
+        		fxPanel.setScene(scene);
             }
        });
-
-
+		
+		
 	}
 	
 	
@@ -240,7 +248,7 @@ public class MainView {
 		leftPanel.setBackground(sideBG);
 		
 		middlePanel.setBorder(new LineBorder(Color.DARK_GRAY));
-		middlePanel.setForeground(Color.WHITE);
+		middlePanel.setForeground(middleBG);//Color.WHITE);
 		middlePanel.setBackground(frameBG);
 
 		
