@@ -298,7 +298,23 @@ public class DbManager {
 			e.printStackTrace();
 		}
 	}
-
+	
+	public static ArrayList<Search> getSavedSearches(){
+		ArrayList<Search> searches = new ArrayList<Search>();
+		ResultSet results = null;
+		try {
+			Statement stmt = connection.createStatement();
+			results = stmt.executeQuery("SELECT * FROM Search;");
+			while (results.next()) {
+				Search search = new Search(results.getString("SearchText"));
+				searches.add(search);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return searches;
+	}
+	
 	/**
 	 * Inserts tagName into Tag table and returns the tag object.
 	 * 
