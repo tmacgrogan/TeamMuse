@@ -651,6 +651,26 @@ public class MainView {
 			}
 		});
 		
+		savedSearchTable.setOpaque(true);
+		savedSearchTable.setBackground(middleBG);
+		
+		savedSearchTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+	        public void valueChanged(ListSelectionEvent event) {
+
+	        	if ( !event.getValueIsAdjusting()) {	
+	        		System.out.println(savedSearchTable.getSelectedRow());
+	        		Search search = savedSearches.get(savedSearchTable.getSelectedRow());
+	        		searchField.setText(search.getSearchText());
+	        		activeTrackList = search.executeSearch();
+	        		updateTrackTable(false);
+//	        		for(int row : trackTable.getSelectedRows()){
+//	        			selectedTracks.add(activeTrackList.get(row));
+//	        			System.out.println("MainView: Songs in Selected Rows via activeTrackList: " + activeTrackList.get(row).getTitle());
+//	        		}
+//	        		updateTagTable();
+	        	}
+	        }
+	    });
 		
 		
 		gl_leftPanel.setHorizontalGroup(
@@ -719,7 +739,6 @@ public class MainView {
 			System.out.println("butt: " + savedSearches.get(i).getSearchText());
 			searchModel.addRow(new Object[]{savedSearches.get(i).getSearchText()});
 		}
-		searchModel.addRow(new Object[]{"shit butt"});
 	}
 	
 	private static void updateTagTable() {
