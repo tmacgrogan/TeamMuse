@@ -33,6 +33,7 @@ public class MainView {
 
 	public static ArrayList<Track> activeTrackList;
 	public static ArrayList<Tag> activeTags = new ArrayList<Tag>();
+	public static ArrayList<Search> savedSearches = new ArrayList<Search>();
 	public static ArrayList<Tag> parents;
 	public static ArrayList<Tag> children;
 	
@@ -59,6 +60,8 @@ public class MainView {
 	private static JTable trackTable;
 	private static JTable tagTable;
 	private static JTableHeader header;
+	
+	private static JTable savedSearchTable;
 	
 	private static JPanel leftPanel;
 	private static JPanel middlePanel;
@@ -135,9 +138,12 @@ public class MainView {
 		initialize();
 		
 		activeTrackList = DbManager.getLibrary();
+		savedSearches = DbManager.getSavedSearches();
+		System.out.println("savedSearches.size() in SnapMain: " + savedSearches.size());
 		
 		trackModel = (DefaultTableModel) trackTable.getModel();
 		updateTrackTable(false);
+		updateSavedSearchTable();
 		
 //		for(int i = 0; i < activeTrackList.size(); i++){
 //			Track currTrack = activeTrackList.get(i);
@@ -158,6 +164,8 @@ public class MainView {
 		
 		frmSnap = new JFrame();
 		tagTable = new JTable();
+		
+		savedSearchTable = new JTable();
 		
 		lblMenu = new JLabel("Menu");
 		lblSongList = new JLabel("Song List");
@@ -189,6 +197,11 @@ public class MainView {
 					/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
 					updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
 					search.favoriteSearch();
+					savedSearches = DbManager.getSavedSearches();
+					for(int i = 0; i < savedSearches.size(); i++){
+						System.out.println(savedSearches.get(i).getSearchText());
+					}
+					System.out.println("reached e");
 				}
 			}
 		});
@@ -615,13 +628,39 @@ public class MainView {
 		btnSave.setHorizontalAlignment(SwingConstants.LEFT);
 		btnSave.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		
+		savedSearchTable.setShowGrid(false);
+		savedSearchTable.setForeground(Color.LIGHT_GRAY);
+		savedSearchTable.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"Tag"
+			}
+		) {
+			Class[] columnTypes = new Class[] {
+				String.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+			boolean[] columnEditables = new boolean[] {
+				false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		});
+		
+		
+		
 		gl_leftPanel.setHorizontalGroup(
 			gl_leftPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_leftPanel.createSequentialGroup()
 					.addGap(20)
 					.addGroup(gl_leftPanel.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnSave)
-						.addComponent(btnImport))
+						.addComponent(btnImport)
+						.addComponent(savedSearchTable))
 					.addGap(100))
 		);
 		gl_leftPanel.setVerticalGroup(
@@ -631,6 +670,7 @@ public class MainView {
 					.addComponent(btnImport)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnSave)
+					.addComponent(savedSearchTable)
 					.addGap(487))
 		);
 		leftPanel.setLayout(gl_leftPanel);
@@ -670,6 +710,16 @@ public class MainView {
 			
 			
 		}
+	}
+	
+	private static void updateSavedSearchTable(){
+		DefaultTableModel searchModel = (DefaultTableModel) savedSearchTable.getModel();
+		System.out.println("savedSearches.size() = " + savedSearches.size());
+		for(int i = 0; i < savedSearches.size(); i++){
+			System.out.println("butt: " + savedSearches.get(i).getSearchText());
+			searchModel.addRow(new Object[]{savedSearches.get(i).getSearchText()});
+		}
+		searchModel.addRow(new Object[]{"shit butt"});
 	}
 	
 	private static void updateTagTable() {
