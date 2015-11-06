@@ -1,6 +1,5 @@
 import java.awt.*;
 
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -23,18 +22,18 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import java.util.Collections;
+import java.util.Date;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
-
 import java.util.function.*;
-
 public class MainView {
 
 	public static ArrayList<Track> activeTrackList;
 	public static ArrayList<Tag> activeTags = new ArrayList<Tag>();
+	public static ArrayList<Search> savedSearches = new ArrayList<Search>();
 	public static ArrayList<Tag> parents;
 	public static ArrayList<Tag> children;
 	
@@ -43,7 +42,7 @@ public class MainView {
 	public static ArrayList<Track> selectedTracks = new ArrayList<Track>();
 	public static Tag selectedTag;
 	
-	public static MetadataComparator trackComparator = new MetadataComparator("Name");
+	public static MetadataComparator trackComparator = new MetadataComparator("Date Added");
 	
 	private static JFrame frmSnap;
 	
@@ -61,6 +60,8 @@ public class MainView {
 	private static JTable trackTable;
 	private static JTable tagTable;
 	private static JTableHeader header;
+	
+	private static JTable savedSearchTable;
 	
 	private static JPanel leftPanel;
 	private static JPanel middlePanel;
@@ -104,21 +105,15 @@ public class MainView {
 		
 		
 		EventQueue.invokeLater(new Runnable() {
-			@Override
 			public void run() {
 				try {
 					MainView window = new MainView();
 					window.frmSnap.setVisible(true);
-					
-					fxPanel.setOpaque(true);
-					fxPanel.setBackground(middleBG);
-					middlePanel.add(fxPanel, BorderLayout.SOUTH);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
-		
 		Platform.runLater(new Runnable() {
 			
             @Override
@@ -126,11 +121,12 @@ public class MainView {
             	PlayBackApplication snapPlayBack = new PlayBackApplication();
             	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, selectedTracks);
             	
-        		fxPanel.setScene(scene);
+        		fxPanel.setScene(scene);                
+                middlePanel.add( fxPanel, BorderLayout.SOUTH);
             }
        });
-		
-		
+
+
 	}
 	
 	
@@ -142,13 +138,17 @@ public class MainView {
 		initialize();
 		
 		activeTrackList = DbManager.getLibrary();
+		savedSearches = DbManager.getSavedSearches();
+		System.out.println("savedSearches.size() in SnapMain: " + savedSearches.size());
 		
 		trackModel = (DefaultTableModel) trackTable.getModel();
+		updateTrackTable(false);
+		updateSavedSearchTable();
 		
-		for(int i = 0; i < activeTrackList.size(); i++){
-			Track currTrack = activeTrackList.get(i);
-			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
-		}
+//		for(int i = 0; i < activeTrackList.size(); i++){
+//			Track currTrack = activeTrackList.get(i);
+//			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
+//		}
 	}
 	
 	/**
@@ -164,6 +164,8 @@ public class MainView {
 		
 		frmSnap = new JFrame();
 		tagTable = new JTable();
+		
+		savedSearchTable = new JTable();
 		
 		lblMenu = new JLabel("Menu");
 		lblSongList = new JLabel("Song List");
@@ -195,6 +197,11 @@ public class MainView {
 					/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
 					updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
 					search.favoriteSearch();
+					savedSearches = DbManager.getSavedSearches();
+					for(int i = 0; i < savedSearches.size(); i++){
+						System.out.println(savedSearches.get(i).getSearchText());
+					}
+					System.out.println("reached e");
 				}
 			}
 		});
@@ -248,7 +255,7 @@ public class MainView {
 		leftPanel.setBackground(sideBG);
 		
 		middlePanel.setBorder(new LineBorder(Color.DARK_GRAY));
-		middlePanel.setForeground(middleBG);//Color.WHITE);
+		middlePanel.setForeground(Color.WHITE);
 		middlePanel.setBackground(frameBG);
 
 		
@@ -546,7 +553,7 @@ public class MainView {
 			new Object[][] {
 			},
 			new String[] {
-				"Name", "Artist", "Album", "Genre"
+				"Name", "Artist", "Album", "Date Added"
 			}
 		) {
 			Class[] columnTypes = new Class[] {
@@ -621,13 +628,59 @@ public class MainView {
 		btnSave.setHorizontalAlignment(SwingConstants.LEFT);
 		btnSave.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		
+		savedSearchTable.setShowGrid(false);
+		savedSearchTable.setForeground(Color.LIGHT_GRAY);
+		savedSearchTable.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"Tag"
+			}
+		) {
+			Class[] columnTypes = new Class[] {
+				String.class
+			};
+			public Class getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+			boolean[] columnEditables = new boolean[] {
+				false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		});
+		
+		savedSearchTable.setOpaque(true);
+		savedSearchTable.setBackground(middleBG);
+		
+		savedSearchTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+	        public void valueChanged(ListSelectionEvent event) {
+
+	        	if ( !event.getValueIsAdjusting()) {	
+	        		System.out.println(savedSearchTable.getSelectedRow());
+	        		Search search = savedSearches.get(savedSearchTable.getSelectedRow());
+	        		searchField.setText(search.getSearchText());
+	        		activeTrackList = search.executeSearch();
+	        		updateTrackTable(false);
+//	        		for(int row : trackTable.getSelectedRows()){
+//	        			selectedTracks.add(activeTrackList.get(row));
+//	        			System.out.println("MainView: Songs in Selected Rows via activeTrackList: " + activeTrackList.get(row).getTitle());
+//	        		}
+//	        		updateTagTable();
+	        	}
+	        }
+	    });
+		
+		
 		gl_leftPanel.setHorizontalGroup(
 			gl_leftPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_leftPanel.createSequentialGroup()
 					.addGap(20)
 					.addGroup(gl_leftPanel.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnSave)
-						.addComponent(btnImport))
+						.addComponent(btnImport)
+						.addComponent(savedSearchTable))
 					.addGap(100))
 		);
 		gl_leftPanel.setVerticalGroup(
@@ -637,6 +690,7 @@ public class MainView {
 					.addComponent(btnImport)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnSave)
+					.addComponent(savedSearchTable)
 					.addGap(487))
 		);
 		leftPanel.setLayout(gl_leftPanel);
@@ -668,11 +722,22 @@ public class MainView {
 		Collections.sort(activeTrackList, trackComparator);
 		for(int i = 0; i < activeTrackList.size(); i++){
 			Track currTrack = activeTrackList.get(i);
-			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
+			Date inDate = new Date(currTrack.getImportDate().getTime() - currTrack.getImportDate().getTimezoneOffset()*60000);
+			String dateString = ""+ inDate.getMonth() + "/" + inDate.getDate() + "/" + (inDate.getYear()%100) + " " + inDate.getHours() + ":" + inDate.getMinutes();
+			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), dateString});
 			
 			System.out.println("MainView: trackModel #rows: " + trackModel.getRowCount());//ME
 			
 			
+		}
+	}
+	
+	private static void updateSavedSearchTable(){
+		DefaultTableModel searchModel = (DefaultTableModel) savedSearchTable.getModel();
+		System.out.println("savedSearches.size() = " + savedSearches.size());
+		for(int i = 0; i < savedSearches.size(); i++){
+			System.out.println("butt: " + savedSearches.get(i).getSearchText());
+			searchModel.addRow(new Object[]{savedSearches.get(i).getSearchText()});
 		}
 	}
 	

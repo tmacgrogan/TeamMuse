@@ -14,14 +14,17 @@ public class MetadataComparator implements Comparator<Track>{
 		if(field ==  "Name"){
 			result = track0.getTitle().compareTo(track1.getTitle());
 		}
-		if(field ==  "Artist"){
+		else if(field ==  "Artist"){
 			result = track0.getArtist().compareTo(track1.getArtist());
 		}
-		if(field ==  "Album"){
+		else if(field ==  "Album"){
 			result = track0.getAlbum().compareTo(track1.getAlbum());
 		}
-		if(field ==  "Genre"){
+		else if(field ==  "Genre"){
 			result = track0.getGenre().compareTo(track1.getGenre());
+		}
+		else if(field == "Date Added"){
+			result = track0.getImportDate().compareTo(track1.getImportDate());
 		}
 		
 		if(reverse) result *= -1;

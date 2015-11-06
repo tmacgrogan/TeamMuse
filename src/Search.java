@@ -162,4 +162,16 @@ public class Search {
 	public void setTagsToExclude(ArrayList<Tag> tagsToExclude){
 		this.tagsToIntersect = tagsToExclude;
 	}
+	
+	public static ArrayList<Search> getAllSearches(){
+		return DbManager.getSavedSearches();
+	}
+	
+	public String getSearchText(){
+		return searchString;
+	}
+	
+	public String toString(){
+		return searchString;
+	}
 }
