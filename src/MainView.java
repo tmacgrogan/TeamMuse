@@ -1,6 +1,5 @@
 import java.awt.*;
 
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -23,27 +22,26 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import java.util.Collections;
+import java.util.Date;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
-
 import java.util.function.*;
-
 public class MainView {
 
 	public static ArrayList<Track> activeTrackList;
 	public static ArrayList<Tag> activeTags = new ArrayList<Tag>();
 	public static ArrayList<Tag> parents;
-	public static ArrayList<Tag> parent;
+	public static ArrayList<Tag> children;
 	
 	private static Dimension listSize = new Dimension(610, 445);
 	
 	public static ArrayList<Track> selectedTracks = new ArrayList<Track>();
 	public static Tag selectedTag;
 	
-	public static MetadataComparator trackComparator = new MetadataComparator("Name");
+	public static MetadataComparator trackComparator = new MetadataComparator("Date Added");
 	
 	private static JFrame frmSnap;
 	
@@ -93,6 +91,7 @@ public class MainView {
 	
 	//TODO: Paremeterize
 	private static JList parentList;
+	private static JList childrenList;
 	private static JButton btnX;
 	private static JPanel tagButtonPanel;
 	
@@ -103,21 +102,15 @@ public class MainView {
 		
 		
 		EventQueue.invokeLater(new Runnable() {
-			@Override
 			public void run() {
 				try {
 					MainView window = new MainView();
 					window.frmSnap.setVisible(true);
-					
-					fxPanel.setOpaque(true);
-					fxPanel.setBackground(middleBG);
-					middlePanel.add(fxPanel, BorderLayout.SOUTH);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
-		
 		Platform.runLater(new Runnable() {
 			
             @Override
@@ -125,11 +118,12 @@ public class MainView {
             	PlayBackApplication snapPlayBack = new PlayBackApplication();
             	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, selectedTracks);
             	
-        		fxPanel.setScene(scene);
+        		fxPanel.setScene(scene);                
+                middlePanel.add( fxPanel, BorderLayout.SOUTH);
             }
        });
-		
-		
+
+
 	}
 	
 	
@@ -143,11 +137,12 @@ public class MainView {
 		activeTrackList = DbManager.getLibrary();
 		
 		trackModel = (DefaultTableModel) trackTable.getModel();
+		updateTrackTable(false);
 		
-		for(int i = 0; i < activeTrackList.size(); i++){
-			Track currTrack = activeTrackList.get(i);
-			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
-		}
+//		for(int i = 0; i < activeTrackList.size(); i++){
+//			Track currTrack = activeTrackList.get(i);
+//			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
+//		}
 	}
 	
 	/**
@@ -246,9 +241,8 @@ public class MainView {
 		
 		leftPanel.setBackground(sideBG);
 		
-		middlePanel.setOpaque(true);
 		middlePanel.setBorder(new LineBorder(Color.DARK_GRAY));
-		middlePanel.setForeground(middleBG);//Color.WHITE);
+		middlePanel.setForeground(Color.WHITE);
 		middlePanel.setBackground(frameBG);
 
 		
@@ -369,7 +363,7 @@ public class MainView {
 		            
 		            selectedTag = activeTags.get(tagTable.getSelectedRow());
 					parents = selectedTag.getParents();
-					parent = selectedTag.getChildren();
+					children = selectedTag.getChildren();
 					
 					JPanel editTagPanel = new JPanel();
 					JTextField newTagNameField = new JTextField();
@@ -378,7 +372,7 @@ public class MainView {
 					final String[] parentString = new String[parents.size()];
 					
 					JTextField newParentField = new JTextField();
-					String[] childrenString = new String[parent.size()];
+					String[] childrenString = new String[children.size()];
 					
 					DefaultListModel childModel = new DefaultListModel();
 					JTextField newChildField = new JTextField();
@@ -387,12 +381,12 @@ public class MainView {
 						parentString[i] = parents.get(i).getName();
 					}
 					
-					for(int i = 0; i < parent.size(); i++){
-						childrenString[i] = parent.get(i).getName();
+					for(int i = 0; i < children.size(); i++){
+						childrenString[i] = children.get(i).getName();
 					}
 				
 					parentList = new JList(parentString);
-					parentList = new JList(childrenString);
+					childrenList = new JList(childrenString);
 					
 					parentList.addMouseListener(new MouseAdapter() {
 					    public void mouseClicked(MouseEvent evt) {
@@ -405,12 +399,12 @@ public class MainView {
 					    }
 					});
 					
-					parentList.addMouseListener(new MouseAdapter() {
+					childrenList.addMouseListener(new MouseAdapter() {
 					    public void mouseClicked(MouseEvent evt) {
-					    	System.out.println("Tag " + parent.get(parentList.getSelectedIndex()).getName());
+					    	System.out.println("Tag " + children.get(childrenList.getSelectedIndex()).getName());
 					        if (evt.getClickCount() == 2) {
 					            // Double-click detected
-					        	selectedTag.removeChild(parent.get(parentList.getSelectedIndex()));
+					        	selectedTag.removeChild(children.get(childrenList.getSelectedIndex()));
 					        }
 					    }
 					});
@@ -419,7 +413,7 @@ public class MainView {
 					    "Rename tag:", newTagNameField,
 					    "Double click to remove parent",parentList,
 					    "Add parent tag:", newParentField,
-					    "Double click to remove child",parentList,
+					    "Double click to remove child",childrenList,
 					    "Add child tag:", newChildField
 					    
 					};
@@ -527,17 +521,16 @@ public class MainView {
 		songPanel.setLayout(new BoxLayout(songPanel, BoxLayout.X_AXIS));
 		
 		scrollPane = new JScrollPane();
+		scrollPane.setOpaque(true);
 		songPanel.add(scrollPane);
 		
 		trackTable = new JTable();
 		scrollPane.setViewportView(trackTable);
 		scrollPane.setOpaque(true);
-		scrollPane.getViewport().setBackground(middleBG);
+		scrollPane.setBackground(middleBG);
 		scrollPane.setBorder(BorderFactory.createEmptyBorder());
 		
 		trackTable.setAlignmentY(Component.TOP_ALIGNMENT);
-		trackTable.setOpaque(true);
-		trackTable.setBackground(middleBG);
 		trackTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		trackTable.setShowVerticalLines(false);
 		trackTable.setShowHorizontalLines(false);
@@ -547,7 +540,7 @@ public class MainView {
 			new Object[][] {
 			},
 			new String[] {
-				"Name", "Artist", "Album", "Genre"
+				"Name", "Artist", "Album", "Date Added"
 			}
 		) {
 			Class[] columnTypes = new Class[] {
@@ -561,7 +554,8 @@ public class MainView {
 		trackTable.getColumnModel().getColumn(1).setPreferredWidth(150);
 		trackTable.getColumnModel().getColumn(2).setPreferredWidth(150);
 		trackTable.getColumnModel().getColumn(3).setPreferredWidth(100);
-		
+		trackTable.setOpaque(true);
+		trackTable.setBackground(middleBG);
 		
 		trackTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
@@ -668,7 +662,9 @@ public class MainView {
 		Collections.sort(activeTrackList, trackComparator);
 		for(int i = 0; i < activeTrackList.size(); i++){
 			Track currTrack = activeTrackList.get(i);
-			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
+			Date inDate = new Date(currTrack.getImportDate().getTime() - currTrack.getImportDate().getTimezoneOffset()*60000);
+			String dateString = ""+ inDate.getMonth() + "/" + inDate.getDate() + "/" + (inDate.getYear()%100) + " " + inDate.getHours() + ":" + inDate.getMinutes();
+			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), dateString});
 			
 			System.out.println("MainView: trackModel #rows: " + trackModel.getRowCount());//ME
 			
@@ -692,11 +688,9 @@ public class MainView {
     	
     	//populates rows with tags of selected track
     	for(int i = 0; i < activeTags.size(); i++){
+    		tagModel.addRow(new Object[]{activeTags.get(i).getName()});
     		JButton newTagButton = addTagButton(activeTags.get(i));
     		tagButtonPanel.add(newTagButton);
-    		
-    		tagModel.addRow(new Object[]{activeTags.get(i).getName()});
-
     	}
     	
     	//tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
@@ -753,37 +747,37 @@ public class MainView {
 		    	if (SwingUtilities.isRightMouseButton(click)){
 		    		popup.show(click.getComponent(), click.getX(), click.getY());
 		    	}else if (SwingUtilities.isLeftMouseButton(click)){
-					parent = curTag.getChildren();
+					children = curTag.getChildren();
 					
 					JPanel editTagPanel = new JPanel();
 					JTextField newTagNameField = new JTextField();
 					newTagNameField.setText(curTag.getName());
 					
-					String[] parentString = new String[parent.size()];
+					String[] childrenString = new String[children.size()];
 					
-					DefaultListModel parentModel = new DefaultListModel();
-					JTextField newParentField = new JTextField();
+					DefaultListModel childModel = new DefaultListModel();
+					JTextField newChildField = new JTextField();
 					
 					
-					for(int i = 0; i < parent.size(); i++){
-						parentString[i] = parent.get(i).getName();
+					for(int i = 0; i < children.size(); i++){
+						childrenString[i] = children.get(i).getName();
 					}
-					parentList = new JList(parentString);
+					childrenList = new JList(childrenString);
 					
-					parentList.addMouseListener(new MouseAdapter() {
+					childrenList.addMouseListener(new MouseAdapter() {
 					    public void mouseClicked(MouseEvent evt) {
-					    	System.out.println("Tag " + parent.get(parentList.getSelectedIndex()).getName());
+					    	System.out.println("Tag " + children.get(childrenList.getSelectedIndex()).getName());
 					        if (evt.getClickCount() == 2) {
 					            // Double-click detected
-					        	curTag.removeParent(parent.get(parentList.getSelectedIndex()));
+					        	curTag.removeChild(children.get(childrenList.getSelectedIndex()));
 					        }
 					    }
 					});
 					
 					Object[] message = {
 					    "Rename tag:", newTagNameField,
-					    "Double click to remove parent",parentList,
-					    "Add parent tag:", newParentField
+					    "Double click to remove child",childrenList,
+					    "Add child tag:", newChildField
 					    
 					};
 					
@@ -793,7 +787,7 @@ public class MainView {
 					    if (curTag.setName(newTagNameField.getText())) {
 					        System.out.println("successful");
 					    }
-					    if (curTag.addChild(newParentField.getText())){
+					    if (curTag.addChild(newChildField.getText())){
 					    	
 					    }
 					} else {
