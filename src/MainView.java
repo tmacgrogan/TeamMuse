@@ -1,5 +1,6 @@
 import java.awt.*;
 
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -28,14 +29,14 @@ import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
-import java.util.function.*;
+//import java.util.function.*;
 public class MainView {
 
 	public static ArrayList<Track> activeTrackList;
 	public static ArrayList<Tag> activeTags = new ArrayList<Tag>();
 	public static ArrayList<Search> savedSearches = new ArrayList<Search>();
 	public static ArrayList<Tag> parents;
-	public static ArrayList<Tag> children;
+	public static ArrayList<Tag> parent;
 	
 	private static Dimension listSize = new Dimension(610, 445);
 	
@@ -94,13 +95,14 @@ public class MainView {
 	
 	//TODO: Paremeterize
 	private static JList parentList;
-	private static JList childrenList;
 	private static JButton btnX;
 	private static JPanel tagButtonPanel;
 	
+	private JFXPanel fxPanel;
+	
 	public static void main(String[] args) {
 		SnapMain();
-		JFXPanel fxPanel = new JFXPanel();
+		JFXPanel fxPanel= new JFXPanel();
 		
 		
 		
@@ -115,14 +117,15 @@ public class MainView {
 			}
 		});
 		Platform.runLater(new Runnable() {
-			
+		
             @Override
             public void run() {
-            	PlayBackApplication snapPlayBack = new PlayBackApplication();
-            	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, selectedTracks);
-            	
-        		fxPanel.setScene(scene);                
-                middlePanel.add( fxPanel, BorderLayout.SOUTH);
+//            	
+//            	PlayBackApplication snapPlayBack = new PlayBackApplication();
+//            	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, selectedTracks);
+//            	
+//        		fxPanel.setScene(scene);                
+//                middlePanel.add( fxPanel, BorderLayout.SOUTH);
             }
        });
 
@@ -376,7 +379,7 @@ public class MainView {
 		            
 		            selectedTag = activeTags.get(tagTable.getSelectedRow());
 					parents = selectedTag.getParents();
-					children = selectedTag.getChildren();
+					parent = selectedTag.getChildren();
 					
 					JPanel editTagPanel = new JPanel();
 					JTextField newTagNameField = new JTextField();
@@ -385,7 +388,7 @@ public class MainView {
 					final String[] parentString = new String[parents.size()];
 					
 					JTextField newParentField = new JTextField();
-					String[] childrenString = new String[children.size()];
+					String[] childrenString = new String[parent.size()];
 					
 					DefaultListModel childModel = new DefaultListModel();
 					JTextField newChildField = new JTextField();
@@ -394,12 +397,12 @@ public class MainView {
 						parentString[i] = parents.get(i).getName();
 					}
 					
-					for(int i = 0; i < children.size(); i++){
-						childrenString[i] = children.get(i).getName();
+					for(int i = 0; i < parent.size(); i++){
+						childrenString[i] = parent.get(i).getName();
 					}
 				
 					parentList = new JList(parentString);
-					childrenList = new JList(childrenString);
+					parentList = new JList(childrenString);
 					
 					parentList.addMouseListener(new MouseAdapter() {
 					    public void mouseClicked(MouseEvent evt) {
@@ -412,12 +415,12 @@ public class MainView {
 					    }
 					});
 					
-					childrenList.addMouseListener(new MouseAdapter() {
+					parentList.addMouseListener(new MouseAdapter() {
 					    public void mouseClicked(MouseEvent evt) {
-					    	System.out.println("Tag " + children.get(childrenList.getSelectedIndex()).getName());
+					    	System.out.println("Tag " + parent.get(parentList.getSelectedIndex()).getName());
 					        if (evt.getClickCount() == 2) {
 					            // Double-click detected
-					        	selectedTag.removeChild(children.get(childrenList.getSelectedIndex()));
+					        	selectedTag.removeChild(parent.get(parentList.getSelectedIndex()));
 					        }
 					    }
 					});
@@ -426,7 +429,7 @@ public class MainView {
 					    "Rename tag:", newTagNameField,
 					    "Double click to remove parent",parentList,
 					    "Add parent tag:", newParentField,
-					    "Double click to remove child",childrenList,
+					    "Double click to remove child",parentList,
 					    "Add child tag:", newChildField
 					    
 					};
@@ -541,6 +544,7 @@ public class MainView {
 		scrollPane.setViewportView(trackTable);
 		scrollPane.setOpaque(true);
 		scrollPane.setBackground(middleBG);
+		scrollPane.getViewport().setBackground(middleBG);
 		scrollPane.setBorder(BorderFactory.createEmptyBorder());
 		
 		trackTable.setAlignmentY(Component.TOP_ALIGNMENT);
@@ -816,37 +820,37 @@ public class MainView {
 		    	if (SwingUtilities.isRightMouseButton(click)){
 		    		popup.show(click.getComponent(), click.getX(), click.getY());
 		    	}else if (SwingUtilities.isLeftMouseButton(click)){
-					children = curTag.getChildren();
+					parent = curTag.getParents();
 					
 					JPanel editTagPanel = new JPanel();
 					JTextField newTagNameField = new JTextField();
 					newTagNameField.setText(curTag.getName());
 					
-					String[] childrenString = new String[children.size()];
+					String[] parentString = new String[parent.size()];
 					
 					DefaultListModel childModel = new DefaultListModel();
-					JTextField newChildField = new JTextField();
+					JTextField newParentField = new JTextField();
 					
 					
-					for(int i = 0; i < children.size(); i++){
-						childrenString[i] = children.get(i).getName();
+					for(int i = 0; i < parent.size(); i++){
+						parentString[i] = parent.get(i).getName();
 					}
-					childrenList = new JList(childrenString);
+					parentList = new JList(parentString);
 					
-					childrenList.addMouseListener(new MouseAdapter() {
+					parentList.addMouseListener(new MouseAdapter() {
 					    public void mouseClicked(MouseEvent evt) {
-					    	System.out.println("Tag " + children.get(childrenList.getSelectedIndex()).getName());
+					    	System.out.println("Tag " + parent.get(parentList.getSelectedIndex()).getName());
 					        if (evt.getClickCount() == 2) {
 					            // Double-click detected
-					        	curTag.removeChild(children.get(childrenList.getSelectedIndex()));
+					        	curTag.removeParent(parent.get(parentList.getSelectedIndex()));
 					        }
 					    }
 					});
 					
 					Object[] message = {
 					    "Rename tag:", newTagNameField,
-					    "Double click to remove child",childrenList,
-					    "Add child tag:", newChildField
+					    "Double click to remove parent",parentList,
+					    "Add parent tag:", newParentField
 					    
 					};
 					
@@ -856,7 +860,7 @@ public class MainView {
 					    if (curTag.setName(newTagNameField.getText())) {
 					        System.out.println("successful");
 					    }
-					    if (curTag.addChild(newChildField.getText())){
+					    if (curTag.addParent(newParentField.getText())){
 					    	
 					    }
 					} else {
