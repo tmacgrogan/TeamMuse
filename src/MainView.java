@@ -28,6 +28,10 @@ import java.util.Date;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.RowSpec;
+import net.miginfocom.swing.MigLayout;
 
 //import java.util.function.*;
 public class MainView {
@@ -37,8 +41,6 @@ public class MainView {
 	public static ArrayList<Search> savedSearches = new ArrayList<Search>();
 	public static ArrayList<Tag> parents;
 	public static ArrayList<Tag> parent;
-	
-	private static Dimension listSize = new Dimension(610, 445);
 	
 	public static ArrayList<Track> selectedTracks = new ArrayList<Track>();
 	public static Tag selectedTag;
@@ -52,7 +54,7 @@ public class MainView {
 	private static Color middleBG = new Color(38,38,38);
 	
 	private static int width = 1000;
-	private static int height = 600;
+	private static int height = 700;
 	
 	private static JTextField tagInfo;
 	private static JTextField searchField;
@@ -472,13 +474,6 @@ public class MainView {
 		});
 		
 		tagInfoPanel.add(btnDeleteTag, BorderLayout.SOUTH);
-		
-		tagButtonPanel = new JPanel();
-		tagButtonPanel.setOpaque(true);
-		tagButtonPanel.setBackground(Color.DARK_GRAY);
-		tagButtonPanel.setPreferredSize(new Dimension(100, height-100));
-		tagInfoPanel.add(tagButtonPanel, BorderLayout.EAST);
-		tagButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		middlePanel.setLayout(new BorderLayout(0, 0));
 		
 		tagTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
@@ -489,8 +484,8 @@ public class MainView {
 		
 		searchPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		searchPanel.setBackground(middleBG);
-		searchPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		middlePanel.add(searchPanel, BorderLayout.NORTH);
+		searchPanel.setLayout(new BorderLayout(0, 0));
 		
 		searchField.setColumns(30);
 		searchPanel.add(searchField);
@@ -512,7 +507,7 @@ public class MainView {
 		
 		searchButton = new JButton("Search");
 		searchButton.addActionListener(searchAction);
-		searchPanel.add(searchButton);
+		searchPanel.add(searchButton, BorderLayout.EAST);
 		
 		btnX = new JButton("X");
 		btnX.addActionListener(new ActionListener() {
@@ -522,7 +517,14 @@ public class MainView {
 				updateTrackTable(true);
 			}
 		});
-		searchPanel.add(btnX);
+		searchPanel.add(btnX, BorderLayout.WEST);
+		
+		tagButtonPanel = new JPanel();
+		searchPanel.add(tagButtonPanel, BorderLayout.SOUTH);
+		tagButtonPanel.setOpaque(true);
+		tagButtonPanel.setBackground(Color.DARK_GRAY);
+		tagButtonPanel.setPreferredSize(new Dimension(556, 40));
+		tagButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		//playerPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		//playerPanel.setBackground(middleBG);
@@ -756,6 +758,7 @@ public class MainView {
     	}
     	
     	tagButtonPanel.removeAll();
+    	tagButtonPanel.updateUI();
     	
     	activeTags = TrackListController.getCommonTags(selectedTracks);
     	
@@ -796,7 +799,7 @@ public class MainView {
 	}
 	
 	private static JButton addTagButton(Tag curTag){
-		Icon xIcon = new ImageIcon("/Users/TvO/School/Fall 2015/CS 4911/TeamMuse/src/xIcon.jpg");
+		Icon xIcon = new ImageIcon("xIcon.png");
 		JButton newTagButton = new JButton(xIcon);
 		newTagButton.setText(curTag.getName());
 		
