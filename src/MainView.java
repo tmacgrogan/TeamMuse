@@ -799,7 +799,7 @@ public class MainView {
 	}
 	
 	private static JButton addTagButton(Tag curTag){
-		Icon xIcon = new ImageIcon("xIcon.png");
+		ImageIcon xIcon = new ImageIcon("src/xIcon.png","x");
 		JButton newTagButton = new JButton(xIcon);
 		newTagButton.setText(curTag.getName());
 		
