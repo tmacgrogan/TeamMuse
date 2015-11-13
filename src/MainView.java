@@ -28,10 +28,10 @@ import java.util.Date;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import net.miginfocom.swing.MigLayout;
+//import com.jgoodies.forms.layout.FormLayout;
+//import com.jgoodies.forms.layout.ColumnSpec;
+//import com.jgoodies.forms.layout.RowSpec;
+//import net.miginfocom.swing.MigLayout;
 
 //import java.util.function.*;
 public class MainView {
@@ -122,12 +122,12 @@ public class MainView {
 		
             @Override
             public void run() {
-//            	
-//            	PlayBackApplication snapPlayBack = new PlayBackApplication();
-//            	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, selectedTracks);
-//            	
-//        		fxPanel.setScene(scene);                
-//                middlePanel.add( fxPanel, BorderLayout.SOUTH);
+            	
+            	PlayBackApplication snapPlayBack = new PlayBackApplication();
+            	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, selectedTracks);
+            	
+        		fxPanel.setScene(scene);                
+                middlePanel.add( fxPanel, BorderLayout.SOUTH);
             }
        });
 
@@ -210,6 +210,8 @@ public class MainView {
 				}
 			}
 		});
+		
+		//TODO remove this
 		btnMusicPlayer = new JButton("Music Player");
 		
 		Action addTagaction = new AbstractAction()
