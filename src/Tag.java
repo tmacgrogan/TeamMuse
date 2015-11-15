@@ -8,6 +8,11 @@ public class Tag {
 	private String description;	
 	private boolean searched; 
 	
+	public Tag() {
+		this.name = null;
+		this.id = (Integer) null;
+	}
+	
 	//Tag pulled from the database
 	public Tag(String name, int id) throws IllegalArgumentException{ 
 		//TODO Sanitize tag names
