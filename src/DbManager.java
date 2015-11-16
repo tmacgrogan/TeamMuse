@@ -299,6 +299,15 @@ public class DbManager {
 		}
 	}
 	
+	public static void deleteSearch(String searchString){
+		try {
+			safeUpdate("DELETE FROM Search WHERE SearchText LIKE ?;",
+					searchString);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static ArrayList<Search> getSavedSearches(){
 		ArrayList<Search> searches = new ArrayList<Search>();
 		ResultSet results = null;
