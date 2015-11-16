@@ -107,29 +107,30 @@ public class MainView {
 		JFXPanel fxPanel= new JFXPanel();
 		
 		
-		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					MainView window = new MainView();
 					window.frmSnap.setVisible(true);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
-		Platform.runLater(new Runnable() {
+
 		
+		Platform.runLater(new Runnable() {
             @Override
             public void run() {
             	
             	PlayBackApplication snapPlayBack = new PlayBackApplication();
-            	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, selectedTracks);
-            	
+            	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, selectedTracks, activeTrackList);
         		fxPanel.setScene(scene);                
                 middlePanel.add( fxPanel, BorderLayout.SOUTH);
             }
        });
+
 
 
 	}
@@ -197,10 +198,12 @@ public class MainView {
 				String text = searchField.getText();
 				if(text != null && !text.isEmpty()) {
 			    	Search search = new Search(text);
-					activeTrackList = search.executeSearch();
+			    	
+			    	activeTrackList = search.executeSearch();
+					
 					System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+activeTrackList.size());
 					/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
-					updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
+					updateTrackTable(false);
 					search.favoriteSearch();
 					savedSearches = DbManager.getSavedSearches();
 					for(int i = 0; i < savedSearches.size(); i++){
@@ -497,7 +500,9 @@ public class MainView {
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
 		    	Search search = new Search(searchField.getText());
+		    	
 				activeTrackList = search.executeSearch();
+				
 				Collections.sort(activeTrackList, trackComparator);
 				System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+activeTrackList.size());
 				/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
@@ -515,7 +520,9 @@ public class MainView {
 		btnX.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				searchField.setText("");
+				
 				activeTrackList = DbManager.getLibrary();
+				
 				updateTrackTable(true);
 			}
 		});
@@ -669,7 +676,9 @@ public class MainView {
 	        		System.out.println(savedSearchTable.getSelectedRow());
 	        		Search search = savedSearches.get(savedSearchTable.getSelectedRow());
 	        		searchField.setText(search.getSearchText());
+	        		
 	        		activeTrackList = search.executeSearch();
+	        		
 	        		updateTrackTable(false);
 //	        		for(int row : trackTable.getSelectedRows()){
 //	        			selectedTracks.add(activeTrackList.get(row));
@@ -719,6 +728,7 @@ public class MainView {
 		 //Therefore, the search result isn't displayed to user
 		/******************DEBUG*************/
 		if(importToSnap)
+			
 			activeTrackList = DbManager.getLibrary();
 		
 		/****************************DEBUG*****************/
