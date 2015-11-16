@@ -98,7 +98,7 @@ public class MainView {
 	//TODO: Paremeterize
 	private static JList parentList;
 	private static JButton btnX;
-	private static JPanel tagButtonPanel;
+	private static JPanel tagSearchButtonPanel;
 	
 	private JFXPanel fxPanel;
 	
@@ -128,6 +128,7 @@ public class MainView {
             	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, selectedTracks, activeTrackList);
         		fxPanel.setScene(scene);                
                 middlePanel.add( fxPanel, BorderLayout.SOUTH);
+
             }
        });
 
@@ -499,6 +500,10 @@ public class MainView {
 		{
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
+		    	Tag T = new Tag().getTagByName(searchField.getText());
+		    	tagSearchButtonPanel.setVisible(true);
+		    	JButton newTagButton = addTagButton(T);
+	    		tagSearchButtonPanel.add(newTagButton);
 		    	Search search = new Search(searchField.getText());
 		    	
 				activeTrackList = search.executeSearch();
@@ -519,6 +524,7 @@ public class MainView {
 		btnX = new JButton("X");
 		btnX.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				tagSearchButtonPanel.setVisible(false);
 				searchField.setText("");
 				
 				activeTrackList = DbManager.getLibrary();
@@ -528,12 +534,13 @@ public class MainView {
 		});
 		searchPanel.add(btnX, BorderLayout.WEST);
 		
-		tagButtonPanel = new JPanel();
-		searchPanel.add(tagButtonPanel, BorderLayout.SOUTH);
-		tagButtonPanel.setOpaque(true);
-		tagButtonPanel.setBackground(Color.DARK_GRAY);
-		tagButtonPanel.setPreferredSize(new Dimension(556, 40));
-		tagButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		tagSearchButtonPanel = new JPanel();
+		searchPanel.add(tagSearchButtonPanel, BorderLayout.SOUTH);
+		tagSearchButtonPanel.setOpaque(true);
+		tagSearchButtonPanel.setBackground(Color.DARK_GRAY);
+		tagSearchButtonPanel.setPreferredSize(new Dimension(556, 40));
+		tagSearchButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		tagSearchButtonPanel.setVisible(false);
 		
 		//playerPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		//playerPanel.setBackground(middleBG);
@@ -769,16 +776,16 @@ public class MainView {
     		tagModel.removeRow(i); 
     	}
     	
-    	tagButtonPanel.removeAll();
-    	tagButtonPanel.updateUI();
+    	tagSearchButtonPanel.removeAll();
+    	tagSearchButtonPanel.updateUI();
     	
     	activeTags = TrackListController.getCommonTags(selectedTracks);
     	
     	//populates rows with tags of selected track
     	for(int i = 0; i < activeTags.size(); i++){
     		tagModel.addRow(new Object[]{activeTags.get(i).getName()});
-    		JButton newTagButton = addTagButton(activeTags.get(i));
-    		tagButtonPanel.add(newTagButton);
+//    		JButton newTagButton = addTagButton(activeTags.get(i));
+//    		tagSearchButtonPanel.add(newTagButton);
     	}
     	
     	//tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
@@ -794,7 +801,7 @@ public class MainView {
 		
 		DefaultTableModel currModel = (DefaultTableModel) T.getModel();
 		
-		tagButtonPanel.removeAll();
+		tagSearchButtonPanel.removeAll();
 		
 		int rows = currModel.getRowCount(); 
     	for(int i = rows - 1; i >=0; i--){
