@@ -198,6 +198,7 @@ public class MainView {
 			public void mouseClicked(MouseEvent e) {
 				String text = searchField.getText();
 				if(text != null && !text.isEmpty()) {
+					System.out.println("reached");
 			    	Search search = new Search(text);
 			    	
 			    	activeTrackList = search.executeSearch();
@@ -207,10 +208,10 @@ public class MainView {
 					updateTrackTable(false);
 					search.favoriteSearch();
 					savedSearches = DbManager.getSavedSearches();
-					for(int i = 0; i < savedSearches.size(); i++){
-						System.out.println(savedSearches.get(i).getSearchText());
+					for (Search theSearch : DbManager.getSavedSearches()){
+						System.out.println(theSearch.getSearchText());
 					}
-					System.out.println("reached e");
+					updateSavedSearchTable();
 				}
 			}
 		});
@@ -500,18 +501,22 @@ public class MainView {
 		{
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		    	Tag T = new Tag(searchField.getText());//new Tag().getTagByName(searchField.getText());
-		    	tagSearchButtonPanel.setVisible(true);
-		    	JButton newTagButton = addTagButton(T);
-	    		tagSearchButtonPanel.add(newTagButton);
-		    	Search search = new Search(searchField.getText());
-		    	
-				activeTrackList = search.executeSearch();
-				
-				Collections.sort(activeTrackList, trackComparator);
-				System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+activeTrackList.size());
-				/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
-				updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
+//		    	Tag T = new Tag(searchField.getText());//new Tag().getTagByName(searchField.getText());
+//		    	tagSearchButtonPanel.setVisible(true);
+//		    	JButton newTagButton = addTagButton(T);
+//	    		tagSearchButtonPanel.add(newTagButton);
+//		    	Search search = new Search(searchField.getText());
+//		    	
+//				activeTrackList = search.executeSearch();
+//				
+//				Collections.sort(activeTrackList, trackComparator);
+//				System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+activeTrackList.size());
+//				/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
+//				updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
+		    	Search theSearch = new Search(searchField.getText());
+		    	activeTrackList = theSearch.executeSearch();
+		    	Collections.sort(activeTrackList, trackComparator);
+		    	updateTrackTable(false);
 			}
 		};
 		
@@ -760,8 +765,9 @@ public class MainView {
 	private static void updateSavedSearchTable(){
 		DefaultTableModel searchModel = (DefaultTableModel) savedSearchTable.getModel();
 		System.out.println("savedSearches.size() = " + savedSearches.size());
+		
+		clearTable(savedSearchTable);
 		for(int i = 0; i < savedSearches.size(); i++){
-			System.out.println("butt: " + savedSearches.get(i).getSearchText());
 			searchModel.addRow(new Object[]{savedSearches.get(i).getSearchText()});
 		}
 	}
