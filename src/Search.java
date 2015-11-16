@@ -9,6 +9,7 @@ public class Search {
 	//default search terms
 	private ArrayList<Tag> tagsToIntersect;
 	private ArrayList<Tag> tagsToExclude;
+	private Search subSearch;
 	private String searchString;
 	
 //	public Search(ArrayList<Tag> tagsToIntersect, ArrayList<Tag> tagsToExclude){
@@ -20,6 +21,7 @@ public class Search {
 		this.searchString = searchString;
 		tagsToIntersect = new ArrayList<Tag>();
 		tagsToExclude = new ArrayList<Tag>();
+		subSearch = null;
 		parse();
 	}
 	
@@ -29,8 +31,11 @@ public class Search {
 		
 		//ArrayList<String> includeTagStrings = new ArrayList<String>();
 		//ArrayList<String> excludeTagStrings = new ArrayList<String>();
-		
-		String[] splitStrings = searchString.split("\\s");
+		String[] subStrings = searchString.split("\\sor\\s", 2);
+		if(subStrings.length == 2){
+			subSearch = new Search(subStrings[1]);
+		}
+		String[] splitStrings = subStrings[0].split("\\s");
 		
 		for(String curr : splitStrings){
 			if(curr.length() > 0){
@@ -120,6 +125,14 @@ public class Search {
 		ArrayList<Track> cantBe = TrackListController.merge(excludeTrackLists);
 		
 		ArrayList<Track> finalList = TrackListController.exclude(mustBe, cantBe);
+		
+		if(subSearch != null){
+			ArrayList<ArrayList<Track>> toMerge = new ArrayList<ArrayList<Track>>();
+			toMerge.add(finalList);
+			toMerge.add(subSearch.executeSearch());
+			finalList = TrackListController.merge(toMerge);
+		}
+		
 		
 //		Collections.swap(finalList, 3, 9);
 //		Collections.swap(finalList, 0, 10);
