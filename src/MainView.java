@@ -500,7 +500,7 @@ public class MainView {
 		{
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		    	Tag T = new Tag().getTagByName(searchField.getText());
+		    	Tag T = new Tag(searchField.getText());//new Tag().getTagByName(searchField.getText());
 		    	tagSearchButtonPanel.setVisible(true);
 		    	JButton newTagButton = addTagButton(T);
 	    		tagSearchButtonPanel.add(newTagButton);
