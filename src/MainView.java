@@ -21,7 +21,7 @@ import com.sun.glass.ui.Application;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
@@ -148,7 +148,8 @@ public class MainView {
 		initialize();
 		
 		//First time activeTrackList set-up. Other calls are hooks for events that could happen later
-		activeTrackList = DbManager.getLibrary();
+		//activeTrackList = DbManager.getLibrary();
+		setActiveTrackList(DbManager.getLibrary());
 		
 		savedSearches = DbManager.getSavedSearches();
 		System.out.println("savedSearches.size() in SnapMain: " + savedSearches.size());
@@ -206,9 +207,10 @@ public class MainView {
 					System.out.println("reached");
 			    	Search search = new Search(text);
 			    	
-			    	activeTrackList = search.executeSearch();
-					
-					System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+activeTrackList.size());
+			    	//activeTrackList = search.executeSearch();
+					setActiveTrackList(search.executeSearch());
+			    	
+					System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+ getActiveTrackList().size());
 					/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
 					updateTrackTable(false);
 					search.favoriteSearch();
@@ -519,7 +521,10 @@ public class MainView {
 //				/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
 //				updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
 		    	Search theSearch = new Search(searchField.getText());
-		    	activeTrackList = theSearch.executeSearch();
+		    	
+		    	//activeTrackList = theSearch.executeSearch();
+		    	setActiveTrackList(theSearch.executeSearch());
+		    	
 		    	Collections.sort(activeTrackList, trackComparator);
 		    	updateTrackTable(false);
 			}
@@ -537,7 +542,8 @@ public class MainView {
 				tagSearchButtonPanel.setVisible(false);
 				searchField.setText("");
 				
-				activeTrackList = DbManager.getLibrary();
+				//activeTrackList = DbManager.getLibrary();
+				setActiveTrackList(DbManager.getLibrary());
 				
 				updateTrackTable(true);
 			}
@@ -611,8 +617,10 @@ public class MainView {
 	        		
 
 	        		for(int row : trackTable.getSelectedRows()){
-	        			selectedTracks.add(activeTrackList.get(row));
-	        			System.out.println("MainView: Songs in Selected Rows via activeTrackList: " + activeTrackList.get(row).getTitle());
+	        			//selectedTracks.add(activeTrackList.get(row));
+	        			selectedTracks.add(getActiveTrackList().get(row));
+	        			
+	        			System.out.println("MainView: Songs in Selected Rows via activeTrackList: " + getActiveTrackList().get(row).getTitle());
 	        		}
 	        		updateTagTable();
 	        	}
@@ -694,7 +702,8 @@ public class MainView {
 	        		Search search = savedSearches.get(savedSearchTable.getSelectedRow());
 	        		searchField.setText(search.getSearchText());
 	        		
-	        		activeTrackList = search.executeSearch();
+	        		//activeTrackList = search.executeSearch();
+	        		setActiveTrackList(search.executeSearch());
 	        		
 	        		updateTrackTable(false);
 //	        		for(int row : trackTable.getSelectedRows()){
@@ -746,8 +755,9 @@ public class MainView {
 		/******************DEBUG*************/
 		if(importToSnap)
 			
-			activeTrackList = DbManager.getLibrary();
-		
+			//activeTrackList = DbManager.getLibrary();
+			setActiveTrackList(DbManager.getLibrary());
+			
 		/****************************DEBUG*****************/
 //		System.out.println("MainView:updateTrackTable: activeTrackList_Size: "+ activeTrackList.size());
 //		System.out.println("MainView:updateTrackTable: activeTrackList_contents: "+ activeTrackList.toString()	);
@@ -755,8 +765,10 @@ public class MainView {
 		clearTable(trackTable);
 		
 		Collections.sort(activeTrackList, trackComparator);
-		for(int i = 0; i < activeTrackList.size(); i++){
-			Track currTrack = activeTrackList.get(i);
+		for(int i = 0; i < getActiveTrackList().size(); i++){
+			//Track currTrack = activeTrackList.get(i);
+			Track currTrack = getActiveTrackList().get(i);
+			
 			Date inDate = new Date(currTrack.getImportDate().getTime() - currTrack.getImportDate().getTimezoneOffset()*60000);
 			String dateString = ""+ inDate.getMonth() + "/" + inDate.getDate() + "/" + (inDate.getYear()%100) + " " + inDate.getHours() + ":" + inDate.getMinutes();
 			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), dateString});
@@ -820,8 +832,18 @@ public class MainView {
     	}	
 	}
 	
-	public ArrayList<Track> getActiveTrackList(){
+	private static ArrayList<Track> getActiveTrackList(){
 		return activeTrackList;
+	}
+	
+	/**
+	 * Sets instance field to collection passed in.
+	 * It is synchronized for atomic update to instance field. Subsequent reads will happen after its state is updated correctly.
+	 * @param c
+	 */
+	private synchronized static void setActiveTrackList(Collection<? extends Track> c){
+		getActiveTrackList().clear();
+		getActiveTrackList().addAll(c);
 	}
 	
 	public JTable getTrackTable(){
