@@ -98,8 +98,10 @@ public class TrackListController {
 		if(tracksIn.size() == 0) return new ArrayList<Tag>();
 		ArrayList<Track> tracks = (ArrayList<Track>) tracksIn.clone();
 		
-		System.out.println(tracks.toString());
-		System.out.println(tracks.size());
+		System.out.println();
+		System.out.println("TrackListController: getCommonTags: tracks.toString(): " + tracks.toString());
+		System.out.println("TrackListController: getCommonTags: tracks.size(): " + tracks.size());
+		System.out.println();
 		
 		ArrayList<Tag> firstTagList = (tracks.remove(0)).getTags();
 		ArrayList<Hashtable<Integer,Tag>> tagListHashes = new ArrayList<Hashtable<Integer, Tag>>();

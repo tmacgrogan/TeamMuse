@@ -36,13 +36,16 @@ import javafx.scene.Scene;
 //import java.util.function.*;
 public class MainView {
 
-	public static ArrayList<Track> activeTrackList;
+	//Volatile keyword allows updated state to be visible to PlayBackApplicaiton
+	public static volatile ArrayList<Track> activeTrackList = new ArrayList<Track>();
+	
 	public static ArrayList<Tag> activeTags = new ArrayList<Tag>();
 	public static ArrayList<Search> savedSearches = new ArrayList<Search>();
 	public static ArrayList<Tag> parents;
 	public static ArrayList<Tag> parent;
 	
-	public static ArrayList<Track> selectedTracks = new ArrayList<Track>();
+	//Volatile keyword allows updated state to be visible to PlayBackApplicaiton
+	public static volatile ArrayList<Track> selectedTracks = new ArrayList<Track>();
 	public static Tag selectedTag;
 	
 	public static MetadataComparator trackComparator = new MetadataComparator("Date Added");
@@ -100,11 +103,11 @@ public class MainView {
 	private static JButton btnX;
 	private static JPanel tagSearchButtonPanel;
 	
-	private JFXPanel fxPanel;
+	//private JFXPanel fxPanel;
 	
 	public static void main(String[] args) {
-		SnapMain();
 		JFXPanel fxPanel= new JFXPanel();
+		SnapMain();
 		
 		
 		EventQueue.invokeLater(new Runnable() {
@@ -144,7 +147,9 @@ public class MainView {
 	public static void SnapMain() {
 		initialize();
 		
+		//First time activeTrackList set-up. Other calls are hooks for events that could happen later
 		activeTrackList = DbManager.getLibrary();
+		
 		savedSearches = DbManager.getSavedSearches();
 		System.out.println("savedSearches.size() in SnapMain: " + savedSearches.size());
 		
@@ -685,7 +690,7 @@ public class MainView {
 	        public void valueChanged(ListSelectionEvent event) {
 
 	        	if ( !event.getValueIsAdjusting()) {	
-	        		System.out.println(savedSearchTable.getSelectedRow());
+	        		System.out.println("\nMainView: savedSearchTable.getSelectedRow(): " + savedSearchTable.getSelectedRow()+"\n");
 	        		Search search = savedSearches.get(savedSearchTable.getSelectedRow());
 	        		searchField.setText(search.getSearchText());
 	        		

@@ -157,10 +157,9 @@ final class PlayBackApplication{//Inherently package private
     			return;
         	
         	//Need to make sure to get column at "Name"
+        	//Returns the title
         	String trackSelected = (String)trackTable.getModel().getValueAt(songRow, 0);
-        	System.out.println("\n PlayBackApplication: trackSelected using trackTable param is: " + trackSelected + "\n");
-        	
-        	System.out.println("\n PlayBackApplication: new and improved activeTrackList logs next Track as: " + activeTrackList.get(songRow+1).getTitle() + "\n");
+        	System.out.println("\n PlayBackApplication: trackSelected using JTable: " + trackSelected + "\n");
         	
         	selectedTrack = selectedTracks.get(0);
         	System.out.println();
@@ -454,6 +453,7 @@ final class PlayBackApplication{//Inherently package private
 		}
 		
 		nextTrack = activeTrackList.get(nextTrackIndex);
+		System.out.println("\n PlayBackApplication: new and improved activeTrackList logs next Track as: " + activeTrackList.get(nextTrackIndex).getTitle() + "\n");
 	}
 	
 	
