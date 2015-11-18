@@ -158,6 +158,7 @@ public class Track {
 		AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
 
 		// ID3v2.3 or ID3v2.4 so use abstract
+		
 		String title = ID3v2Tag.getFirst(FieldKey.TITLE);
 		if (title == "") {
 			return MP3File.getBaseFilename(mp3File.getFile());

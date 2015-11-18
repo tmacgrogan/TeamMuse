@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 import javax.swing.JFileChooser;
@@ -131,10 +132,54 @@ public class TrackListController {
 		return toReturn;
 	}
 	
-	public static ArrayList<Track> importToSnap()
-	{
+	public static ArrayList<Track> importM3UPlayList(){
+		ArrayList<Track> trackList = new ArrayList<Track>();
+		for(File file : chooseFiles(new FileNameExtensionFilter("M3U Files", "m3u"))){
+			Scanner scan;
+			try {
+				scan = new Scanner(file);
+				while (scan.hasNextLine()){
+					String line = scan.nextLine();
+					
+					if(line.charAt(0) !='#'){ //line is a file location
+						Track track;
+						try {
+							track = new Track(line);
+						} catch (Exception e) {
+							track = null;
+							System.out.println("caught exception for: " + line);
+							e.printStackTrace();
+						}
 
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("MP3 Files", "mp3");
+						if(track != null){
+							trackList.add(track);
+						}
+					}
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}			
+		}
+		DbManager.importTracks(trackList);
+		for(Track track : trackList){
+			track.addTag("butt");
+		}
+		return trackList;
+	}
+	
+	public static ArrayList<Track> importToSnap()
+	{	
+		ArrayList<Track> trackList = new ArrayList<Track>();
+		
+		for(File file : chooseFiles(new FileNameExtensionFilter("MP3 Files", "mp3"))){
+			trackList.add(new Track(file.getAbsolutePath()));
+		}
+		System.out.println(trackList.size());
+		DbManager.importTracks(trackList);
+		return trackList;
+	}
+	
+	private static ArrayList<File> chooseFiles(FileNameExtensionFilter filter){
 		
 		JFileChooser chooser = new JFileChooser();
 		chooser.setFileFilter(filter);
@@ -146,48 +191,31 @@ public class TrackListController {
 		JPanel panel = new JPanel( new BorderLayout() );
 		int approval = chooser.showOpenDialog(panel);
 		
-		File[] files;
-		ArrayList<Track> trackList = new ArrayList<Track>();
+		File[] files = null;
+		ArrayList<File> allFiles = new ArrayList<File>();
 		//make list of track objects from tracks user selects
 		if(approval == JFileChooser.APPROVE_OPTION){//Click Open
 			//a directory, list of tracks, or a track
-			files = chooser.getSelectedFiles();
+			files = chooser.getSelectedFiles();			
 			
-			File[] filesInDir;
 			for(File file: files)
 			{
 				if(file.isDirectory())
 				{
 					FileSystemView fileSysView = chooser.getFileSystemView();
-					filesInDir = fileSysView.getFiles(file, false);
-					for(File fileInDir: filesInDir)
-					{
-						 
+					for(File fileInDir: fileSysView.getFiles(file, false))
+					{						 
 						if( fileInDir.getAbsolutePath().contains("mp3")){
-							/**************************DEBUG*****************************/
-							System.out.println("A file in directory: " + fileInDir.getAbsolutePath());
-							
-							trackList.add( new Track( fileInDir.getAbsolutePath() ) );
-							//System.out.println(fileInDir.toString() );
+							allFiles.add(fileInDir);
 						}
 						
 					}
 					
 				}else{//isFile
-					/**************************DEBUG*****************************/
-					System.out.println("Selected a regular file: " + file.getAbsolutePath());
-					
-					trackList.add( new Track(file.getAbsolutePath()));
-					
-				}  
-				
-			}
-			
+					allFiles.add(file);					
+				}  				
+			}			
 		}
-		/**************************DEBUG*****************************/
-		System.out.println("Importing to tracks");
-		
-		DbManager.importTracks(trackList);
-		return trackList;
+		return allFiles;
 	}
 }

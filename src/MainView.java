@@ -515,7 +515,6 @@ public class MainView {
 //				updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
 		    	Search theSearch = new Search(searchField.getText());
 		    	activeTrackList = theSearch.executeSearch();
-		    	Collections.sort(activeTrackList, trackComparator);
 		    	updateTrackTable(false);
 			}
 		};
@@ -684,7 +683,7 @@ public class MainView {
 		savedSearchTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
 
-	        	if ( !event.getValueIsAdjusting()) {	
+	        	if ( !event.getValueIsAdjusting() && savedSearchTable.getSelectedRow() != -1) {	
 	        		System.out.println(savedSearchTable.getSelectedRow());
 	        		Search search = savedSearches.get(savedSearchTable.getSelectedRow());
 	        		searchField.setText(search.getSearchText());
@@ -692,11 +691,6 @@ public class MainView {
 	        		activeTrackList = search.executeSearch();
 	        		
 	        		updateTrackTable(false);
-//	        		for(int row : trackTable.getSelectedRows()){
-//	        			selectedTracks.add(activeTrackList.get(row));
-//	        			System.out.println("MainView: Songs in Selected Rows via activeTrackList: " + activeTrackList.get(row).getTitle());
-//	        		}
-//	        		updateTagTable();
 	        	}
 	        }
 	    });
