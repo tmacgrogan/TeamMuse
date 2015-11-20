@@ -36,7 +36,7 @@ public class Track {
 
 	public Track(String location) {
 		Location = location;
-
+		id = -1;
 		// AudioFile
 		try {
 
@@ -192,6 +192,9 @@ public class Track {
 	}
 
 	public int getTrackId() {
+		if(id < 0){
+			id = DbManager.getTrackId(Location);
+		}
 		return id;
 	}
 

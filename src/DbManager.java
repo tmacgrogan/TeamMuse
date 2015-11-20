@@ -105,12 +105,12 @@ public class DbManager {
 	 * @return
 	 */
 	// TODO getTrackId, maybe
-	public static int getTrackId(String trackName) {
+	public static int getTrackId(String trackLocation) {
 		int id = 0;
 		ResultSet existing;
-		String queryString = "SELECT * FROM Track WHERE Name LIKE ?;";
+		String queryString = "SELECT * FROM Track WHERE FileLocation LIKE ?;";
 		try {
-			existing = safeQuery(queryString, trackName);
+			existing = safeQuery(queryString, trackLocation);
 			if (!existing.next()) {
 				id = -1;
 			} else {

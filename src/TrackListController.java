@@ -99,8 +99,10 @@ public class TrackListController {
 		if(tracksIn.size() == 0) return new ArrayList<Tag>();
 		ArrayList<Track> tracks = (ArrayList<Track>) tracksIn.clone();
 		
-		System.out.println(tracks.toString());
-		System.out.println(tracks.size());
+		System.out.println();
+		System.out.println("TrackListController: getCommonTags: tracks.toString(): " + tracks.toString());
+		System.out.println("TrackListController: getCommonTags: tracks.size(): " + tracks.size());
+		System.out.println();
 		
 		ArrayList<Tag> firstTagList = (tracks.remove(0)).getTags();
 		ArrayList<Hashtable<Integer,Tag>> tagListHashes = new ArrayList<Hashtable<Integer, Tag>>();
@@ -134,17 +136,22 @@ public class TrackListController {
 	
 	public static ArrayList<Track> importM3UPlayList(){
 		ArrayList<Track> trackList = new ArrayList<Track>();
+		
 		for(File file : chooseFiles(new FileNameExtensionFilter("M3U Files", "m3u"))){
 			Scanner scan;
+			
 			try {
 				scan = new Scanner(file);
+				
 				while (scan.hasNextLine()){
 					String line = scan.nextLine();
 					
 					if(line.charAt(0) !='#'){ //line is a file location
 						Track track;
+						
 						try {
 							track = new Track(line);
+						
 						} catch (Exception e) {
 							track = null;
 							System.out.println("caught exception for: " + line);
@@ -158,12 +165,19 @@ public class TrackListController {
 				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
-			}			
+			}
+			DbManager.importTracks(trackList);
+			
+			for(Track track : trackList){
+				System.out.println("title: " + track.getTitle());
+
+				track.addTag("butt");
+			}
+			
+			System.out.println("HOBO: " + file.getName());
+			
 		}
-		DbManager.importTracks(trackList);
-		for(Track track : trackList){
-			track.addTag("butt");
-		}
+		
 		return trackList;
 	}
 	
