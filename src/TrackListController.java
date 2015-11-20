@@ -134,8 +134,9 @@ public class TrackListController {
 		return toReturn;
 	}
 	
-	public static ArrayList<Track> importM3UPlayList(){
+	public static Search importM3UPlayList(){
 		ArrayList<Track> trackList = new ArrayList<Track>();
+		String playListTag = new String();
 		
 		for(File file : chooseFiles(new FileNameExtensionFilter("M3U Files", "m3u"))){
 			Scanner scan;
@@ -168,17 +169,16 @@ public class TrackListController {
 			}
 			DbManager.importTracks(trackList);
 			
+			playListTag = "list:" + file.getName().substring(0, file.getName().length() - 4);
+			
 			for(Track track : trackList){
 				System.out.println("title: " + track.getTitle());
 
-				track.addTag("butt");
+				track.addTag(playListTag);
 			}
 			
-			System.out.println("HOBO: " + file.getName());
-			
 		}
-		
-		return trackList;
+		return new Search(playListTag);
 	}
 	
 	public static ArrayList<Track> importToSnap()

@@ -204,7 +204,6 @@ public class MainView {
 			public void mouseClicked(MouseEvent e) {
 				String text = searchField.getText();
 				if(text != null && !text.isEmpty()) {
-					System.out.println("reached");
 			    	Search search = new Search(text);
 			    	
 			    	//activeTrackList = search.executeSearch();
@@ -214,7 +213,6 @@ public class MainView {
 					/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
 					updateTrackTable(false);
 					search.favoriteSearch();
-					savedSearches = DbManager.getSavedSearches();
 					for (Search theSearch : DbManager.getSavedSearches()){
 						System.out.println(theSearch.getSearchText());
 					}
@@ -653,7 +651,10 @@ public class MainView {
 		btnImport.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				TrackListController.importToSnap();
+				TrackListController.importM3UPlayList().favoriteSearch();
+				updateSavedSearchTable();
+				
+				//TrackListController.importToSnap();
 				updateTrackTable(true);
 			}
 		});
@@ -774,10 +775,14 @@ public class MainView {
 	}
 	
 	private static void updateSavedSearchTable(){
+		savedSearches = DbManager.getSavedSearches();
+		
 		DefaultTableModel searchModel = (DefaultTableModel) savedSearchTable.getModel();
+		
 		System.out.println("savedSearches.size() = " + savedSearches.size());
 		
 		clearTable(savedSearchTable);
+		
 		for(int i = 0; i < savedSearches.size(); i++){
 			searchModel.addRow(new Object[]{savedSearches.get(i).getSearchText()});
 		}
