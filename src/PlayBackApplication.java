@@ -39,8 +39,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.layout.BorderPane;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+
 
 
 
@@ -49,7 +52,7 @@ final class PlayBackApplication{//Inherently package private
 	ImageView imageViewPause;
 	ImageView imageViewStop;
 	
-	private HBox mediaBar = new HBox(5.0);
+	private BorderPane mediaBar = new BorderPane();
 	
 	private MediaPlayer mediaPlayer;
 	private Media media;
@@ -85,7 +88,7 @@ final class PlayBackApplication{//Inherently package private
 	//TODO Adjust components on Hbox to move with resizing
 	public PlayBackApplication(){
 	    mediaBar.setPadding(new Insets(5, 10, 5, 10));
-        mediaBar.setAlignment(Pos.CENTER_LEFT);
+        //mediaBar.setAlignment(Pos.CENTER_LEFT);
         
 		//Set up buttons
 		InputStream playImageInput = getClass().getResourceAsStream("Default_Play.png");
@@ -102,11 +105,6 @@ final class PlayBackApplication{//Inherently package private
 		imageViewPause = new ImageView(pauseButtonImage);
 		imageViewStop = new ImageView(stopButtonImage);
 
-		trackTitleDisplay = new StackPane();
-		trackTitle = new Label();
-		
-		trackTitleDisplay.getChildren().addAll(new Rectangle(200,35,Color.BLACK), trackTitle);
-		
 		
 		Circle buttonCircle = new Circle(2);
 		playButton = new Button(); 
@@ -116,22 +114,44 @@ final class PlayBackApplication{//Inherently package private
 		stopButton = new Button();
 		stopButton.setGraphic(imageViewStop);
 		stopButton.setShape( buttonCircle );
-		//VBox buttons = new VBox();
-	    //buttons.getChildren().add(playButton);
-	    //buttons.getChildren().add(stopButton);
+		HBox buttons = new HBox(playButton, stopButton);
 		
-	        
+		mediaBar.setLeft(buttons);
+		BorderPane.setMargin(buttons, new Insets(0,100,0,0));
+		
 		playTime = new Label();
 		playTime.setMinWidth(Control.USE_PREF_SIZE);
         timeLabel = new Label("Time");
-        timeLabel.setMinWidth(Control.USE_PREF_SIZE);
+        //timeLabel.setMinWidth(Control.USE_PREF_SIZE);
 		timeSlider = new Slider();
 		timeSlider.setMinWidth(Control.USE_PREF_SIZE);
-		VBox timeSliderVBox = new VBox();
-        timeSliderVBox.getChildren().addAll(timeLabel,timeSlider, playTime);
-        timeSliderVBox.setAlignment(Pos.BOTTOM_LEFT);
-       
-		HBox.setHgrow(timeSlider, Priority.SOMETIMES);
+		HBox timeSliderHBox = new HBox();
+        timeSliderHBox.getChildren().addAll(timeLabel,timeSlider, playTime);//.addAll(timeLabel,timeSlider, playTime);
+        timeSliderHBox.setAlignment(Pos.BOTTOM_CENTER);
+        
+        trackTitleDisplay = new StackPane();
+		trackTitle = new Label();
+		trackTitleDisplay.getChildren().addAll(new Rectangle(), trackTitle);//new Rectangle(200,35,Color.BLACK)
+		StackPane.setAlignment(trackTitle,Pos.CENTER_LEFT);
+       // BorderPane trackInfo = new BorderPane();
+       // trackInfo.setTop(trackTitleDisplay);
+       // trackInfo.setBottom(timeSliderHBox);
+        mediaBar.setCenter(trackTitleDisplay);
+       // BorderPane.setAlignment(trackTitleDisplay, Pos.CENTER_LEFT);
+        mediaBar.setBottom(timeSliderHBox);
+        
+        //BorderPane.setMargin( timeSliderHBox,new Insets(0, (mediaBar.getWidth() * (1/4)),0, mediaBar.getWidth() * (1/4)));
+       // BorderPane.setAlignment(timeSliderHBox, Pos.BOTTOM_CENTER);
+        
+        //VBox trackInfo = new VBox();
+        //trackInfo.getChildren().addAll(trackTitleDisplay, timeSliderHBox);
+       // mediaBar.setCenter(trackInfo);
+        //mediaBar.setTop(trackTitleDisplay);
+        //mediaBar.setCenter(trackInfo);
+        //BorderPane.setAlignment(trackTitleDisplay, Pos.CENTER);
+        //BorderPane.setAlignment(timeSliderHBox, Pos.BOTTOM_CENTER);
+        
+		//HBox.setHgrow(timeSlider, Priority.SOMETIMES);
 
 		
         volumeLabel = new Label("Volume");
@@ -143,14 +163,17 @@ final class PlayBackApplication{//Inherently package private
         //TODO use south padding instead of dummy label
 		volumeSliderVBox.getChildren().addAll(volumeLabel,volumeSlider, new Label());
 		volumeSliderVBox.setAlignment(Pos.BOTTOM_LEFT);
+		mediaBar.setRight(volumeSliderVBox);
 		
-        HBox.setHgrow(volumeSlider, Priority.SOMETIMES);
+        //HBox.setHgrow(volumeSlider, Priority.SOMETIMES);
 
-        mediaBar.getChildren().addAll(playButton, stopButton);
-        mediaBar.getChildren().add(timeSliderVBox);
-        mediaBar.getChildren().add(trackTitleDisplay);
-        mediaBar.getChildren().add(volumeSliderVBox);
-        mediaBar.setAlignment(Pos.CENTER);
+        //mediaBar.getChildren().addAll(playButton, stopButton);
+        
+       // mediaBar.getChildren().add(timeSliderVBox);
+        //mediaBar.getChildren().add(trackInfo);
+       // mediaBar.getChildren().add(trackTitleDisplay);
+        //mediaBar.getChildren().add(volumeSliderVBox);
+        //mediaBar.setAlignment(Pos.CENTER);
         
         
         //Set volume of media player to what user sets
@@ -160,9 +183,7 @@ final class PlayBackApplication{//Inherently package private
             }
         });
 
-		
-		//firstPlay = true;
-		sceneColor = Color.DIMGRAY;
+		sceneColor = Color.ALICEBLUE;
 	}//END Constructor
 	
 	
@@ -452,7 +473,7 @@ final class PlayBackApplication{//Inherently package private
         			
         		case PAUSED://Symbol is set to play
         			//User wants to resume && there's time left on the song
-        			if( currTrackLocation.equals(selectedTrackLocation) ){//&& !(mediaPlayer.getCurrentTime().equals(mediaPlayer.getStopTime())) ){
+        			//if( currTrackLocation.equals(selectedTrackLocation) ){//&& !(mediaPlayer.getCurrentTime().equals(mediaPlayer.getStopTime())) ){
         				mediaPlayer.play();
         			
         				//Change button
@@ -473,48 +494,48 @@ final class PlayBackApplication{//Inherently package private
         				System.out.println("PlayBackApplication: PAUSED: User wants to resume && there's time left on the song");
         				System.out.println("PlayBackApplication: PAUSED: mediaPlayer status after poll: " + mediaPlayer.getStatus());
         				System.out.println();
-        				return;
-        			}
-        			
-        			
-        			//User wants to play a different song
-        			media = new Media(selectedTrackURI);
-        			mediaPlayer = new MediaPlayer(media);
-        			
-        			currTrack = selectedTrack;
-        			currTrackLocation = selectedTrackLocation;
-        			
-        			mediaPlayer.setOnReady( () ->{
-        				duration = mediaPlayer.getMedia().getDuration();
-        				updateValues();
-        				
-        	        	//For time slider
-        	            mediaPlayer.currentTimeProperty().addListener((ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) -> {
-        	            	updateValues();//Update time slider to represent current time of track playback and volume
-        	            });
-        	            
-        				mediaPlayer.play();
-        				
-        				//Change button
-						this.playButton.setGraphic(imageViewPause);
-						//Set playing song title text
-						this.trackTitle.setText(currTrack.getTitle());
-						
-        		        System.out.println("PlayBackApplication: MediaControl: setOnReady call: UpdateValues running");
-        				}
-    				);//END setOnReady
-        			
-        			
-            		mediaPlayer.setOnEndOfMedia( ()->{
-            			System.out.println("\n PlayBackApplicaiton: PAUSED2: On end of media and status is: " +  mediaPlayer.getStatus());
-        				setNextTrackPlay(activeTrackList);  
-        				playButton.fire();
-
-        			}
-        		);//END setOnEndOfMedia
+//        				return;
+//        			//}
+//        			
+//        			
+//        			//User wants to play a different song
+//        			media = new Media(selectedTrackURI);
+//        			mediaPlayer = new MediaPlayer(media);
+//        			
+//        			currTrack = selectedTrack;
+//        			currTrackLocation = selectedTrackLocation;
+//        			
+//        			mediaPlayer.setOnReady( () ->{
+//        				duration = mediaPlayer.getMedia().getDuration();
+//        				updateValues();
+//        				
+//        	        	//For time slider
+//        	            mediaPlayer.currentTimeProperty().addListener((ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) -> {
+//        	            	updateValues();//Update time slider to represent current time of track playback and volume
+//        	            });
+//        	            
+//        				mediaPlayer.play();
+//        				
+//        				//Change button
+//						this.playButton.setGraphic(imageViewPause);
+//						//Set playing song title text
+//						this.trackTitle.setText(currTrack.getTitle());
+//						
+//        		        System.out.println("PlayBackApplication: MediaControl: setOnReady call: UpdateValues running");
+//        				}
+//    				);//END setOnReady
+//        			
+//        			
+//            		mediaPlayer.setOnEndOfMedia( ()->{
+//            			System.out.println("\n PlayBackApplicaiton: PAUSED2: On end of media and status is: " +  mediaPlayer.getStatus());
+//        				setNextTrackPlay(activeTrackList);  
+//        				playButton.fire();
+//
+//        			}
+//        		);//END setOnEndOfMedia
             		
 
-    				System.out.println("PlayBackApplication: MediaControl: PAUSED 2: UpdateValues running");
+    				System.out.println("PlayBackApplication: MediaControl: PAUSED 2");
         			break;
         					
         			
