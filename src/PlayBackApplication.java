@@ -132,7 +132,8 @@ final class PlayBackApplication{//Inherently package private
         trackTitleDisplay = new StackPane();
 		trackTitle = new Label();
 		trackTitleDisplay.getChildren().addAll(new Rectangle(), trackTitle);//new Rectangle(200,35,Color.BLACK)
-		StackPane.setAlignment(trackTitle,Pos.CENTER_LEFT);
+		//trackTitleDisplay.setAlignment(trackTitle, Pos.);
+		StackPane.setAlignment(trackTitle,Pos.CENTER);
        // BorderPane trackInfo = new BorderPane();
        // trackInfo.setTop(trackTitleDisplay);
        // trackInfo.setBottom(timeSliderHBox);
