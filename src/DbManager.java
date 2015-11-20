@@ -104,7 +104,6 @@ public class DbManager {
 	 *            - file location
 	 * @return
 	 */
-	// TODO getTrackId, maybe
 	public static int getTrackId(String trackLocation) {
 		int id = 0;
 		ResultSet existing;
