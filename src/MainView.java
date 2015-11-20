@@ -155,7 +155,7 @@ public class MainView {
 		System.out.println("savedSearches.size() in SnapMain: " + savedSearches.size());
 		
 		trackModel = (DefaultTableModel) trackTable.getModel();
-		updateTrackTable(false);
+		updateTrackTable();
 		updateSavedSearchTable();
 		
 //		for(int i = 0; i < activeTrackList.size(); i++){
@@ -211,7 +211,7 @@ public class MainView {
 			    	
 					System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+ getActiveTrackList().size());
 					/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
-					updateTrackTable(false);
+					updateTrackTable();
 					search.favoriteSearch();
 					for (Search theSearch : DbManager.getSavedSearches()){
 						System.out.println(theSearch.getSearchText());
@@ -522,7 +522,7 @@ public class MainView {
 		    	
 		    	//activeTrackList = theSearch.executeSearch();
 		    	setActiveTrackList(theSearch.executeSearch());		    	
-		    	updateTrackTable(false);
+		    	updateTrackTable();
 			}
 		};
 		
@@ -540,8 +540,7 @@ public class MainView {
 				
 				//activeTrackList = DbManager.getLibrary();
 				setActiveTrackList(DbManager.getLibrary());
-				
-				updateTrackTable(true);
+				updateTrackTable();
 			}
 		});
 		searchPanel.add(btnX, BorderLayout.WEST);
@@ -635,7 +634,7 @@ public class MainView {
 				
 				trackComparator.setField(field);
 				
-				updateTrackTable(false);				
+				updateTrackTable();				
 			}
 		});
 				
@@ -651,11 +650,15 @@ public class MainView {
 		btnImport.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				TrackListController.importM3UPlayList().favoriteSearch();
+				Search importedPlayList = TrackListController.importM3UPlayList();
+				importedPlayList.favoriteSearch();
+				setActiveTrackList(importedPlayList.executeSearch());
 				updateSavedSearchTable();
 				
+				//uncomment these to have import button import files
 				//TrackListController.importToSnap();
-				updateTrackTable(true);
+				//setActiveTrackList(DbManager.getLibrary());
+				updateTrackTable();
 			}
 		});
 		btnImport.setForeground(Color.GRAY);
@@ -705,7 +708,7 @@ public class MainView {
 	        		//activeTrackList = search.executeSearch();
 	        		setActiveTrackList(search.executeSearch());
 	        		
-	        		updateTrackTable(false);
+	        		updateTrackTable();
 	        	}
 	        }
 	    });
@@ -743,17 +746,7 @@ public class MainView {
 	
 	
 	/***********************DEBUG:Added parameter for importToSnap button and Search button to both work using this call*********/
-	private static void updateTrackTable(boolean importToSnap){
-		/*********************DEBUG:PROBLEM DISPLAYING SEARCH RESULT*****************/
-		 //At this point activeTrackList was with searched result but you call getLibrary to overwrite that correct search.
-		 //Therefore, the search result isn't displayed to user
-		/******************DEBUG*************/
-		if(importToSnap)
-			
-			//activeTrackList = DbManager.getLibrary();
-			setActiveTrackList(DbManager.getLibrary());
-			
-		/****************************DEBUG*****************/
+	private static void updateTrackTable(){
 //		System.out.println("MainView:updateTrackTable: activeTrackList_Size: "+ activeTrackList.size());
 //		System.out.println("MainView:updateTrackTable: activeTrackList_contents: "+ activeTrackList.toString()	);
 		
