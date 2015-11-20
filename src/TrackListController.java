@@ -147,7 +147,7 @@ public class TrackListController {
 				//scan = new Scanner(file);
 				
 				for(String line = read.readLine(); line != null; line = read.readLine()){
-					if(line.charAt(0) !='#'){ //line is a file location
+					if( (line.length() > 0)&& line.charAt(0) !='#'){ //line is a file location
 						Track track;
 					
 						try {
