@@ -136,6 +136,15 @@ public class Track {
 	public String getTrackLocation() {
 		return Location;
 	}
+	
+	/**
+	 * Set track location to this absolute path.
+	 * 
+	 * @param trackLocation
+	 */
+	public void setTrackLocation(String trackLocation){
+		Location = trackLocation;
+	}
 
 	/**
 	 * Parses through audioFile's SNAP ID3 Frame to retrieve unique identifiers,

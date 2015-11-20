@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-//import javafx.application.Application;
-//import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.value.ObservableValue;
 //import javafx.embed.swing.JFXPanel;
@@ -24,40 +22,53 @@ import javafx.scene.image.ImageView;
 import javafx.scene.media.MediaPlayer;
 //import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
-//import javafx.scene.paint.Paint;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.paint.Paint;
 import javafx.scene.media.Media;
 
 //import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 //import javafx.scene.layout.Region;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.layout.BorderPane;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
 
 
+
 final class PlayBackApplication{//Inherently package private	
+	ImageView imageViewPlay;
+	ImageView imageViewPause;
+	ImageView imageViewStop;
 	
-	private HBox mediaBar = new HBox(5.0);
+	private BorderPane mediaBar = new BorderPane();
 	
 	private MediaPlayer mediaPlayer;
 	private Media media;
 	private String currTrackLocation;
-	private String autoPlay_NextTrackLocation;
+	//private String autoPlay_NextTrackLocation;
 	
 	private Track currTrack;
 	private Track nextTrack;
 	private Track selectedTrack;
 
-	
+	private Label trackTitle;
 	private Label playTime;
 	private Label timeLabel;
 	private Label volumeLabel;
+	
+	StackPane trackTitleDisplay;
 	
 	private Duration duration;
 	
@@ -77,45 +88,93 @@ final class PlayBackApplication{//Inherently package private
 	//TODO Adjust components on Hbox to move with resizing
 	public PlayBackApplication(){
 	    mediaBar.setPadding(new Insets(5, 10, 5, 10));
-        mediaBar.setAlignment(Pos.CENTER_LEFT);
+        //mediaBar.setAlignment(Pos.CENTER_LEFT);
         
 		//Set up buttons
-        //TODO remove buttons, Thao has better buttons
 		InputStream playImageInput = getClass().getResourceAsStream("Default_Play.png");
 		Image playButtonImage = new Image(playImageInput);
+		
+		
 		InputStream pauseImageInput = getClass().getResourceAsStream("Default_Pause.png");
 		Image pauseButtonImage = new Image(pauseImageInput);
+		
 		InputStream stopImageInput = getClass().getResourceAsStream("Default_Stop.png");
 		Image stopButtonImage = new Image(stopImageInput);
 
-		ImageView imageViewPlay = new ImageView(playButtonImage);
-		ImageView imageViewPause = new ImageView(pauseButtonImage);
-		ImageView imageViewStop = new ImageView(stopButtonImage);
+		imageViewPlay = new ImageView(playButtonImage);
+		imageViewPause = new ImageView(pauseButtonImage);
+		imageViewStop = new ImageView(stopButtonImage);
 
+		
+		Circle buttonCircle = new Circle(2);
 		playButton = new Button(); 
 		playButton.setGraphic(imageViewPlay);
-		pauseButton = new Button();
-		pauseButton.setGraphic(imageViewPause);
+		playButton.setShape( buttonCircle );
+		
 		stopButton = new Button();
 		stopButton.setGraphic(imageViewStop);
+		stopButton.setShape( buttonCircle );
+		HBox buttons = new HBox(playButton, stopButton);
+		
+		mediaBar.setLeft(buttons);
+		BorderPane.setMargin(buttons, new Insets(0,100,0,0));
 		
 		playTime = new Label();
 		playTime.setMinWidth(Control.USE_PREF_SIZE);
         timeLabel = new Label("Time");
-        timeLabel.setMinWidth(Control.USE_PREF_SIZE);
+        //timeLabel.setMinWidth(Control.USE_PREF_SIZE);
 		timeSlider = new Slider();
 		timeSlider.setMinWidth(Control.USE_PREF_SIZE);
-		timeSlider.setMaxWidth(100);
-		HBox.setHgrow(timeSlider, Priority.ALWAYS);
+		HBox timeSliderHBox = new HBox();
+        timeSliderHBox.getChildren().addAll(timeLabel,timeSlider, playTime);//.addAll(timeLabel,timeSlider, playTime);
+        timeSliderHBox.setAlignment(Pos.BOTTOM_CENTER);
+        
+        trackTitleDisplay = new StackPane();
+		trackTitle = new Label();
+		trackTitleDisplay.getChildren().addAll(new Rectangle(), trackTitle);//new Rectangle(200,35,Color.BLACK)
+		StackPane.setAlignment(trackTitle,Pos.CENTER_LEFT);
+       // BorderPane trackInfo = new BorderPane();
+       // trackInfo.setTop(trackTitleDisplay);
+       // trackInfo.setBottom(timeSliderHBox);
+        mediaBar.setCenter(trackTitleDisplay);
+       // BorderPane.setAlignment(trackTitleDisplay, Pos.CENTER_LEFT);
+        mediaBar.setBottom(timeSliderHBox);
+        
+        //BorderPane.setMargin( timeSliderHBox,new Insets(0, (mediaBar.getWidth() * (1/4)),0, mediaBar.getWidth() * (1/4)));
+       // BorderPane.setAlignment(timeSliderHBox, Pos.BOTTOM_CENTER);
+        
+        //VBox trackInfo = new VBox();
+        //trackInfo.getChildren().addAll(trackTitleDisplay, timeSliderHBox);
+       // mediaBar.setCenter(trackInfo);
+        //mediaBar.setTop(trackTitleDisplay);
+        //mediaBar.setCenter(trackInfo);
+        //BorderPane.setAlignment(trackTitleDisplay, Pos.CENTER);
+        //BorderPane.setAlignment(timeSliderHBox, Pos.BOTTOM_CENTER);
+        
+		//HBox.setHgrow(timeSlider, Priority.SOMETIMES);
 
+		
         volumeLabel = new Label("Volume");
         volumeLabel.setMinWidth(Control.USE_PREF_SIZE);
         volumeSlider = new Slider();
         volumeSlider.setMinWidth(Control.USE_PREF_SIZE);
-        //volumeSlider.setMaxWidth(100);//Control.USE_PREF_SIZE);
-        HBox.setHgrow(volumeSlider, Priority.SOMETIMES);
-        //volumeSlider.valueProperty().addListener((Observable ov) -> {
-        //});
+        volumeSlider.setMaxWidth(70);
+        VBox volumeSliderVBox = new VBox();
+        //TODO use south padding instead of dummy label
+		volumeSliderVBox.getChildren().addAll(volumeLabel,volumeSlider, new Label());
+		volumeSliderVBox.setAlignment(Pos.BOTTOM_LEFT);
+		mediaBar.setRight(volumeSliderVBox);
+		
+        //HBox.setHgrow(volumeSlider, Priority.SOMETIMES);
+
+        //mediaBar.getChildren().addAll(playButton, stopButton);
+        
+       // mediaBar.getChildren().add(timeSliderVBox);
+        //mediaBar.getChildren().add(trackInfo);
+       // mediaBar.getChildren().add(trackTitleDisplay);
+        //mediaBar.getChildren().add(volumeSliderVBox);
+        //mediaBar.setAlignment(Pos.CENTER);
+        
         
         //Set volume of media player to what user sets
         volumeSlider.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
@@ -123,19 +182,8 @@ final class PlayBackApplication{//Inherently package private
                 mediaPlayer.setVolume(volumeSlider.getValue() / 100.0);
             }
         });
-        
-      
-		mediaBar.getChildren().add(timeLabel);
-		mediaBar.getChildren().add(timeSlider);
-		mediaBar.getChildren().add(playTime);
-		mediaBar.getChildren().add(playButton);
-		mediaBar.getChildren().add(pauseButton);
-		mediaBar.getChildren().add(stopButton);
-		mediaBar.getChildren().add(volumeLabel);
-		mediaBar.getChildren().add(volumeSlider);
-		
-		//firstPlay = true;
-		sceneColor = Color.DIMGRAY;
+
+		sceneColor = Color.ALICEBLUE;
 	}//END Constructor
 	
 	
@@ -148,7 +196,8 @@ final class PlayBackApplication{//Inherently package private
 	 */
 	public Scene snapPlayBackSetup(DefaultTableModel trackModel, JTable trackTable, ArrayList<Track> selectedTracks, ArrayList<Track> activeTrackList){
         
-        /*****************Play Even Handler*************************/
+		/*****************Play Even Handler*************************/
+		
 		//Listener attached to time slider for when user seeks. Track time gets updated too.
 		//Listener attached to volume slider for when user sets it. Audio set to user specified volume.
         EventHandler<ActionEvent> playEvent = (ActionEvent e) -> {
@@ -158,16 +207,16 @@ final class PlayBackApplication{//Inherently package private
         	
         	//Need to make sure to get column at "Name"
         	//Returns the title
-        	String trackSelected = (String)trackTable.getModel().getValueAt(songRow, 0);
-        	System.out.println("\n PlayBackApplication: trackSelected using JTable: " + trackSelected + "\n");
+        	//String trackSelected = (String)trackTable.getModel().getValueAt(songRow, 0);
+        	//System.out.println("\n PlayBackApplication: trackSelected using JTable: " + trackSelected);
         	
         	selectedTrack = selectedTracks.get(0);
-        	System.out.println();
-        	System.out.println("PlayBackApplicaiton: selectedTrack: " + selectedTrack.getTitle());
+        	System.out.println("\nPlayBackApplicaiton: selectedTrack: " + selectedTrack.getTitle());
         	
+        	//nextTrack filled in endOfMedia callback
         	if(nextTrack != null) {
         		selectedTrack = nextTrack;//if media ends by itself nextTrack is set
-        		System.out.println("PlayBackApplication: selectedTrack is switched to nextTrack: " + selectedTrack.getTitle() + "\n" );
+        		System.out.println("\nPlayBackApplication: selectedTrack is switched to nextTrack: " + selectedTrack.getTitle() );
         		
         	   	nextTrack = null;//will be set-up onEndOfMedia if track ends by itself	
         	}
@@ -176,7 +225,7 @@ final class PlayBackApplication{//Inherently package private
         	String selectedTrackURI = (new File(selectedTrackLocation)).toURI().toString();
         	
         	if(mediaPlayer == null){//First Ever Playback
-        		System.out.println("PlayBackApplication: First Ever Playback");
+        		System.out.println("\nPlayBackApplication: First Ever Playback");
         		media = new Media(selectedTrackURI);
         		mediaPlayer = new MediaPlayer(media);
         		
@@ -185,28 +234,29 @@ final class PlayBackApplication{//Inherently package private
         		currTrackLocation = selectedTrackLocation;
         		
         		mediaPlayer.setOnReady( () ->{
-					duration = mediaPlayer.getMedia().getDuration();//returns duration in seconds
-					updateValues();//duration must be set before updateValues can be called
-					
-					
-	            	//Makes time slider move during track playback
-	        		//Add this block anywhere a new media object created in order to monitor its current playing time
-	                mediaPlayer.currentTimeProperty().addListener((ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) -> {
-	                	updateValues();//Update time slider to represent current time of track playback and volume
-	                	
-	                });
-	                
-	                
-					mediaPlayer.play();
-
-					//updateValues();
-					System.out.println("PlayBackApplication: MediaControl: mediaPlayer READY");
+						duration = mediaPlayer.getMedia().getDuration();//returns duration in seconds
+						updateValues();//duration must be set before updateValues can be called
+						
+		            	//Makes time slider move during track playback
+		        		//Add this block anywhere a new media object created in order to monitor its current playing time
+		                mediaPlayer.currentTimeProperty().addListener((ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) -> {
+		                	updateValues();//Update time slider to represent current time of track playback and volume
+		                	
+		                });
+		                
+						mediaPlayer.play();
+						
+						//Change button
+						this.playButton.setGraphic(imageViewPause);
+						//Set playing song title text
+						this.trackTitle.setText(currTrack.getTitle());
+						
+						System.out.println("\nPlayBackApplication: MediaControl: mediaPlayer READY");
         			}
         		);
             	
 
-                
-                //Allows user to move time slider to seek on track 
+                //Allows user to move time slider to seek on track. Only need to set once for duration of global timeSlider
                 timeSlider.valueProperty().addListener((Observable ov) -> {
                 	//System.out.println("PlayBackApplication: timeSlider change event");
                     if (timeSlider.isValueChanging()) {
@@ -224,21 +274,29 @@ final class PlayBackApplication{//Inherently package private
         		mediaPlayer.setOnEndOfMedia( ()->{
         				setNextTrackPlay(activeTrackList); 
         				playButton.fire();
-        			
         			}
         		);//END setOnEndOfMedia
         		
                
-        		
         	}//END if(mediaPlayer == null){First Ever Playback
 
         	
         	MediaPlayer.Status status = mediaPlayer.getStatus();
         	System.out.println("PlayBackApplication: playEvent: mediaPlayer status poll: " + status);
         	switch(status){
-        	
-        		case PLAYING://Applicable action here is user wanting to play a different song. Not what's currently playing since it's what's currently playing
+        		
+        		case PLAYING://Symbol shows pause
+        			//Applicable action here is user wanting to play a different song. Not what's currently playing 
+        			//If status is PLAYING, button has pause symbol
+        			//pause currently playing music
+        			mediaPlayer.pause();
         			
+					//Change button
+					this.playButton.setGraphic(imageViewPlay);
+					//Set playing song title text
+					//this.trackTitle.setText(currTrack.getTitle());
+        			
+					
         			System.out.println();
         			System.out.println("PlayBackApplication: mediaPlayer's current time: " + mediaPlayer.getCurrentTime());
         			System.out.println("PlayBackApplication: mediaPlayer's stop time: " + mediaPlayer.getStopTime());
@@ -247,6 +305,42 @@ final class PlayBackApplication{//Inherently package private
         			System.out.println("PlayBackApplication: currTrackLocation equals selectedTrackLocaiton: " + currTrackLocation.equals(selectedTrackLocation));
         			System.out.println();
         			
+        			if( (mediaPlayer.getCurrentTime().equals(mediaPlayer.getStopTime())) ){
+        				
+        				System.out.println("\n PlayBackApplication: PLAYING: Song ended and next track should play: " + selectedTrack.getTitle() );
+        				media = new Media(selectedTrackURI);
+        				mediaPlayer = new MediaPlayer(media);
+        				
+        				currTrack = selectedTrack;
+        				currTrackLocation = selectedTrackLocation;
+        				
+        				System.out.println("PlayBackApplication: Playing new song: MediaPlayer status: " + mediaPlayer.getStatus());
+        				
+        				mediaPlayer.setOnReady( () ->{
+	        					duration = mediaPlayer.getMedia().getDuration();
+	        					updateValues();
+	        					
+	            	        	//For time slider
+	            	            mediaPlayer.currentTimeProperty().addListener((ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) -> {
+	            	            	updateValues();//Update time slider to represent current time of track playback and volume
+	            	            	
+	            	            });
+
+	            				mediaPlayer.play();
+	            				//Set playing song title text
+	            				this.playButton.setGraphic(imageViewPause);
+	    						this.trackTitle.setText(currTrack.getTitle());
+        					}
+        				);
+
+        	            
+                		mediaPlayer.setOnEndOfMedia( ()->{
+            					setNextTrackPlay(activeTrackList);  
+            					playButton.fire();
+            				}
+                		);//END setOnEndOfMedia
+        			}
+        			/*
         			//When song finishes status is still PLAYING. If user hits play again on same song. It should be played again since its finished.
         			if(currTrackLocation.equals(selectedTrackLocation) && (mediaPlayer.getCurrentTime().equals(mediaPlayer.getStopTime())) ){
         				//mediaPlayer.seek(mediaPlayer.getStartTime());
@@ -258,18 +352,31 @@ final class PlayBackApplication{//Inherently package private
         				updateValues();
         				
         				mediaPlayer.play();
-        				//updateValues();
+        				//Set playing song title text
+						this.trackTitle.setText(currTrack.getTitle());
+						
         				System.out.println("PlayBackApplication: MediaControl: PLAYING 1: UpdateValues running");
         			}
-        			
+        			*/
+        			/*
         			//User selects a new song and hits play button while a current song is playing which isn't the selected song 
         			if( !(currTrackLocation.equals(selectedTrackLocation)) ){
-        				System.out.println("\nPlayBackApplication: MediaControl: PLAYING 2 UpdateValues running\n");
+        				
+            			mediaPlayer.pause();
+            			
+    					//Change button
+    					this.playButton.setGraphic(imageViewPause);
+    					//Set playing song title text
+    					this.trackTitle.setText(currTrack.getTitle());
+    					
+    					
+        				System.out.println("\nPlayBackApplication: MediaControl: PLAYING 2 UpdateValues running");
         				mediaPlayer.stop();//current song
         				System.out.println("PlayBackApplication: selected new track. Status of previous after stop call: " + mediaPlayer.getStatus() + "\n");
         				
         				mediaPlayer.seek(mediaPlayer.getStartTime());
         				updateValues();
+        				
         				
         				media = new Media(selectedTrackURI);
         				mediaPlayer = new MediaPlayer(media);
@@ -290,6 +397,8 @@ final class PlayBackApplication{//Inherently package private
 	            	            });
 
 	            				mediaPlayer.play();
+	            				//Set playing song title text
+	    						this.trackTitle.setText(currTrack.getTitle());
 	            				//updateValues();
 	            		        //System.out.println("PlayBackApplication: MediaControl: setOnReady call: UpdateValues running");
         					}
@@ -297,110 +406,140 @@ final class PlayBackApplication{//Inherently package private
 
         	            
                 		mediaPlayer.setOnEndOfMedia( ()->{
-            				setNextTrackPlay(activeTrackList);  
-            				playButton.fire();
+            					setNextTrackPlay(activeTrackList);  
+            					playButton.fire();
+            				}
+                		);//END setOnEndOfMedia
 
-            			}
-            		);//END setOnEndOfMedia
-
-        				
-        				//return;
-        			}
-        			
+        			}//END second IF condition
+        			*/
         			//Reached if play pressed on song currently playing 
-        			System.out.println("PlayBackApplication: in PLAYING: outside of conditionals: at locatio before break");
+        			System.out.println("PlayBackApplication: in PLAYING: paused pressedon song currently playing");
         			break;
         			
-        		case STOPPED:
+        		case STOPPED://symbols are play, stop
         			
         			//User playing a different song than previous song
         			if( !(currTrackLocation.equals(selectedTrackLocation)) ){
         				media = new Media(selectedTrackURI);
-        				//duration = mediaPlayer.getMedia().getDuration();
                 		mediaPlayer = new MediaPlayer(media);
                 		
                 		currTrack = selectedTrack;
                 		currTrackLocation = selectedTrackLocation;
                 		
                 		mediaPlayer.setOnReady( () ->{
-                			duration = mediaPlayer.getMedia().getDuration();
-                			updateValues();
-                			
-            	        	//For time slider
-            	            mediaPlayer.currentTimeProperty().addListener((ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) -> {
-            	            	updateValues();//Update time slider to represent current time of track playback and volume
-            	            	
-            	            });
-            	            
-            				mediaPlayer.play();
+	                			duration = mediaPlayer.getMedia().getDuration();
+	                			updateValues();
+	                			
+	            	        	//For time slider
+	            	            mediaPlayer.currentTimeProperty().addListener((ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) -> {
+	            	            	updateValues();//Update time slider to represent current time of track playback and volume
+	            	            	
+	            	            });
+	            	            
+	            				mediaPlayer.play();
+	            				
+	            				//Set playing song title text
+	        					//Change button
+	        					this.playButton.setGraphic(imageViewPause);
+	        					//Set playing song title text
+	        					this.trackTitle.setText(currTrack.getTitle());
             				}
         				);//END setOnReady()
                 		
                 		mediaPlayer.setOnEndOfMedia( ()->{
-            				setNextTrackPlay(activeTrackList);
-            				playButton.fire();
+	            				setNextTrackPlay(activeTrackList);
+	            				playButton.fire();
+            				}
+                		);//END setOnEndOfMedia
 
-            			}
-            		);//END setOnEndOfMedia
-
-        				System.out.println("PlayBackApplication: MediaControl: STOPPED 1: UpdateValues running");
-        				System.out.println("PlayBackApplication: playEvent: mediaPlayer status after poll: " + mediaPlayer.getStatus());
+        				System.out.println("\nPlayBackApplication: MediaControl: STOPPED 1");
+        				System.out.println("\nPlayBackApplication: playEvent: mediaPlayer status after poll: " + mediaPlayer.getStatus());
         				return;
         			}
+        			
         			//User wanting to replay same song
         			mediaPlayer.seek(mediaPlayer.getStartTime());
         			updateValues();
+        			
         			mediaPlayer.play();
-        			System.out.println("PlayBackApplication: MediaControl: STOPPED 2: UpdateValues running");
+					//Change button
+					this.playButton.setGraphic(imageViewPause);
+					//Set playing song title text
+					this.trackTitle.setText(currTrack.getTitle());
+					
+        			System.out.println("\nPlayBackApplication: MediaControl: STOPPED 2: User want to replay same song");
         			break;
         			
-        		case PAUSED:
+        		case PAUSED://Symbol is set to play
         			//User wants to resume && there's time left on the song
-        			if( currTrackLocation.equals(selectedTrackLocation) && !(mediaPlayer.getCurrentTime().equals(mediaPlayer.getStopTime())) ){
+        			//if( currTrackLocation.equals(selectedTrackLocation) ){//&& !(mediaPlayer.getCurrentTime().equals(mediaPlayer.getStopTime())) ){
         				mediaPlayer.play();
-        				//updateValues();
-        				System.out.println("PlayBackApplication: MediaControl: PAUSED 1: UpdateValues running");
-        				System.out.println("PlayBackApplication: playEvent: mediaPlayer status after poll: " + mediaPlayer.getStatus());
-        				return;
-        			}
-        			//User wants to play a different song
-        			//else if( !(mediaPlayer.getCurrentTime().equals(mediaPlayer.getStopTime())) )
-        			media = new Media(selectedTrackURI);
-        			mediaPlayer = new MediaPlayer(media);
         			
-        			currTrack = selectedTrack;
-        			currTrackLocation = selectedTrackLocation;
-        			
-        			mediaPlayer.setOnReady( () ->{
-        				duration = mediaPlayer.getMedia().getDuration();
-        				updateValues();
+        				//Change button
+						this.playButton.setGraphic(imageViewPause);
+						//Set playing song title text
+						//this.trackTitle.setText(currTrack.getTitle());
         				
-        	        	//For time slider
-        	            mediaPlayer.currentTimeProperty().addListener((ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) -> {
-        	            	updateValues();//Update time slider to represent current time of track playback and volume
-        	            	
-        	            });
-        	            
-        				mediaPlayer.play();
-        		        //updateValues();
-        	            
-        		        System.out.println("PlayBackApplication: MediaControl: setOnReady call: UpdateValues running");
-        				}
-    				);
-        			
-            		mediaPlayer.setOnEndOfMedia( ()->{
-        				setNextTrackPlay(activeTrackList);  
-        				playButton.fire();
-
-        			}
-        		);//END setOnEndOfMedia
+						
+						mediaPlayer.setOnEndOfMedia( ()->{
+								System.out.println("\n PlayBackApplicaiton: PAUSED: On end of media and status is: " +  mediaPlayer.getStatus());
+            					setNextTrackPlay(activeTrackList);
+            					playButton.fire();
+        					}
+						);//END setOnEndOfMedia
+						
+						
+        				System.out.println();
+        				System.out.println("PlayBackApplication: PAUSED: User wants to resume && there's time left on the song");
+        				System.out.println("PlayBackApplication: PAUSED: mediaPlayer status after poll: " + mediaPlayer.getStatus());
+        				System.out.println();
+//        				return;
+//        			//}
+//        			
+//        			
+//        			//User wants to play a different song
+//        			media = new Media(selectedTrackURI);
+//        			mediaPlayer = new MediaPlayer(media);
+//        			
+//        			currTrack = selectedTrack;
+//        			currTrackLocation = selectedTrackLocation;
+//        			
+//        			mediaPlayer.setOnReady( () ->{
+//        				duration = mediaPlayer.getMedia().getDuration();
+//        				updateValues();
+//        				
+//        	        	//For time slider
+//        	            mediaPlayer.currentTimeProperty().addListener((ObservableValue<? extends Duration> observable, Duration oldValue, Duration newValue) -> {
+//        	            	updateValues();//Update time slider to represent current time of track playback and volume
+//        	            });
+//        	            
+//        				mediaPlayer.play();
+//        				
+//        				//Change button
+//						this.playButton.setGraphic(imageViewPause);
+//						//Set playing song title text
+//						this.trackTitle.setText(currTrack.getTitle());
+//						
+//        		        System.out.println("PlayBackApplication: MediaControl: setOnReady call: UpdateValues running");
+//        				}
+//    				);//END setOnReady
+//        			
+//        			
+//            		mediaPlayer.setOnEndOfMedia( ()->{
+//            			System.out.println("\n PlayBackApplicaiton: PAUSED2: On end of media and status is: " +  mediaPlayer.getStatus());
+//        				setNextTrackPlay(activeTrackList);  
+//        				playButton.fire();
+//
+//        			}
+//        		);//END setOnEndOfMedia
             		
 
-    				System.out.println("PlayBackApplication: MediaControl: PAUSED 2: UpdateValues running");
+    				System.out.println("PlayBackApplication: MediaControl: PAUSED 2");
         			break;
         					
         			
-        	}
+        	}//END Switch stmt
         	System.out.println("PlayBackApplication: playEvent: mediaPlayer status after poll: " + mediaPlayer.getStatus());
 
         	
@@ -408,27 +547,34 @@ final class PlayBackApplication{//Inherently package private
         
         EventHandler<ActionEvent> stopEvent = (ActionEvent e)->{
         	mediaPlayer.stop();//Stop playing currently playing track
+        	
+			//Change button
+			this.playButton.setGraphic(imageViewPlay);
+			//Set playing song title text
+			this.trackTitle.setText("");
+			
         	mediaPlayer.seek(mediaPlayer.getStartTime());
         	        	
         	updateValues();
         	System.out.println("PlayBackApplication: MediaControl: stopEvent: UpdateValues running");
 		};
-		
-		EventHandler<ActionEvent> pauseEvent = (ActionEvent e)->{
-        	mediaPlayer.pause();
-        	//updateValues();
-        	System.out.println("PlayBackApplication: MediaControl: pauseEvent: UpdateValues running");
-		};
 
 		playButton.setOnAction(playEvent);
 		stopButton.setOnAction(stopEvent);
-		pauseButton.setOnAction(pauseEvent);
 		
 		Scene scene = new Scene(mediaBar, sceneColor);
 		//scene.setFill(Paint.valueOf("#202020"));
 		return scene;
 	}
 	
+	/**
+	 * Sets currTrack and currTrackLocation
+	 * @param currentTrack
+	 */
+	private void setCurrentTrack(Track currentTrack){
+		this.currTrack = currentTrack;
+		this.currTrackLocation = currentTrack.getTrackLocation();
+	}
 	
 	/*
 	private MediaPlayer mediaPlayer;
@@ -437,7 +583,7 @@ final class PlayBackApplication{//Inherently package private
 	private String autoPlay_NextTrackLocation;
 	*/
 	/**
-	 * Updates nextTrack, currTrack fields
+	 * Updates nextTrack
 	 * @param window.getActiveTrackList()
 	 */
 	private void setNextTrackPlay(ArrayList<Track> activeTrackList){
