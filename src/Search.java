@@ -25,6 +25,21 @@ public class Search {
 		parse();
 	}
 	
+	public Search(ArrayList<Tag> tagsToIntersect, ArrayList<Tag> tagsToExclude, Search subSearch){
+		this.tagsToIntersect = tagsToIntersect;
+		this.tagsToExclude = tagsToExclude;
+		this.subSearch = subSearch; 
+		for(Tag tag : tagsToIntersect){
+			this.searchString += tag.getName() + " ";
+		}
+		for(Tag tag : tagsToExclude){
+			this.searchString += "-" + tag.getName() + " ";
+		}
+		if(this.subSearch != null){
+			this.searchString += "or " + subSearch.getSearchText();
+		}		
+	}
+	
 	private void parse(){
 		
 		searchString = searchString.trim();
