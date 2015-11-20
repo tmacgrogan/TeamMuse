@@ -1,6 +1,5 @@
 import java.awt.BorderLayout;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.*;
 
 import javax.swing.JFileChooser;
@@ -231,5 +230,42 @@ public class TrackListController {
 			}			
 		}
 		return allFiles;
+	}
+	
+	public static void exportM3u(ArrayList<Track> playlist){
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("M3U Playlist", "m3u");
+		
+		JFileChooser chooser = new JFileChooser();
+		chooser.setFileFilter(filter);
+		//chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		chooser.setMultiSelectionEnabled(false);
+		
+		JPanel panel = new JPanel( new BorderLayout() );
+		int approval = chooser.showSaveDialog(panel);
+		System.out.println("start");
+		if(approval == JFileChooser.APPROVE_OPTION){
+			System.out.println("approved");
+			File dir = chooser.getSelectedFile();
+			StringBuffer text = new StringBuffer();
+			String path = dir.getAbsolutePath();
+			if(!path.contains(".m3u")){
+				path = path + ".m3u";
+			}
+			try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), "utf-8"))) {
+				text.append("#EXTM3U\n\n");
+				for(Track t : playlist){
+					text.append("#EXTINF:")
+						.append(t.getRuntime() + ",")
+						.append(t.getArtist() + " - ")
+						.append(t.getTitle() + "\n")
+						.append(t.getTrackLocation() + "\n\n");
+				}
+				System.out.println(path + ":\n" + text);
+				writer.write(text.toString());
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+		}
 	}
 }

@@ -176,13 +176,12 @@ public class Track {
 	}
 
 	/**
-	 * I don't really know how we should do this. Maybe make a separate ID3
-	 * class? *
+	 * Return Track runtime
 	 * 
 	 * @return
 	 */
-	public String[][] getID3() {
-		return null;
+	public String getRuntime() {
+		return ((int)mp3File.getMP3AudioHeader().getPreciseTrackLength()) + "";
 	}
 
 	public void setImportDate(Date date){
