@@ -152,7 +152,7 @@ public class MainView {
 		setActiveTrackList(DbManager.getLibrary());
 		
 		savedSearches = DbManager.getSavedSearches();
-		System.out.println("savedSearches.size() in SnapMain: " + savedSearches.size());
+		//System.out.println("savedSearches.size() in SnapMain: " + savedSearches.size());
 		
 		trackModel = (DefaultTableModel) trackTable.getModel();
 		updateTrackTable();
@@ -213,9 +213,6 @@ public class MainView {
 					/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
 					updateTrackTable();
 					search.favoriteSearch();
-					for (Search theSearch : DbManager.getSavedSearches()){
-						System.out.println(theSearch.getSearchText());
-					}
 					updateSavedSearchTable();
 				}
 			}
@@ -630,7 +627,7 @@ public class MainView {
 			public void mouseClicked(MouseEvent e){
 				String field = trackTable.getModel().getColumnName(trackTable.columnAtPoint(e.getPoint()));
 				
-				System.out.println("Clicked column: " + field);
+				//System.out.println("Clicked column: " + field);
 				
 				trackComparator.setField(field);
 				
@@ -701,7 +698,7 @@ public class MainView {
 
 
 	        	if ( !event.getValueIsAdjusting() && savedSearchTable.getSelectedRow() != -1) {	
-	        		System.out.println("\nMainView: savedSearchTable.getSelectedRow(): " + savedSearchTable.getSelectedRow()+"\n");
+	        		//System.out.println("\nMainView: savedSearchTable.getSelectedRow(): " + savedSearchTable.getSelectedRow()+"\n");
 	        		Search search = savedSearches.get(savedSearchTable.getSelectedRow());
 	        		searchField.setText(search.getSearchText());
 	        		
@@ -761,9 +758,7 @@ public class MainView {
 			String dateString = ""+ inDate.getMonth() + "/" + inDate.getDate() + "/" + (inDate.getYear()%100) + " " + inDate.getHours() + ":" + inDate.getMinutes();
 			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), dateString});
 			
-			System.out.println("MainView: trackModel #rows: " + trackModel.getRowCount());//ME
-			
-			
+			//System.out.println("MainView: trackModel #rows: " + trackModel.getRowCount());
 		}
 	}
 	
@@ -772,7 +767,7 @@ public class MainView {
 		
 		DefaultTableModel searchModel = (DefaultTableModel) savedSearchTable.getModel();
 		
-		System.out.println("savedSearches.size() = " + savedSearches.size());
+		//System.out.println("savedSearches.size() = " + savedSearches.size());
 		
 		clearTable(savedSearchTable);
 		
@@ -886,7 +881,7 @@ public class MainView {
 					
 					parentList.addMouseListener(new MouseAdapter() {
 					    public void mouseClicked(MouseEvent evt) {
-					    	System.out.println("Tag " + parent.get(parentList.getSelectedIndex()).getName());
+					    	//System.out.println("Tag " + parent.get(parentList.getSelectedIndex()).getName());
 					        if (evt.getClickCount() == 2) {
 					            // Double-click detected
 					        	curTag.removeParent(parent.get(parentList.getSelectedIndex()));
