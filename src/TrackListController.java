@@ -1,6 +1,6 @@
 import java.awt.BorderLayout;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import javax.swing.JFileChooser;
@@ -139,20 +139,20 @@ public class TrackListController {
 		String playListTag = new String();
 		
 		for(File file : chooseFiles(new FileNameExtensionFilter("M3U Files", "m3u"))){
-			Scanner scan;
+			//Scanner scan;
+			BufferedReader read;
 			
 			try {
-				scan = new Scanner(file);
+				read = new BufferedReader(new InputStreamReader(new FileInputStream(file), Charset.forName("UTF8")));
+				//scan = new Scanner(file);
 				
-				while (scan.hasNextLine()){
-					String line = scan.nextLine();
-					
+				for(String line = read.readLine(); line != null; line = read.readLine()){
 					if(line.charAt(0) !='#'){ //line is a file location
 						Track track;
-						
+					
 						try {
 							track = new Track(line);
-						
+					
 						} catch (Exception e) {
 							track = null;
 							System.out.println("caught exception for: " + line);
@@ -164,7 +164,29 @@ public class TrackListController {
 						}
 					}
 				}
+//				while (scan.hasNextLine()){
+//					String line = scan.nextLine();
+//					
+//					if(line.charAt(0) !='#'){ //line is a file location
+//						Track track;
+//						
+//						try {
+//							track = new Track(line);
+//						
+//						} catch (Exception e) {
+//							track = null;
+//							System.out.println("caught exception for: " + line);
+//							e.printStackTrace();
+//						}
+//
+//						if(track != null){
+//							trackList.add(track);
+//						}
+//					}
+//				}
 			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			DbManager.importTracks(trackList);
