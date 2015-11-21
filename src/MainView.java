@@ -504,6 +504,7 @@ public class MainView {
 					int option = JOptionPane.showConfirmDialog(null, message, "Edit Tag", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 					if (option == JOptionPane.OK_OPTION) {
 					    if (selectedTag.setName(newTagNameField.getText())) {
+					    	updateSavedSearchTable();
 					        System.out.println("successful");
 					    }
 					    if (selectedTag.addParent(newParentField.getText())){
@@ -611,6 +612,7 @@ public class MainView {
 				Search importedPlayList = TrackListController.importM3UPlayList();
 				importedPlayList.favoriteSearch();
 				setActiveTrackList(importedPlayList.executeSearch());
+				updateTrackTable();
 				updateSavedSearchTable();
 			}
 		});
@@ -954,6 +956,7 @@ public class MainView {
 					int option = JOptionPane.showConfirmDialog(null, message, "Edit Tag", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 					if (option == JOptionPane.OK_OPTION) {
 					    if (curTag.setName(newTagNameField.getText())) {
+					    	updateSavedSearchTable();
 					        System.out.println("successful");
 					    }
 					    if (curTag.addParent(newParentField.getText())){
