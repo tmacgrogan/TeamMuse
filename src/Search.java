@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Collections;
 
+import javax.swing.JOptionPane;
+
 /**
  * The Search class holds a group of Tags that correspond to the sets of songs associated with those Tag either intersected, excluded, or merged.
  *
@@ -70,6 +72,7 @@ public class Search {
 	
 					if(currTag.getTagId() < 0 ){
 						System.out.println("Search term \""+ curr + "\" is not an existing tag");
+						JOptionPane.showMessageDialog(null, "Search term \""+ curr + "\" is not an existing tag");
 					}
 					else{
 						tagsToIntersect.add(currTag);

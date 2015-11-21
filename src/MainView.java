@@ -48,6 +48,8 @@ public class MainView {
 	public static volatile ArrayList<Track> selectedTracks = new ArrayList<Track>();
 	public static Tag selectedTag;
 	
+	public static String lastTagAdded = "";
+	
 	public static MetadataComparator trackComparator = new MetadataComparator("Date Added");
 	
 	private static JFrame frmSnap;
@@ -225,6 +227,7 @@ public class MainView {
 		{
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
+		    	lastTagAdded = addTagField.getText();
 				for(Track track : selectedTracks){
 					track.addTag(addTagField.getText());
 				}
@@ -615,6 +618,7 @@ public class MainView {
 	        			System.out.println("MainView: Songs in Selected Rows via activeTrackList: " + getActiveTrackList().get(row).getTitle());
 	        		}
 	        		updateTagTable();
+	        		addTagField.setText(lastTagAdded);
 	        	}
 	        			
 	        	btnAddTag.setEnabled(true);
