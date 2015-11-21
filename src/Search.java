@@ -31,6 +31,7 @@ public class Search {
 		this.tagsToIntersect = tagsToIntersect;
 		this.tagsToExclude = tagsToExclude;
 		this.subSearch = subSearch; 
+		this.searchString = "";
 		for(Tag tag : tagsToIntersect){
 			this.searchString += tag.getName() + " ";
 		}
@@ -175,7 +176,7 @@ public class Search {
 	 * 
 	 */
 	public void favoriteSearch(){
-		DbManager.saveSearch(searchString);
+		DbManager.saveSearch(this);
 	}
 	
 	public ArrayList<Tag> getTagsToIntersect(){
@@ -196,6 +197,10 @@ public class Search {
 	
 	public static ArrayList<Search> getAllSearches(){
 		return DbManager.getSavedSearches();
+	}
+	
+	public Search getSubSearch(){
+		return subSearch;
 	}
 	
 	public String getSearchText(){

@@ -3,7 +3,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class DbManager {
@@ -289,11 +288,40 @@ public class DbManager {
 		return children;
 	}
 
-	public static void saveSearch(String searchString) {
+	public static void saveSearch(Search search) {
+		if(search.getSubSearch() != null){
+			saveSearch(search.getSubSearch());
+		}
 		try {
-			safeUpdate("INSERT INTO Search(SearchText) VALUES( ? );",
-					searchString);
+			String sub;
+			if(search.getSubSearch() != null){
+				ResultSet idRes = safeQuery("SELECT max(SearchId) FROM Search;");
+				idRes.next();
+				sub = "INSERT INTO Search(SearchText, SubSearchId) VALUES( ?, " + idRes.getInt(1) + " );";
+			}
+			else {
+				sub = "INSERT INTO Search(SearchText) VALUES( ? );";
+			}
+			safeUpdate(sub, search.getSearchText());
+			ResultSet idRes = safeQuery("SELECT max(SearchId) FROM Search;");
+			idRes.next();
+			int id = idRes.getInt(1);
+			insertSearchedTags(search.getTagsToIntersect(), true, id);
+			insertSearchedTags(search.getTagsToExclude(), false, id);
 		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void insertSearchedTags(ArrayList<Tag> tags, boolean isIncluded, int searchId){
+		try{
+			Statement s = connection.createStatement();
+			for(Tag t : tags){
+				System.out.println("\tinserting into SearchedTag: SearchId = " + searchId + ", TagId = " + t.getTagId() + ", IsIncluded = " + isIncluded);
+				s.executeUpdate("INSERT INTO SearchedTag(SearchId, TagId, IsIncluded) VALUES(" + searchId + ", " + t.getTagId() + ", " + (isIncluded?1:0) + ");");
+			}
+		}
+		catch(SQLException e){
 			e.printStackTrace();
 		}
 	}
@@ -311,16 +339,48 @@ public class DbManager {
 		ArrayList<Search> searches = new ArrayList<Search>();
 		ResultSet results = null;
 		try {
+			String query = readSql("./db/GetSearches.sql")[0];
 			Statement stmt = connection.createStatement();
-			results = stmt.executeQuery("SELECT * FROM Search;");
+			results = stmt.executeQuery(query);
 			while (results.next()) {
-				Search search = new Search(results.getString("SearchText"));
+				Search search = createSearch(results.getInt("SearchId"));
 				searches.add(search);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return searches;
+	}
+	
+	private static Search createSearch(int id){
+		Search s = null;
+		try{
+			ResultSet tagRes = connection.createStatement().executeQuery("SELECT * FROM Tag t JOIN SearchedTag st ON st.TagId = t.TagId WHERE st.SearchId = " + id + ";");
+			ArrayList<Tag> intersect = new ArrayList<Tag>();
+			ArrayList<Tag> exclude = new ArrayList<Tag>();
+			while(tagRes.next()){
+				Tag t = new Tag(tagRes.getString("name"), tagRes.getInt("TagId"));
+				if(tagRes.getBoolean("IsIncluded")){
+					intersect.add(t);
+				}
+				else{
+					exclude.add(t);
+				}
+			}
+			ResultSet res = connection.createStatement().executeQuery("SELECT SubSearchId FROM Search WHERE SearchId = " + id + ";");
+			res.next();
+			int subId = res.getInt("SubSearchId");
+			if(res.wasNull()){
+				s = new Search(intersect, exclude, null);
+			}
+			else{
+				s = new Search(intersect, exclude, createSearch(subId));
+			}
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+		}
+		return s;
 	}
 	
 	/**
