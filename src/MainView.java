@@ -79,9 +79,11 @@ public class MainView {
 	private static JPanel searchPanel;
 	private static JPanel playerPanel;
 	private static JPanel songPanel;
+	private static JPanel tagButtonPanel;
 	
 	private static DefaultTableModel trackModel;
 	private static DefaultTableModel tagModel;
+	private static DefaultTableModel searchTagModel;
 	
 	private static JButton btnImport;
 	private static JButton btnAddTag;
@@ -104,6 +106,11 @@ public class MainView {
 	private static JList parentList;
 	private static JButton btnX;
 	private static JPanel tagSearchButtonPanel;
+	private static JPanel importExportPanel;
+	private static JButton btnImportPlaylist;
+	private static JButton btnExportPlaylist;
+
+	
 	
 	//private JFXPanel fxPanel;
 	
@@ -178,7 +185,6 @@ public class MainView {
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		
 		frmSnap = new JFrame();
-		tagTable = new JTable();
 		
 		savedSearchTable = new JTable();
 		
@@ -193,6 +199,7 @@ public class MainView {
 		tagInfoPanel = new JPanel();
 		searchPanel = new JPanel();
 		songPanel = new JPanel();
+		tagButtonPanel = new JPanel();
 		//playerPanel = new JPanel();
 		
 		lblTagName = new JLabel("Tag Information");
@@ -215,8 +222,9 @@ public class MainView {
 					/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
 					updateTrackTable();
 					search.favoriteSearch();
-					updateSavedSearchTable();
 				}
+				
+				updateSavedSearchTable();
 			}
 		});
 		
@@ -246,6 +254,26 @@ public class MainView {
 		
 		
 		gl_leftPanel = new GroupLayout(leftPanel);
+		gl_leftPanel.setHorizontalGroup(
+			gl_leftPanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_leftPanel.createSequentialGroup()
+					.addGap(20)
+					.addGroup(gl_leftPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(btnSave)
+						.addComponent(btnImport)
+						.addComponent(savedSearchTable, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(84, Short.MAX_VALUE))
+		);
+		gl_leftPanel.setVerticalGroup(
+			gl_leftPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_leftPanel.createSequentialGroup()
+					.addGap(5)
+					.addComponent(btnImport)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnSave)
+					.addComponent(savedSearchTable, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(575, Short.MAX_VALUE))
+		);
 		groupLayout = new GroupLayout(frmSnap.getContentPane());
 		
 		frmSnap.setTitle("Snap");
@@ -353,6 +381,30 @@ public class MainView {
 		tagInfo.setColumns(13);
 		tagInfo.setEditable(false);
 		
+		btnDeleteTag.setEnabled(false);
+		btnDeleteTag.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+	        	
+				selectedTag = activeTags.get(tagTable.getSelectedRow());
+				
+				for(Track track : selectedTracks){
+					track.removeTag(selectedTag);
+				}
+				
+				updateTagTable();
+			}
+		});
+		
+		tagInfoPanel.add(btnDeleteTag, BorderLayout.SOUTH);
+		
+		tagInfoPanel.add(tagButtonPanel, BorderLayout.EAST);
+		tagButtonPanel.setOpaque(true);
+		tagButtonPanel.setBackground(sideBG);
+		tagButtonPanel.setPreferredSize(new Dimension(100, 600));
+		tagTable = new JTable();
+		tagInfoPanel.add(tagTable, BorderLayout.WEST);
+		
 		tagTable.setShowGrid(false);
 		tagTable.setForeground(Color.LIGHT_GRAY);
 		tagTable.setModel(new DefaultTableModel(
@@ -382,7 +434,7 @@ public class MainView {
 		tagTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tagTable.setShowVerticalLines(false);
 		tagTable.setPreferredSize(new Dimension(180, height));
-		tagInfoPanel.add(tagTable, BorderLayout.CENTER);
+		tagTable.setVisible(true);
 		
 		tagTable.addMouseListener(new MouseAdapter() {
 		    public void mousePressed(MouseEvent click) {
@@ -470,29 +522,13 @@ public class MainView {
 		    }
 		});
 		
-		btnDeleteTag.setEnabled(false);
-		btnDeleteTag.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-	        	
-				selectedTag = activeTags.get(tagTable.getSelectedRow());
-				
-				for(Track track : selectedTracks){
-					track.removeTag(selectedTag);
-				}
-				
-				updateTagTable();
-			}
-		});
-		
-		tagInfoPanel.add(btnDeleteTag, BorderLayout.SOUTH);
-		middlePanel.setLayout(new BorderLayout(0, 0));
-		
 		tagTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
 	        	btnDeleteTag.setEnabled(true);
 	        }
 	    });
+		tagButtonPanel.setVisible(false);
+		middlePanel.setLayout(new BorderLayout(0, 0));
 		
 		searchPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		searchPanel.setBackground(middleBG);
@@ -506,11 +542,9 @@ public class MainView {
 		{
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-//		    	Tag T = new Tag(searchField.getText());//new Tag().getTagByName(searchField.getText());
-//		    	tagSearchButtonPanel.setVisible(true);
-//		    	JButton newTagButton = addTagButton(T);
-//	    		tagSearchButtonPanel.add(newTagButton);
-//		    	Search search = new Search(searchField.getText());
+		    	tagSearchButtonPanel.setVisible(true);
+		    	Tag searchTag = new Tag(searchField.getText());
+		    	//updateSearchTagTable(searchTag);
 //		    	
 //				activeTrackList = search.executeSearch();
 //				
@@ -551,6 +585,39 @@ public class MainView {
 		tagSearchButtonPanel.setBackground(Color.DARK_GRAY);
 		tagSearchButtonPanel.setPreferredSize(new Dimension(556, 40));
 		tagSearchButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		
+		importExportPanel = new JPanel();
+		importExportPanel.setOpaque(true);
+		importExportPanel.setBackground(middleBG);
+		searchPanel.add(importExportPanel, BorderLayout.NORTH);
+		
+		btnImport.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				TrackListController.importToSnap();
+				setActiveTrackList(DbManager.getLibrary());
+				updateTrackTable();
+			}
+		});
+		btnImport.setForeground(Color.GRAY);
+		btnImport.setBackground(Color.DARK_GRAY);
+		btnImport.setHorizontalAlignment(SwingConstants.LEFT);
+		btnImport.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		
+		btnImportPlaylist = new JButton("Import Playlist");
+		btnImportPlaylist.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				Search importedPlayList = TrackListController.importM3UPlayList();
+				importedPlayList.favoriteSearch();
+				setActiveTrackList(importedPlayList.executeSearch());
+				updateSavedSearchTable();
+			}
+		});
+		importExportPanel.add(btnImportPlaylist);
+		
+		btnExportPlaylist = new JButton("Export Playlist");
+		importExportPanel.add(btnExportPlaylist);
 		tagSearchButtonPanel.setVisible(false);
 		
 		//playerPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -648,25 +715,6 @@ public class MainView {
 	    header.setForeground(Color.white);
 		
 		
-		btnImport.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-//				Search importedPlayList = TrackListController.importM3UPlayList();
-//				importedPlayList.favoriteSearch();
-//				setActiveTrackList(importedPlayList.executeSearch());
-//				updateSavedSearchTable();
-				
-				//uncomment these to have import button import files
-				TrackListController.importToSnap();
-				setActiveTrackList(DbManager.getLibrary());
-				updateTrackTable();
-			}
-		});
-		btnImport.setForeground(Color.GRAY);
-		btnImport.setBackground(Color.DARK_GRAY);
-		btnImport.setHorizontalAlignment(SwingConstants.LEFT);
-		btnImport.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-		
 		btnSave.setForeground(Color.GRAY);
 		btnSave.setHorizontalAlignment(SwingConstants.LEFT);
 		btnSave.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
@@ -713,28 +761,6 @@ public class MainView {
 	        	}
 	        }
 	    });
-		
-		
-		gl_leftPanel.setHorizontalGroup(
-			gl_leftPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_leftPanel.createSequentialGroup()
-					.addGap(20)
-					.addGroup(gl_leftPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnSave)
-						.addComponent(btnImport)
-						.addComponent(savedSearchTable))
-					.addGap(100))
-		);
-		gl_leftPanel.setVerticalGroup(
-			gl_leftPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_leftPanel.createSequentialGroup()
-					.addGap(5)
-					.addComponent(btnImport)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnSave)
-					.addComponent(savedSearchTable)
-					.addGap(487))
-		);
 		leftPanel.setLayout(gl_leftPanel);
 		frmSnap.getContentPane().setLayout(groupLayout);
 		frmSnap.setBounds((screen.width/2)-(width/2), (screen.height/2)-(height/2), width, height);
@@ -790,20 +816,44 @@ public class MainView {
     		tagModel.removeRow(i); 
     	}
     	
-    	tagSearchButtonPanel.removeAll();
-    	tagSearchButtonPanel.updateUI();
+    	tagButtonPanel.removeAll();
+    	tagButtonPanel.updateUI();
     	
     	activeTags = TrackListController.getCommonTags(selectedTracks);
     	
     	//populates rows with tags of selected track
     	for(int i = 0; i < activeTags.size(); i++){
     		tagModel.addRow(new Object[]{activeTags.get(i).getName()});
-//    		JButton newTagButton = addTagButton(activeTags.get(i));
-//    		tagSearchButtonPanel.add(newTagButton);
+    		JButton newTagButton = addTagButton(activeTags.get(i));
+    		tagButtonPanel.add(newTagButton);
     	}
     	
     	//tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
 	}
+	
+//	private static void updateSearchTagTable(Tag searchTag){
+//		// TODO Auto-generated method stub
+//		searchTagModel = (DefaultTableModel) searchTagTable.getModel();
+//    	
+//    	//clears row to be ready to display new set of tags
+//    	int rows = searchTagModel.getRowCount(); 
+//    	for(int i = rows - 1; i >=0; i--){
+//    		searchTagModel.removeRow(i); 
+//    	}
+//    	
+//    	tagSearchButtonPanel.removeAll();
+//    	tagSearchButtonPanel.updateUI();
+//    	
+//    	//activeTags = TrackListController.getCommonTags(selectedTracks);
+//    	
+//    	//populates rows with tags of selected track
+//    	//for(int i = 0; i < activeTags.size(); i++){
+//    		searchTagModel.addRow(new Object[]{searchTag.getName()});
+//    		//JButton newTagButton = addTagButton(searchTag);
+//    		//tagSearchB,kuttonPanel.add(newTagButton);
+//    	//}
+//		
+//	}
 	
 	
 	
