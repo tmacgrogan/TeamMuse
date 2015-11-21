@@ -147,7 +147,7 @@ public class TrackListController {
 				//scan = new Scanner(file);
 				
 				for(String line = read.readLine(); line != null; line = read.readLine()){
-					if(line.charAt(0) !='#'){ //line is a file location
+					if( (line.length() > 0)&& line.charAt(0) !='#'){ //line is a file location
 						Track track;
 					
 						try {
@@ -164,26 +164,6 @@ public class TrackListController {
 						}
 					}
 				}
-//				while (scan.hasNextLine()){
-//					String line = scan.nextLine();
-//					
-//					if(line.charAt(0) !='#'){ //line is a file location
-//						Track track;
-//						
-//						try {
-//							track = new Track(line);
-//						
-//						} catch (Exception e) {
-//							track = null;
-//							System.out.println("caught exception for: " + line);
-//							e.printStackTrace();
-//						}
-//
-//						if(track != null){
-//							trackList.add(track);
-//						}
-//					}
-//				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

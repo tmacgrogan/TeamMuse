@@ -647,16 +647,18 @@ public class MainView {
 		btnImport.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
+//				These lines import a playlist
 //				Search importedPlayList = TrackListController.importM3UPlayList();
 //				importedPlayList.favoriteSearch();
 //				setActiveTrackList(importedPlayList.executeSearch());
 //				updateSavedSearchTable();
 				
+				//This line exports a playlist
 				TrackListController.exportM3u(getActiveTrackList());
 				
-				//uncomment these to have import button import files
-				//TrackListController.importToSnap();
-				//setActiveTrackList(DbManager.getLibrary());
+//				these lines import files
+//				TrackListController.importToSnap();
+//				setActiveTrackList(DbManager.getLibrary());
 				updateTrackTable();
 			}
 		});
