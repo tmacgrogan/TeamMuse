@@ -257,8 +257,17 @@ public class TrackListController {
 	
 	public static void exportM3u(ArrayList<Track> playlist){
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("M3U Playlist", "m3u");
+		String defaultPath;
 		
-		JFileChooser chooser = new JFileChooser();
+		//System.out.println(System.getProperty("os.name").substring(0, 3).equals("Win"));
+		if(System.getProperty("os.name").substring(0, 3).equals("Win")){
+			System.out.println("reached");
+			defaultPath = System.getProperty("user.home")+"/Documents/VirtualDJ/Playlists";
+		}else{
+			defaultPath = System.getProperty("user.home")+"Library/VirtualDJ/Playlists";
+		}		
+
+		JFileChooser chooser = new JFileChooser(defaultPath);
 		chooser.setFileFilter(filter);
 		//chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		chooser.setMultiSelectionEnabled(false);

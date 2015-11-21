@@ -605,7 +605,7 @@ public class MainView {
 
 	        	if ( !event.getValueIsAdjusting()) {	        		
 	        		selectedTracks.clear();
-	        		System.out.println("trackTable.getSelectedRows size: "+ trackTable.getSelectedRows().length);
+	        		//System.out.println("trackTable.getSelectedRows size: "+ trackTable.getSelectedRows().length);
 	        		
 
 	        		for(int row : trackTable.getSelectedRows()){
@@ -647,10 +647,12 @@ public class MainView {
 		btnImport.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				Search importedPlayList = TrackListController.importM3UPlayList();
-				importedPlayList.favoriteSearch();
-				setActiveTrackList(importedPlayList.executeSearch());
-				updateSavedSearchTable();
+//				Search importedPlayList = TrackListController.importM3UPlayList();
+//				importedPlayList.favoriteSearch();
+//				setActiveTrackList(importedPlayList.executeSearch());
+//				updateSavedSearchTable();
+				
+				TrackListController.exportM3u(getActiveTrackList());
 				
 				//uncomment these to have import button import files
 				//TrackListController.importToSnap();
