@@ -110,7 +110,6 @@ public class MainView {
 	private static JPanel tagSearchButtonPanel;
 	private static JPanel importExportPanel;
 	private static JButton importTracks;
-	private static JButton btnExportPlaylist;
 	private static JPanel buttonMiddlePanel;
 	private static JLabel lblSavedPlaylists;
 
@@ -230,7 +229,8 @@ public class MainView {
             public void actionPerformed(ActionEvent e) {
             	//System.out.println("SAVE SEARCH TABLE ROW: " + savedSearchTable.getSelectedRow());
             	DbManager.deleteSearch(savedSearchTable.getValueAt(savedSearchTable.getSelectedRow(), 0).toString());
-            	updateSavedSearchTable();
+            	TrackListController.exportM3u(getActiveTrackList());
+     
             }
         });
         searchPopupMenu.add(exportItem);
@@ -458,7 +458,7 @@ public class MainView {
 		tagButtonPanel.setBackground(sideBG);
 		tagButtonPanel.setPreferredSize(new Dimension(100, 600));
 		tagTable = new JTable();
-		tagInfoPanel.add(tagTable, BorderLayout.WEST);
+		tagInfoPanel.add(tagTable, BorderLayout.CENTER);
 		
 		tagTable.setShowGrid(false);
 		tagTable.setForeground(Color.LIGHT_GRAY);
@@ -595,8 +595,8 @@ public class MainView {
 		{
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		    	tagSearchButtonPanel.setVisible(true);
-		    	Tag searchTag = new Tag(searchField.getText());
+		    	//tagSearchButtonPanel.setVisible(true);
+		    	//Tag searchTag = new Tag(searchField.getText());
 		    	//updateSearchTagTable(searchTag);
 //		    	
 //				activeTrackList = search.executeSearch();
@@ -680,16 +680,6 @@ public class MainView {
 				TrackListController.importToSnap();
 				setActiveTrackList(DbManager.getLibrary());
 				updateTrackTable();
-			}
-		});
-		
-		btnExportPlaylist = new JButton("Export Playlist");
-		buttonMiddlePanel.add(btnExportPlaylist);
-		btnExportPlaylist.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-		btnExportPlaylist.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				TrackListController.exportM3u(activeTrackList);
 			}
 		});
 		btnSave = new JButton("Save Playlist");
