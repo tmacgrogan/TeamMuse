@@ -105,11 +105,12 @@ public class MainView {
 	private static JButton btnX;
 	private static JPanel tagSearchButtonPanel;
 	
-	//private JFXPanel fxPanel;
+	private static JFXPanel fxPanel;
 	
 	public static void main(String[] args) {
-		JFXPanel fxPanel= new JFXPanel();
 		SnapMain();
+		fxPanel= new JFXPanel();
+		middlePanel.add( fxPanel, BorderLayout.SOUTH);
 		
 		
 		EventQueue.invokeLater(new Runnable() {
@@ -124,7 +125,6 @@ public class MainView {
 			}
 		});
 
-		
 		Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -132,12 +132,8 @@ public class MainView {
             	PlayBackApplication snapPlayBack = new PlayBackApplication();
             	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, selectedTracks, activeTrackList);
         		fxPanel.setScene(scene);                
-                middlePanel.add( fxPanel, BorderLayout.SOUTH);
-
             }
        });
-
-
 
 	}
 	
