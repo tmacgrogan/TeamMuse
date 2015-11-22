@@ -11,6 +11,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -85,7 +87,7 @@ public class MainView {
 	private static DefaultTableModel tagModel;
 	private static DefaultTableModel searchTagModel;
 	
-	private static JButton btnImport;
+	private static JButton btnImportPlaylist;
 	private static JButton btnAddTag;
 	private static JButton btnDeleteTag;
 	private static JButton btnMusicPlayer;
@@ -107,8 +109,10 @@ public class MainView {
 	private static JButton btnX;
 	private static JPanel tagSearchButtonPanel;
 	private static JPanel importExportPanel;
-	private static JButton btnImportPlaylist;
+	private static JButton importTracks;
 	private static JButton btnExportPlaylist;
+	private static JPanel buttonMiddlePanel;
+	private static JLabel lblSavedPlaylists;
 
 	
 	
@@ -187,6 +191,50 @@ public class MainView {
 		frmSnap = new JFrame();
 		
 		savedSearchTable = new JTable();
+		savedSearchTable.setOpaque(true);
+		savedSearchTable.setBackground(sideBG);
+		
+		final JPopupMenu searchPopupMenu = new JPopupMenu();
+		searchPopupMenu.addPopupMenuListener(new PopupMenuListener() {
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        int rowAtPoint = savedSearchTable.rowAtPoint(SwingUtilities.convertPoint(searchPopupMenu, new Point(0, 0), savedSearchTable));
+                        if (rowAtPoint > -1) {
+                        	savedSearchTable.setRowSelectionInterval(rowAtPoint, rowAtPoint);
+                        }
+                    }
+                });
+
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+        });
+        JMenuItem deleteItem = new JMenuItem("Delete");
+        deleteItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	System.out.println("SAVE SEARCH TABLE ROW: " + savedSearchTable.getSelectedRow());
+            	DbManager.deleteSearch(savedSearchTable.getValueAt(savedSearchTable.getSelectedRow(), 0).toString());
+            	updateSavedSearchTable();
+            }
+        });
+        searchPopupMenu.add(deleteItem);
+        savedSearchTable.setComponentPopupMenu(searchPopupMenu);
 		
 		lblMenu = new JLabel("Menu");
 		lblSongList = new JLabel("Song List");
@@ -206,25 +254,9 @@ public class MainView {
 		
 		btnAddTag = new JButton("+");
 		btnDeleteTag = new JButton("Delete Tag");
-		btnImport = new JButton("Import");
-		btnSave = new JButton("Save");
-		btnSave.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				String text = searchField.getText();
-				if(text != null && !text.isEmpty()) {
-			    	Search search = new Search(text);
-			    	
-			    	//activeTrackList = search.executeSearch();
-					setActiveTrackList(search.executeSearch());
-			    	
-					System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+ getActiveTrackList().size());
-					/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
-					updateTrackTable();
-					search.favoriteSearch();
-				}
-				
-				updateSavedSearchTable();
+		btnImportPlaylist = new JButton("Import Playlist");
+		btnImportPlaylist.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 			}
 		});
 		
@@ -250,29 +282,41 @@ public class MainView {
 		
 		
 		tagInfo = new JTextField();
-		searchField = new JTextField();
+		
+		lblSavedPlaylists = new JLabel("Saved Playlists");
+		lblSavedPlaylists.setFont(new Font("Lucida Sans", Font.PLAIN, 13));
+		lblSavedPlaylists.setForeground(Color.WHITE);
+		lblSavedPlaylists.setOpaque(true);
+		lblSavedPlaylists.setBackground(Color.GRAY);
 		
 		
 		gl_leftPanel = new GroupLayout(leftPanel);
 		gl_leftPanel.setHorizontalGroup(
-			gl_leftPanel.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_leftPanel.createSequentialGroup()
-					.addGap(20)
-					.addGroup(gl_leftPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnSave)
-						.addComponent(btnImport)
-						.addComponent(savedSearchTable, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(84, Short.MAX_VALUE))
+			gl_leftPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_leftPanel.createSequentialGroup()
+					.addGroup(gl_leftPanel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(Alignment.LEADING, gl_leftPanel.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(savedSearchTable, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE))
+						.addGroup(Alignment.LEADING, gl_leftPanel.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(lblSavedPlaylists, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)))
+					.addContainerGap())
+				.addGroup(Alignment.TRAILING, gl_leftPanel.createSequentialGroup()
+					.addContainerGap(34, Short.MAX_VALUE)
+					.addComponent(btnImportPlaylist)
+					.addGap(32))
 		);
 		gl_leftPanel.setVerticalGroup(
 			gl_leftPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_leftPanel.createSequentialGroup()
-					.addGap(5)
-					.addComponent(btnImport)
+					.addContainerGap()
+					.addComponent(btnImportPlaylist)
+					.addGap(126)
+					.addComponent(lblSavedPlaylists)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnSave)
-					.addComponent(savedSearchTable, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(575, Short.MAX_VALUE))
+					.addComponent(savedSearchTable, GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
+					.addContainerGap())
 		);
 		groupLayout = new GroupLayout(frmSnap.getContentPane());
 		
@@ -536,9 +580,6 @@ public class MainView {
 		middlePanel.add(searchPanel, BorderLayout.NORTH);
 		searchPanel.setLayout(new BorderLayout(0, 0));
 		
-		searchField.setColumns(30);
-		searchPanel.add(searchField);
-		
 		Action searchAction = new AbstractAction()
 		{
 		    @Override
@@ -561,25 +602,6 @@ public class MainView {
 			}
 		};
 		
-		searchField.addActionListener(searchAction);
-		
-		searchButton = new JButton("Search");
-		searchButton.addActionListener(searchAction);
-		searchPanel.add(searchButton, BorderLayout.EAST);
-		
-		btnX = new JButton("X");
-		btnX.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				tagSearchButtonPanel.setVisible(false);
-				searchField.setText("");
-				
-				//activeTrackList = DbManager.getLibrary();
-				setActiveTrackList(DbManager.getLibrary());
-				updateTrackTable();
-			}
-		});
-		searchPanel.add(btnX, BorderLayout.WEST);
-		
 		tagSearchButtonPanel = new JPanel();
 		searchPanel.add(tagSearchButtonPanel, BorderLayout.SOUTH);
 		tagSearchButtonPanel.setOpaque(true);
@@ -592,20 +614,6 @@ public class MainView {
 		importExportPanel.setBackground(middleBG);
 		searchPanel.add(importExportPanel, BorderLayout.NORTH);
 		
-		btnImport.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				TrackListController.importToSnap();
-				setActiveTrackList(DbManager.getLibrary());
-				updateTrackTable();
-			}
-		});
-		btnImport.setForeground(Color.GRAY);
-		btnImport.setBackground(Color.DARK_GRAY);
-		btnImport.setHorizontalAlignment(SwingConstants.LEFT);
-		btnImport.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-		
-		btnImportPlaylist = new JButton("Import Playlist");
 		btnImportPlaylist.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
@@ -616,10 +624,90 @@ public class MainView {
 				updateSavedSearchTable();
 			}
 		});
-		importExportPanel.add(btnImportPlaylist);
+		btnImportPlaylist.setForeground(Color.GRAY);
+		btnImportPlaylist.setBackground(Color.DARK_GRAY);
+		btnImportPlaylist.setHorizontalAlignment(SwingConstants.LEFT);
+		btnImportPlaylist.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		
+		btnX = new JButton("X");
+		importExportPanel.add(btnX);
+		btnX.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tagSearchButtonPanel.setVisible(false);
+				searchField.setText("");
+				
+				//activeTrackList = DbManager.getLibrary();
+				setActiveTrackList(DbManager.getLibrary());
+				updateTrackTable();
+			}
+		});
+		searchField = new JTextField();
+		importExportPanel.add(searchField);
+		
+		searchField.setColumns(30);
+		
+		searchField.addActionListener(searchAction);
+		
+		searchButton = new JButton("Search");
+		importExportPanel.add(searchButton);
+		
+		buttonMiddlePanel = new JPanel();
+		buttonMiddlePanel.setOpaque(true);
+		buttonMiddlePanel.setBackground(sideBG);
+		searchPanel.add(buttonMiddlePanel, BorderLayout.CENTER);
+		
+		importTracks = new JButton("Import Tracks");
+		buttonMiddlePanel.add(importTracks);
+		importTracks.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		importTracks.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		importTracks.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				TrackListController.importToSnap();
+				setActiveTrackList(DbManager.getLibrary());
+				updateTrackTable();
+			}
+		});
 		
 		btnExportPlaylist = new JButton("Export Playlist");
-		importExportPanel.add(btnExportPlaylist);
+		buttonMiddlePanel.add(btnExportPlaylist);
+		btnExportPlaylist.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		btnExportPlaylist.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				TrackListController.exportM3u(activeTrackList);
+			}
+		});
+		btnSave = new JButton("Save Playlist");
+		buttonMiddlePanel.add(btnSave);
+		btnSave.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String text = searchField.getText();
+				if(text != null && !text.isEmpty()) {
+			    	Search search = new Search(text);
+			    	
+			    	//activeTrackList = search.executeSearch();
+					setActiveTrackList(search.executeSearch());
+			    	
+					System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+ getActiveTrackList().size());
+					/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
+					updateTrackTable();
+					search.favoriteSearch();
+				}
+				
+				updateSavedSearchTable();
+			}
+		});
+		
+		
+		btnSave.setForeground(Color.GRAY);
+		btnSave.setHorizontalAlignment(SwingConstants.LEFT);
+		btnSave.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		searchButton.addActionListener(searchAction);
 		tagSearchButtonPanel.setVisible(false);
 		
 		//playerPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -715,11 +803,6 @@ public class MainView {
 		header = trackTable.getTableHeader();
 	    header.setBackground(middleBG);
 	    header.setForeground(Color.white);
-		
-		
-		btnSave.setForeground(Color.GRAY);
-		btnSave.setHorizontalAlignment(SwingConstants.LEFT);
-		btnSave.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		
 		savedSearchTable.setShowGrid(false);
 		savedSearchTable.setForeground(Color.LIGHT_GRAY);
