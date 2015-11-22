@@ -223,6 +223,17 @@ public class MainView {
 				
 			}
         });
+        JMenuItem exportItem = new JMenuItem("Export");
+        exportItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	//System.out.println("SAVE SEARCH TABLE ROW: " + savedSearchTable.getSelectedRow());
+            	DbManager.deleteSearch(savedSearchTable.getValueAt(savedSearchTable.getSelectedRow(), 0).toString());
+            	updateSavedSearchTable();
+            }
+        });
+        searchPopupMenu.add(exportItem);
         JMenuItem deleteItem = new JMenuItem("Delete");
         deleteItem.addActionListener(new ActionListener() {
 
