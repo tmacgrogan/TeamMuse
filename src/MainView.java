@@ -42,6 +42,8 @@ public class MainView {
 	public static volatile ArrayList<Track> activeTrackList = new ArrayList<Track>();
 	
 	public static ArrayList<Tag> activeTags = new ArrayList<Tag>();
+	public static ArrayList<Tag> intersectTags = new ArrayList<Tag>();
+	public static ArrayList<Tag> excludeTags = new ArrayList<Tag>();
 	public static ArrayList<Search> savedSearches = new ArrayList<Search>();
 	public static ArrayList<Tag> parents;
 	public static ArrayList<Tag> parent;
@@ -591,21 +593,33 @@ public class MainView {
 		{
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		    	//tagSearchButtonPanel.setVisible(true);
-		    	//Tag searchTag = new Tag(searchField.getText());
-		    	//updateSearchTagTable(searchTag);
-//		    	
-//				activeTrackList = search.executeSearch();
-//				
+		    	tagSearchButtonPanel.setVisible(true);
+				
 //				Collections.sort(activeTrackList, trackComparator);
 //				System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+activeTrackList.size());
 //				/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
 //				updateTrackTable(false);//call here overwrites what is correctly in activeTrackList with the entire library again
 		    	Search theSearch = new Search(searchField.getText());
-		    	
-		    	//activeTrackList = theSearch.executeSearch();
+
 		    	setActiveTrackList(theSearch.executeSearch());		    	
 		    	updateTrackTable();
+		    	
+		    	tagSearchButtonPanel.removeAll();
+		    	tagSearchButtonPanel.updateUI();
+		    	
+		    	activeTags = TrackListController.getCommonTags(activeTrackList);
+		    	intersectTags = theSearch.getTagsToIntersect();
+		    	excludeTags = theSearch.getTagsToExclude();
+		    	
+		    	//populates rows with tags of selected track
+		    	for(int i = 0; i < intersectTags.size(); i++){
+		    		JButton newTagButton = addTagButton(intersectTags.get(i),"intersect");
+		    		tagSearchButtonPanel.add(newTagButton);
+		    	}
+		    	for(int i = 0; i < excludeTags.size(); i++){
+		    		JButton newTagButton = addTagButton(excludeTags.get(i),"exclude");
+		    		tagSearchButtonPanel.add(newTagButton);
+		    	}
 			}
 		};
 		
@@ -660,7 +674,7 @@ public class MainView {
 		
 		buttonMiddlePanel = new JPanel();
 		buttonMiddlePanel.setOpaque(true);
-		buttonMiddlePanel.setBackground(sideBG);
+		buttonMiddlePanel.setBackground(middleBG);
 		searchPanel.add(buttonMiddlePanel, BorderLayout.CENTER);
 		
 		importTracks = new JButton("Import Tracks");
@@ -906,7 +920,7 @@ public class MainView {
     	//populates rows with tags of selected track
     	for(int i = 0; i < activeTags.size(); i++){
     		tagModel.addRow(new Object[]{activeTags.get(i).getName()});
-    		JButton newTagButton = addTagButton(activeTags.get(i));
+    		JButton newTagButton = addTagButton(activeTags.get(i),"");
     		tagButtonPanel.add(newTagButton);
     	}
     	
@@ -973,8 +987,14 @@ public class MainView {
 		return trackTable;
 	}
 	
-	private static JButton addTagButton(Tag curTag){
-		ImageIcon xIcon = new ImageIcon("src/xIcon.png","x");
+	private static JButton addTagButton(Tag curTag, String iconType){
+		ImageIcon xIcon = new ImageIcon();
+		if (iconType == "intersect"){
+			xIcon = new ImageIcon("src/intersect.png","x");
+		}else if (iconType == "exclude"){
+			xIcon = new ImageIcon("src/exclude.png","x");
+		}
+		
 		JButton newTagButton = new JButton(xIcon);
 		newTagButton.setText(curTag.getName());
 		
