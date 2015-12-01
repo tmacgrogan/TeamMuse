@@ -91,7 +91,6 @@ public class MainView {
 	
 	private static JButton btnImportPlaylist;
 	private static JButton btnAddTag;
-	private static JButton btnDeleteTag;
 	private static JButton btnMusicPlayer;
 	private static JButton btnSave;
 
@@ -262,12 +261,7 @@ public class MainView {
 		lblTagName = new JLabel("Tag Information");
 		
 		btnAddTag = new JButton("+");
-		btnDeleteTag = new JButton("Delete Tag");
 		btnImportPlaylist = new JButton("Import Playlist");
-		btnImportPlaylist.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		
 		//TODO remove this
 		btnMusicPlayer = new JButton("Music Player");
@@ -434,27 +428,9 @@ public class MainView {
 		tagInfo.setColumns(13);
 		tagInfo.setEditable(false);
 		
-		btnDeleteTag.setEnabled(false);
-		btnDeleteTag.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseReleased(MouseEvent e) {
-	        	
-				selectedTag = activeTags.get(tagTable.getSelectedRow());
-				
-				for(Track track : selectedTracks){
-					track.removeTag(selectedTag);
-				}
-				
-				updateTagTable();
-			}
-		});
-		
-		tagInfoPanel.add(btnDeleteTag, BorderLayout.SOUTH);
-		
 		tagInfoPanel.add(tagButtonPanel, BorderLayout.EAST);
 		tagButtonPanel.setOpaque(true);
 		tagButtonPanel.setBackground(sideBG);
-		tagButtonPanel.setPreferredSize(new Dimension(100, 600));
 		tagTable = new JTable();
 		tagInfoPanel.add(tagTable, BorderLayout.CENTER);
 		
@@ -486,7 +462,6 @@ public class MainView {
 		tagTable.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		tagTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tagTable.setShowVerticalLines(false);
-		tagTable.setPreferredSize(new Dimension(180, height));
 		tagTable.setVisible(true);
 		
 		tagTable.addMouseListener(new MouseAdapter() {
@@ -576,11 +551,52 @@ public class MainView {
 		    }
 		});
 		
-		tagTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-	        public void valueChanged(ListSelectionEvent event) {
-	        	btnDeleteTag.setEnabled(true);
-	        }
-	    });
+		final JPopupMenu tagPopupMenu = new JPopupMenu();
+		tagPopupMenu.addPopupMenuListener(new PopupMenuListener() {
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        int rowAtPoint = tagTable.rowAtPoint(SwingUtilities.convertPoint(tagPopupMenu, new Point(0, 0), tagTable));
+                        if (rowAtPoint > -1) {
+                        	tagTable.setRowSelectionInterval(rowAtPoint, rowAtPoint);
+                        }
+                    }
+                });
+
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+        });
+        JMenuItem deleteTag = new JMenuItem("Delete");
+        deleteTag.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {  	
+				selectedTag = activeTags.get(tagTable.getSelectedRow());
+				
+				for(Track track : selectedTracks){
+					track.removeTag(selectedTag);
+				}
+				
+				updateTagTable();
+            }
+        });
+        tagPopupMenu.add(deleteTag);
+        tagTable.setComponentPopupMenu(tagPopupMenu);
+        
 		tagButtonPanel.setVisible(false);
 		middlePanel.setLayout(new BorderLayout(0, 0));
 		
@@ -786,7 +802,9 @@ public class MainView {
 	        			System.out.println("MainView: Songs in Selected Rows via activeTrackList: " + getActiveTrackList().get(row).getTitle());
 	        		}
 	        		updateTagTable();
-	        		addTagField.setText(lastTagAdded);
+	        		
+	        		//DO WE NEED THIS LINE????
+	        		//addTagField.setText(lastTagAdded);
 	        	}
 	        			
 	        	btnAddTag.setEnabled(true);
