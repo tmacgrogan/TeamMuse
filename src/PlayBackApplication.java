@@ -255,6 +255,8 @@ final class PlayBackApplication{//Inherently package private
 		                });
 		                
 						mediaPlayer.play();
+						if(playButton.isHover()) playButton.setGraphic(imageViewPause_Hover);
+						else playButton.setGraphic(imageViewPause);
 						
 						//this.playButton.setGraphic(imageViewPause);
 						this.trackTitle.setText("Now Playing: " + currTrack.getTitle());
@@ -307,6 +309,8 @@ final class PlayBackApplication{//Inherently package private
         			//If status is PLAYING, button has pause symbol
         			//pause currently playing music
         			mediaPlayer.pause();
+        			if(playButton.isHover()) playButton.setGraphic(imageViewPlay_Hover);
+        			else playButton.setGraphic(imageViewPlay);
         			
         			//this.playButton.setGraphic(imageViewPlay);
         			//Change button, title display, highlight effects when button hovered
@@ -348,7 +352,9 @@ final class PlayBackApplication{//Inherently package private
 	            	            });
 
 	            				mediaPlayer.play();
-
+	            				if(playButton.isHover()) playButton.setGraphic(imageViewPause_Hover);
+	            				else playButton.setGraphic(imageViewPause);
+	            					
 	            				//this.playButton.setGraphic(imageViewPause);
 	    						this.trackTitle.setText("Now Playing: " + currTrack.getTitle());
 	    						//Change button, title display, highlight effects when button hovered
@@ -395,7 +401,9 @@ final class PlayBackApplication{//Inherently package private
 	            	            });
 	            	            
 	            				mediaPlayer.play();
-	            				
+	            				if(playButton.isHover()) playButton.setGraphic(imageViewPause_Hover);
+	            				else playButton.setGraphic(imageViewPause); 
+	            					
 	        					//this.playButton.setGraphic(imageViewPause);
 	        					this.trackTitle.setText("Now Playing: " + currTrack.getTitle());
 	        					//Change button, title display, highlight effects when button hovered
@@ -425,7 +433,9 @@ final class PlayBackApplication{//Inherently package private
         			updateValues();
         			
         			mediaPlayer.play();
-
+        			if(playButton.isHover()) playButton.setGraphic(imageViewPause_Hover);
+        			else playButton.setGraphic(imageViewPause);
+        			
 					//this.playButton.setGraphic(imageViewPause);
 					this.trackTitle.setText("Now Playing: " + currTrack.getTitle());
 					//Change button, title display, highlight effects when button hovered
@@ -444,6 +454,8 @@ final class PlayBackApplication{//Inherently package private
         			//User wants to resume && there's time left on the song
         			//if( currTrackLocation.equals(selectedTrackLocation) ){//&& !(mediaPlayer.getCurrentTime().equals(mediaPlayer.getStopTime())) ){
         				mediaPlayer.play();
+        				if(playButton.isHover()) playButton.setGraphic(imageViewPause_Hover);
+        				else playButton.setGraphic(imageViewPause);
         			
 						//this.playButton.setGraphic(imageViewPause);
 						//Change button, title display, highlight effects when button hovered
