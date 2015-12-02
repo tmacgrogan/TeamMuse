@@ -472,49 +472,29 @@ public class MainView {
 		            
 		            
 		            selectedTag = activeTags.get(tagTable.getSelectedRow());
-					parents = selectedTag.getParents();
-					parent = selectedTag.getChildren();
+		            parent = selectedTag.getParents();
 					
 					JPanel editTagPanel = new JPanel();
 					JTextField newTagNameField = new JTextField();
 					newTagNameField.setText(selectedTag.getName());
-					DefaultListModel parentModel = new DefaultListModel();
-					final String[] parentString = new String[parents.size()];
 					
-					JTextField newParentField = new JTextField();
-					String[] childrenString = new String[parent.size()];
+					String[] parentString = new String[parent.size()];
 					
 					DefaultListModel childModel = new DefaultListModel();
-					JTextField newChildField = new JTextField();
+					JTextField newParentField = new JTextField();
 					
-					for(int i = 0; i < parents.size(); i++){
-						parentString[i] = parents.get(i).getName();
-					}
 					
 					for(int i = 0; i < parent.size(); i++){
-						childrenString[i] = parent.get(i).getName();
+						parentString[i] = parent.get(i).getName();
 					}
-				
 					parentList = new JList(parentString);
-					parentList = new JList(childrenString);
 					
 					parentList.addMouseListener(new MouseAdapter() {
 					    public void mouseClicked(MouseEvent evt) {
-					    	System.out.println("Tag " + parents.get(parentList.getSelectedIndex()).getName());
+					    	//System.out.println("Tag " + parent.get(parentList.getSelectedIndex()).getName());
 					        if (evt.getClickCount() == 2) {
 					            // Double-click detected
-					        	selectedTag.removeParent(parents.get(parentList.getSelectedIndex()));
-					        	
-					        }
-					    }
-					});
-					
-					parentList.addMouseListener(new MouseAdapter() {
-					    public void mouseClicked(MouseEvent evt) {
-					    	System.out.println("Tag " + parent.get(parentList.getSelectedIndex()).getName());
-					        if (evt.getClickCount() == 2) {
-					            // Double-click detected
-					        	selectedTag.removeChild(parent.get(parentList.getSelectedIndex()));
+					        	selectedTag.removeParent(parent.get(parentList.getSelectedIndex()));
 					        }
 					    }
 					});
@@ -522,9 +502,7 @@ public class MainView {
 					Object[] message = {
 					    "Rename tag:", newTagNameField,
 					    "Double click to remove parent",parentList,
-					    "Add parent tag:", newParentField,
-					    "Double click to remove child",parentList,
-					    "Add child tag:", newChildField
+					    "Add parent tag:", newParentField
 					    
 					};
 					
@@ -536,10 +514,6 @@ public class MainView {
 					        System.out.println("successful");
 					    }
 					    if (selectedTag.addParent(newParentField.getText())){
-					    	
-					        
-					    }
-					    if (selectedTag.addChild(newChildField.getText())){
 					    	
 					    }
 					} else {
