@@ -656,6 +656,7 @@ public class MainView {
 		btnX.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				tagSearchButtonPanel.setVisible(false);
+				buttonMiddlePanel.setVisible(false);
 				searchField.setText("");
 				
 				//activeTrackList = DbManager.getLibrary();
