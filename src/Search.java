@@ -4,7 +4,11 @@ import java.util.Collections;
 import javax.swing.JOptionPane;
 
 /**
- * The Search class holds a group of Tags that correspond to the sets of songs associated with those Tag either intersected, excluded, or merged.
+ * The Search class represents a set of Tracks composed of other sets specified via Tags that are combined via various set operations.
+ * Searches are created with a String which specifies which Tags are to be used in the search and how the sets of Tracks those Tags describe are to be combined.
+ * In memory, the Search is stored as the collection of those Tags, but can return the correct set of Tracks by querying the database when prompted with executeSearch()
+ * 
+ * When creating a Search, terms separated by spaces indicate the name of a Tag. 
  *
  */
 public class Search {
