@@ -5,17 +5,43 @@ import javax.swing.JOptionPane;
 
 /**
  * The Search class represents a set of Tracks composed of other sets specified via Tags that are combined via various set operations.
- * Searches are created with a String which specifies which Tags are to be used in the search and how the sets of Tracks those Tags describe are to be combined.
- * In memory, the Search is stored as the collection of those Tags, but can return the correct set of Tracks by querying the database when prompted with executeSearch()
+ * This set of Tracks is any Tracks in the Library that are described with *all* of the specified positive tags and *none* of the specified negative tags. 
+ * Tags are specified via a String which is parsed to determine which Tags are to be used and how the sets of Tracks those Tags describe are to be combined.
+ * A Search is stored as the collection of Tags, but can return the correct set of Tracks by querying the database when prompted with executeSearch()
  * 
- * When creating a Search, terms separated by spaces indicate the name of a Tag. 
+ * When creating a Search via a search String, terms separated by spaces indicate the names of a Tags. 
+ * 
+ * Every Tag in the search String that is not preceded by a '-' represents an positive (intersected) Tag.
+ * For each positive Tag when the Search is executed, the set of Tracks that Tag describes is queried from the database and then the intersection of all of these Tracks is found.
+ * 
+ * Every Tag in the search String that is preceded by a '-' represents a negative (excluded) Tag.
+ * For each negative Tag when the Search is executed, the set of Tracks that Tag describes is queried from the database and the difference of the intersected Tracks and this set is found.
+ * 
+ * The keyword 'or' can be used to combine multiple searches. The search String is split at every instance of 'or' and these are used to create sub-Searches.
+ * When a Search is executed, the union of the sets of every sub Search is found.
+ * 
+ * @Author Scott Beale
+ *
+ */
+/**
+ * @author Akolyte01
+ *
+ */
+/**
+ * @author Akolyte01
  *
  */
 public class Search {
 	//default search terms
+	
+	/** List of Positive Tags */
 	private ArrayList<Tag> tagsToIntersect;
+	/** List of Negative Tags */
 	private ArrayList<Tag> tagsToExclude;
+	/** Searches comprised of multiple subSearches separated by the 'or' keyword are stored and recalled recursively as a linked list of Search objects.
+	 * If there are no subSearches, subSearch is null */
 	private Search subSearch;
+	/** The Search as represented by a single String */
 	private String searchString;
 	
 //	public Search(ArrayList<Tag> tagsToIntersect, ArrayList<Tag> tagsToExclude){
@@ -23,6 +49,12 @@ public class Search {
 //		this.tagsToExclude = tagsToExclude;
 //	}
 	
+	
+	/**
+	 * Creates a search object by parsing the searchString to populate the lists of Tags that describe the set of Tracks represented by the Search.
+	 * @param searchString Specifies what combination of Tags that describes the set of Tracks this Search represents. 
+	 * Tags are separated by spaces. Negative Tags are preceded by a '-'. SubSearches are separated by ' or '.
+	 */
 	public Search(String searchString){
 		this.searchString = searchString;
 		tagsToIntersect = new ArrayList<Tag>();
@@ -31,6 +63,11 @@ public class Search {
 		parse();
 	}
 	
+	/**Creates a search object 'backwards' by passing in lists of Tag objects. Used to reconstruct saved Search objects from how they are stored in the database.
+	 * @param tagsToIntersect positive Tags
+	 * @param tagsToExclude negative Tags
+	 * @param subSearch next Search in the linked list of sub Searches
+	 */
 	public Search(ArrayList<Tag> tagsToIntersect, ArrayList<Tag> tagsToExclude, Search subSearch){
 		this.tagsToIntersect = tagsToIntersect;
 		this.tagsToExclude = tagsToExclude;
@@ -47,6 +84,10 @@ public class Search {
 		}		
 	}
 	
+	/**
+	 * Parses the searchString and populates the lists of Tags that describe the set of Tracks represented by the Search.
+	 * If the 'or' is keyword is present, splits the String at the first instance and sets the subSearch to a new Search created from the remainder of searchString.
+	 */
 	private void parse(){
 		
 		searchString = searchString.trim();
@@ -87,40 +128,12 @@ public class Search {
 		}
 	}
 	
-	public void print(){
-		String toPrint = "";
-		for(Tag curr : tagsToIntersect){
-			toPrint += curr.getName() + " ";
-		}
-		System.out.println("Tags to intersect: "+toPrint);
 		
-		toPrint = "";
-		for(Tag curr : tagsToExclude){
-			toPrint += curr.getName() + " ";
-		}
-		System.out.println("Tags to exclude: "+toPrint);
-	}
-	
-	public static void test(){
-		Search testSearch = new Search("cat bat scat rat fat mat");
-		testSearch.print();
-		testSearch = new Search("cat bat scat -rat fat -mat");
-		testSearch.print();
-		testSearch = new Search(" cat bat scat -rat fat -mat");
-		testSearch.print();
-		testSearch = new Search(" cat bat scAT 	       -rat fat -mat");
-		testSearch.print();
-		testSearch = new Search(" cat bat scAT 	 afsdfak; elj489qy2pt5huo    fa  -rat fat -mat");
-		testSearch.print();
-
-//		testSearch = new Search("  -cat	 bat scAT  RAT   FAT -mat");
-//		testSearch.print();
-//		System.out.println("reached");
-	}
-		
-	/**Creates the intersection of all of the TrackLists returned by getTracks for every Tag in tagsToIntersect
+	/**Creates the intersection of all of the TrackLists returned by getTracks for every Tag in tagsToIntersect. If tagsToIntersect is empty, finds the entire library.
 	 * Merges all of the TrackLists returned by getTracks for every Tag in tagsToExclude
-	 * @return a TrackList containing every Track found in all of the tagsToIntersect and in none of the tagsToExclude
+	 * Then finds the difference of the intersected Tracks and excluded Tracks.
+	 * Finally finds the union of this difference and executeSearch() of any subSearch;
+	 * @return a TrackList containing every Track found in all of the tagsToIntersect and in none of the tagsToExclude, as well as any returned by executing the subSearch;
 	 */
 	public ArrayList<Track> executeSearch(){
 		ArrayList<ArrayList<Track>> intersectTrackLists = new ArrayList<ArrayList<Track>>();
@@ -169,12 +182,6 @@ public class Search {
 		return finalList;		
 	}
 	
-	/**exports the results of performSearch by writing to a document to be read as a playlist by compatible programs
-	 * 
-	 */
-	public void export(){
-		
-	}
 	
 	/**Saves this Search so it can be accessed later--saves to database so it can be found after closing and reopening
 	 * 
@@ -183,34 +190,67 @@ public class Search {
 		DbManager.saveSearch(this);
 	}
 	
+	
+	/**
+	 * Gets the tagsToIntersect
+	 * @return tagsToIntersect The positive Tags
+	 */
 	public ArrayList<Tag> getTagsToIntersect(){
 		return tagsToIntersect;
 	}
 	
+	/**
+	 * Sets tagsToIntersect
+	 * @param tagsToIntersect The positive Tags
+	 */
 	public void setTagsToIntersect(ArrayList<Tag> tagsToIntersect){
 		this.tagsToIntersect = tagsToIntersect;
 	}
 	
+	/**
+	 * Gets the tagsToExclude
+	 * @return tagsToExclude The negative Tags
+	 */
 	public ArrayList<Tag> getTagsToExclude(){
 		return tagsToExclude;
 	}
 	
+	/**
+	 * Sets tagsToExclude
+	 * @param tagsToExclude The negative Tags
+	 */
 	public void setTagsToExclude(ArrayList<Tag> tagsToExclude){
 		this.tagsToIntersect = tagsToExclude;
 	}
 	
+	/**
+	 * Gets all of the Search objects saved in the database.
+	 * @return ArrayList of all Search objects saved in the database.
+	 */
 	public static ArrayList<Search> getAllSearches(){
 		return DbManager.getSavedSearches();
 	}
 	
+	/**
+	 * Gets any subSearch
+	 * @return the subSearch
+	 */
 	public Search getSubSearch(){
 		return subSearch;
 	}
 	
+	/**
+	 * Gets the searchText
+	 * @return the searchText
+	 */
 	public String getSearchText(){
 		return searchString;
 	}
 	
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString(){
 		return searchString;
 	}

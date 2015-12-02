@@ -1,19 +1,42 @@
 import java.util.ArrayList;
 
+/**
+ * The Tag class represents a particular user-defined attribute that may be used to 'describe' any Track.
+ * Once a Tag is added to a Track, searching for the Tag will return the Track, as well as all others with the Tag.
+ * Tags may have a hierarchical parent/child with other Tags, allowing Tags to exist as more specific subcategories of others.
+ * Retrieving tracks of a Tag with children also retrieves the tracks of those Children. 
+ * Tags may have any number of children or parents. 
+ * 
+ * Example: The user defines Tag 'rock' as parent of Tag 'metal' which in turn is a parent of 'thrash.'
+ * Searching for 'metal' will retrieve any Tracks tagged with 'metal' or 'thrash' but will no retrieve Tracks tagged with only 'rock'
+ *
+ */
 public class Tag {
 
-	//TODO possible structures to hold children and parents
+	/** Unique ID that persists even if Tag is renamed */
 	private int id;
+	/** The name of the Tag must consist of characters without whitespace or '-' */
 	private String name;
+	/** User defined description of the Tag	 */
 	private String description;	
 	private boolean searched; 
 	
+	
+	/**
+	 * Creates an empty Tag object not linked to the Database. Avoid use out side of test applications.
+	 */
 	public Tag() {
 		this.name = null;
 		this.id = (Integer) null;
 	}
 	
 	//Tag pulled from the database
+	/**
+	 * Creates a Tag object to reference a Tag already stored in the database. Avoid use outside of this class or DbManager
+	 * @param name The String name of the Tag.
+	 * @param id the unique identifier of the Tag
+	 * @throws IllegalArgumentException Thrown if the specified name includes invalid characters
+	 */
 	public Tag(String name, int id) throws IllegalArgumentException{ 
 		//TODO Sanitize tag names
 		this.name = name;
@@ -23,27 +46,23 @@ public class Tag {
 		}
 	}
 	
+	/**
+	 * Creates a Tag object with a given name. If a Tag with this name already exists in the database, creates the Tag with the corresponding id,
+	 * otherwise is added as a new Tag to the database and is assigned an id
+	 * @param name
+	 * @throws IllegalArgumentException
+	 */
 	public Tag(String name) throws IllegalArgumentException{
 		this(name, DbManager.getTagId(name));
 	}
 	
 	/**creates a TrackList containing every Track listed under This in the database, 
 	 * then for every child This has, merges with the getTracks of the child.
-	 * @return 
+	 * @return List of all Tracks tagged with this Tag or any child Tags
 	 */
 	public ArrayList<Track> getTracks(){
 		ArrayList<Integer> visitedTags = new ArrayList<Integer>();
 		return this.getTracks(visitedTags);
-//		ArrayList<ArrayList<Track>> allTrackLists = new ArrayList<ArrayList<Track>>();
-//		ArrayList<Tag> visitedTags = new ArrayList<Tag>();
-//		
-//		allTrackLists.add(DbManager.getTracks(this));
-//		visitedTags.add(this);
-//		
-//		for(Tag child : this.getChildren()){
-//			allTrackLists.add(child.getTracks());			
-//		}
-//		return TrackListController.merge(allTrackLists);
 	}
 	
 	public ArrayList<Track> getTracks(ArrayList<Integer> visitedTags){
@@ -63,6 +82,11 @@ public class Tag {
 	}
 	
 	//TODO addChild method
+	/**
+	 * Adds a Tag as child of this in the database
+	 * @param child The child Tag
+	 * @return Boolean of whether operation was successful;
+	 */
 	public boolean addChild(String child){
 		if( !nameIsValid(child) )
 			return false;
@@ -110,42 +134,26 @@ public class Tag {
 		trackBeingRemoved.removeTag(this);
 	}
 	
+	/**
+	 * Removes the parent-child relationship between this and a parent Tag
+	 * @param parent The former parent Tag
+	 */
 	public void removeParent(Tag parent){
 		DbManager.removeParentTagLink(parent.getTagId(), this.id);
 	}
 	
+	/**
+	 * Removes the parent-child relationship between this and a parent TAg
+	 * @param child The former child Tag
+	 */
 	public void removeChild(Tag child){
 		DbManager.removeParentTagLink(this.id, child.getTagId());
 	}
 	
 	
-	/**Searches the database to return the Tag whose name matches the passed String
-	 * If there are multiple matches, return the first and throw exception
-	 * @param name
-	 * @return
-	 */
-	public static Tag getTagByName(String name){
-		return null;
-	}
-	
-	
-	/**Searches the database to return the Tag whose uniqueIdentifier matches the passed String
-	 * @param ID
-	 * @return
-	 */
-	public static Tag getTagByID(String ID){
-		return null;
-	}	
-	
-	/**Creates tiered relationship between two Tags by adding the child to the list of the parent's children and vice versa in the database
-	 * @param child is searched for whenever parent is
-	 * @param parent is not searched for when child is
-	 */
-	public static void createRelationship(Tag child, Tag parent){
-		
-	}
 	
 	/**
+	 * Retrieve any child Tags of this Tag
 	 * @return any Tags listed as children of This in the database.
 	 */
 	public ArrayList<Tag> getChildren(){
@@ -153,20 +161,34 @@ public class Tag {
 	}
 	
 	/**
+	 * Retrieve any parent Tags of this Tag
 	 * @return any Tags listed as parents of This in the database.
 	 */
 	public ArrayList<Tag> getParents(){
 		return DbManager.getParents(id);
 	}
 	
+	/**
+	 * Get the unique identifier
+	 * @return the unique identifier
+	 */
 	public int getTagId(){
 		return id;
 	}
 	
+	/**
+	 * Get the name
+	 * @return the Tag's name
+	 */
 	public String getName(){
 		return name;
 	}
 	
+	/**
+	 * Set the name to a new String if it is valid.
+	 * @param newName the new name for the tag
+	 * @return Boolean whether the newName was valid and Tag updated or not.
+	 */
 	public boolean setName(String newName){
 		//TODO implement validation
 		if(nameIsValid(newName)){
@@ -178,14 +200,27 @@ public class Tag {
 			return false;
 	}
 	
+	/**
+	 * Get the description of the Tag
+	 * @return the description
+	 */
 	public String getDescription(){
 		return description;
 	}
 	
+	/**
+	 * Set the description of the Tag
+	 * @param newDescription the new description
+	 */
 	public void setDescription(String newDescription){
 		description = newDescription;
 	}
 	
+	/**
+	 * Checks whether a given String is valid for use as a name for a Tag. To be valid it must not include any whitespace or '-' chars
+	 * @param name The String being validated
+	 * @return Boolean of whether the name is valid or not
+	 */
 	private boolean nameIsValid(String name){
 		//space, comma, dash, "not", parentheses, empty/whitespace
 		String trimName = name.trim();
@@ -248,7 +283,5 @@ public class Tag {
 		
 	}
 	*/
-	
-	
 
 }

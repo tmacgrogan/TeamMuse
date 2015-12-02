@@ -899,7 +899,7 @@ public class MainView {
 			Track currTrack = getActiveTrackList().get(i);
 			
 			Date inDate = new Date(currTrack.getImportDate().getTime() - currTrack.getImportDate().getTimezoneOffset()*60000);
-			String dateString = ""+ inDate.getMonth() + "/" + inDate.getDate() + "/" + (inDate.getYear()%100) + " " + inDate.getHours() + ":" + inDate.getMinutes();
+			String dateString = ""+ inDate.getMonth() + "/" + inDate.getDate() + "/" + (inDate.getYear()%100) + " " + inDate.getHours() + ((inDate.getMinutes() > 10) ? ":" : ":0") + inDate.getMinutes();
 			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), dateString});
 			
 			//System.out.println("MainView: trackModel #rows: " + trackModel.getRowCount());

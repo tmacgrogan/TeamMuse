@@ -18,22 +18,31 @@ import org.jaudiotagger.tag.id3.AbstractID3v2Tag;
  */
 public class Track {
 
+	/** The unique identifier of the Track as stored in the database */
 	private int id;
-	// private String Album;
-	// private String Artist;
 
 	private MP3File mp3File;
 	private Date importDate;
 	// private String Genre;
+	/** Absolute path */
 	private String Location;// Absolute path
 
 	// private String Title;
 
+	/**
+	 * Constructor for Track already in the database (assigned an id)
+	 * @param location The absolute path to the Tracks file
+	 * @param trackId The unique identifier
+	 */
 	public Track(String location, int trackId) {
 		this(location);
 		this.id = trackId;
 	}
 
+	/**
+	 * Creates a Track from a given location to an .mp3 file. 
+	 * @param location Absolute path to an .mp3 file
+	 */
 	public Track(String location) {
 		Location = location;
 		id = -1;

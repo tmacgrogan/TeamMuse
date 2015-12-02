@@ -9,11 +9,18 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
 
+/**
+ * Helper class for performing operations on or generating ArrayLists of Tracks for other parts in the application. 
+ * In particular, performing set operations used by the Search class as well as importing and exporting files.
+ * @author Scott Beale
+ *
+ */
 public class TrackListController {
 	
 	/**
-	 * @param toMerge
-	 * @return a ArrayList<Track> that is the merge of all sets of toMerge
+	 * Finds the union of each ArrayList of Tracks passed in.
+	 * @param toMerge Contains ArrayLists of Tracks that are merged (union).
+	 * @return The union of every set of toMerge
 	 */
 	public static ArrayList<Track> merge(ArrayList<ArrayList<Track>> toMerge){
 		int hashSize = 0;
@@ -35,8 +42,9 @@ public class TrackListController {
 		return new ArrayList<Track>(hashOfMerge.values());
 	}
 	
-	/**Returns 
-	 * @param toIntersect
+	/** 
+	 * Finds the intersection of each ArrayList of Tracks passed in.
+	 * @param toIntersect Contains ArrayLists of Tracks that are intersected.
 	 * @return the intersection of every set of toIntersect
 	 */
 	public static ArrayList<Track> intersect(ArrayList<ArrayList<Track>> toIntersect){
@@ -72,8 +80,9 @@ public class TrackListController {
 	}
 	
 	/**
-	 * @param mustBe 
-	 * @param cantBe
+	 * Finds the difference of mustBe and cantBe
+	 * @param mustBe set of Tracks whose presence is required for inclusion in returned set
+	 * @param cantBe set of Tracks whose presence is forbidden from inclusion in returned set
 	 * @return a ArrayList<Track> containing every member that is in mustBe and is not in cantBe
 	 */
 	public static ArrayList<Track> exclude(ArrayList<Track> mustBe, ArrayList<Track> cantBe){
@@ -94,6 +103,11 @@ public class TrackListController {
 	}
 	
 	
+	/**
+	 * Finds all Tags shared by every Track in the passed ArrayList
+	 * @param tracksIn the Tracks whose common Tags are found.
+	 * @return Every Tag shared by every Track of tracksIn.
+	 */
 	@SuppressWarnings("unchecked")
 	public static ArrayList<Tag> getCommonTags(ArrayList<Track> tracksIn){
 		if(tracksIn.size() == 0) return new ArrayList<Tag>();
@@ -134,6 +148,13 @@ public class TrackListController {
 		return toReturn;
 	}
 	
+	/**
+	 * Opens a file chooser to import a M3U playlist. 
+	 * Parses the .m3U file and imports every .mp3 file not already present into the Library.
+	 * Adds a tag with name 'list:[FileName]' to every Track in the .m3u file.
+	 * Saves a search for that tag in Saved searches
+	 * @return Search for new Tag created and added to every Track of playlist
+	 */
 	public static Search importM3UPlayList(){
 		ArrayList<Track> trackList = new ArrayList<Track>();
 		String playListTag = new String();
@@ -183,6 +204,12 @@ public class TrackListController {
 		return new Search(playListTag);
 	}
 	
+	/**
+	 * Opens a file chooser to select a collection of .mp3 file or a folder. 
+	 * If files are selected, adds those Tracks to the database.
+	 * If a folder is selected, adds any .mp3 files contained in that folder or lower as Tracks to the database.
+	 * @return List of new Tracks successfully added to the database
+	 */
 	public static ArrayList<Track> importToSnap()
 	{	
 		ArrayList<Track> trackList = new ArrayList<Track>();
@@ -195,6 +222,11 @@ public class TrackListController {
 		return trackList;
 	}
 	
+	/**
+	 * Opens a file chooser for a particular kind of file specified by the filter.
+	 * @param filter The filter to indicate what type of file is to be chosen.
+	 * @return List of files user chooses
+	 */
 	private static ArrayList<File> chooseFiles(FileNameExtensionFilter filter){
 		
 		JFileChooser chooser = new JFileChooser();
@@ -235,6 +267,11 @@ public class TrackListController {
 		return allFiles;
 	}
 	
+	/**
+	 * Writes a List of tracks into an .m3u file which can be imported into Virtual DJ or iTunes
+	 * If Virtual DJ is present on the user's computer, defaults to placing new playlists into Virtual DJs playlist folder, allowing them to be quickly accessed.
+	 * @param playlist
+	 */
 	public static void exportM3u(ArrayList<Track> playlist){
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("M3U Playlist", "m3u");
 		String defaultPath;
