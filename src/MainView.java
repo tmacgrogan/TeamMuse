@@ -586,7 +586,6 @@ public class MainView {
 		{
 		    @Override
 		    public void actionPerformed(ActionEvent e) {
-		    	tagSearchButtonPanel.setVisible(true);
 				
 //				Collections.sort(activeTrackList, trackComparator);
 //				System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+activeTrackList.size());
@@ -601,7 +600,7 @@ public class MainView {
 		};
 		
 		tagSearchButtonPanel = new JPanel();
-		searchPanel.add(tagSearchButtonPanel, BorderLayout.SOUTH);
+		searchPanel.add(tagSearchButtonPanel, BorderLayout.CENTER);
 		tagSearchButtonPanel.setOpaque(true);
 		tagSearchButtonPanel.setBackground(Color.DARK_GRAY);
 		tagSearchButtonPanel.setPreferredSize(new Dimension(556, 40));
@@ -627,35 +626,8 @@ public class MainView {
 		btnImportPlaylist.setHorizontalAlignment(SwingConstants.LEFT);
 		btnImportPlaylist.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		
-		btnX = new JButton("X");
-		importExportPanel.add(btnX);
-		btnX.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				tagSearchButtonPanel.setVisible(false);
-				searchField.setText("");
-				
-				//activeTrackList = DbManager.getLibrary();
-				setActiveTrackList(DbManager.getLibrary());
-				updateTrackTable();
-			}
-		});
-		searchField = new JTextField();
-		importExportPanel.add(searchField);
-		
-		searchField.setColumns(30);
-		
-		searchField.addActionListener(searchAction);
-		
-		searchButton = new JButton("Search");
-		importExportPanel.add(searchButton);
-		
-		buttonMiddlePanel = new JPanel();
-		buttonMiddlePanel.setOpaque(true);
-		buttonMiddlePanel.setBackground(middleBG);
-		searchPanel.add(buttonMiddlePanel, BorderLayout.CENTER);
-		
 		importTracks = new JButton("Import Tracks");
-		buttonMiddlePanel.add(importTracks);
+		importExportPanel.add(importTracks);
 		importTracks.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		importTracks.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -669,6 +641,35 @@ public class MainView {
 				updateTrackTable();
 			}
 		});
+		searchField = new JTextField();
+		importExportPanel.add(searchField);
+		
+		searchField.setColumns(25);
+		
+		searchField.addActionListener(searchAction);
+		
+		searchButton = new JButton("Search");
+		importExportPanel.add(searchButton);
+		
+		btnX = new JButton("X");
+		importExportPanel.add(btnX);
+		btnX.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tagSearchButtonPanel.setVisible(false);
+				buttonMiddlePanel.setVisible(false);
+				searchField.setText("");
+				
+				//activeTrackList = DbManager.getLibrary();
+				setActiveTrackList(DbManager.getLibrary());
+				updateTrackTable();
+			}
+		});
+		
+		buttonMiddlePanel = new JPanel();
+		buttonMiddlePanel.setOpaque(true);
+		buttonMiddlePanel.setBackground(Color.DARK_GRAY);
+		buttonMiddlePanel.setVisible(false);
+		searchPanel.add(buttonMiddlePanel, BorderLayout.EAST);
 		btnSave = new JButton("Save Playlist");
 		buttonMiddlePanel.add(btnSave);
 		
@@ -690,6 +691,7 @@ public class MainView {
 				}
 				
 				updateSavedSearchTable();
+				
 			}
 		});
 		
@@ -906,6 +908,10 @@ public class MainView {
 	}
 	
 	private static void updateSearchTagTable(Search theSearch){
+		
+		tagSearchButtonPanel.setVisible(true);
+		buttonMiddlePanel.setVisible(true);
+		
 		tagSearchButtonPanel.removeAll();
 		tagSearchButtonPanel.updateUI();
 		
