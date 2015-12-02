@@ -219,9 +219,9 @@ public class MainView {
 				
 			}
         });
+		//Exporting searched results
         JMenuItem exportItem = new JMenuItem("Export");
         exportItem.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
             	//System.out.println("SAVE SEARCH TABLE ROW: " + savedSearchTable.getSelectedRow());
@@ -231,6 +231,8 @@ public class MainView {
             }
         });
         searchPopupMenu.add(exportItem);
+        
+        //Deleting a saved search playlist
         JMenuItem deleteItem = new JMenuItem("Delete");
         deleteItem.addActionListener(new ActionListener() {
 
@@ -242,6 +244,7 @@ public class MainView {
             }
         });
         searchPopupMenu.add(deleteItem);
+        
         savedSearchTable.setComponentPopupMenu(searchPopupMenu);
 		
 		lblMenu = new JLabel("Menu");
@@ -593,23 +596,7 @@ public class MainView {
 
 		    	setActiveTrackList(theSearch.executeSearch());		    	
 		    	updateTrackTable();
-		    	
-		    	tagSearchButtonPanel.removeAll();
-		    	tagSearchButtonPanel.updateUI();
-		    	
-		    	activeTags = TrackListController.getCommonTags(activeTrackList);
-		    	intersectTags = theSearch.getTagsToIntersect();
-		    	excludeTags = theSearch.getTagsToExclude();
-		    	
-		    	//populates rows with tags of selected track
-		    	for(int i = 0; i < intersectTags.size(); i++){
-		    		JButton newTagButton = addTagButton(intersectTags.get(i),"intersect");
-		    		tagSearchButtonPanel.add(newTagButton);
-		    	}
-		    	for(int i = 0; i < excludeTags.size(); i++){
-		    		JButton newTagButton = addTagButton(excludeTags.get(i),"exclude");
-		    		tagSearchButtonPanel.add(newTagButton);
-		    	}
+		    	updateSearchTagTable(theSearch);
 			}
 		};
 		
@@ -635,7 +622,7 @@ public class MainView {
 				updateSavedSearchTable();
 			}
 		});
-		btnImportPlaylist.setForeground(Color.GRAY);
+		btnImportPlaylist.setForeground(Color.BLACK);
 		btnImportPlaylist.setBackground(Color.DARK_GRAY);
 		btnImportPlaylist.setHorizontalAlignment(SwingConstants.LEFT);
 		btnImportPlaylist.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
@@ -684,6 +671,8 @@ public class MainView {
 		});
 		btnSave = new JButton("Save Playlist");
 		buttonMiddlePanel.add(btnSave);
+		
+		//Save a searched playlist
 		btnSave.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -705,7 +694,7 @@ public class MainView {
 		});
 		
 		
-		btnSave.setForeground(Color.GRAY);
+		btnSave.setForeground(Color.BLACK);
 		btnSave.setHorizontalAlignment(SwingConstants.LEFT);
 		btnSave.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		searchButton.addActionListener(searchAction);
@@ -846,6 +835,7 @@ public class MainView {
 	        		setActiveTrackList(search.executeSearch());
 	        		
 	        		updateTrackTable();
+	        		updateSearchTagTable(search);
 	        	}
 	        }
 	    });
@@ -898,50 +888,39 @@ public class MainView {
 		// TODO Auto-generated method stub
 		tagModel = (DefaultTableModel) tagTable.getModel();
     	
-    	//clears row to be ready to display new set of tags
-    	int rows = tagModel.getRowCount(); 
-    	for(int i = rows - 1; i >=0; i--){
-    		tagModel.removeRow(i); 
-    	}
+    	clearTable(tagTable);
     	
-    	tagButtonPanel.removeAll();
-    	tagButtonPanel.updateUI();
+    	//tagButtonPanel.removeAll();
+    	//tagButtonPanel.updateUI();
     	
     	activeTags = TrackListController.getCommonTags(selectedTracks);
     	
-    	//populates rows with tags of selected track
+    	//populates rows with tags of selected track(s)
     	for(int i = 0; i < activeTags.size(); i++){
     		tagModel.addRow(new Object[]{activeTags.get(i).getName()});
-    		JButton newTagButton = addTagButton(activeTags.get(i),"");
-    		tagButtonPanel.add(newTagButton);
+    		//JButton newTagButton = addTagButton(activeTags.get(i),"");
+    		//tagButtonPanel.add(newTagButton);
     	}
     	
     	//tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
 	}
 	
-//	private static void updateSearchTagTable(Tag searchTag){
-//		// TODO Auto-generated method stub
-//		searchTagModel = (DefaultTableModel) searchTagTable.getModel();
-//    	
-//    	//clears row to be ready to display new set of tags
-//    	int rows = searchTagModel.getRowCount(); 
-//    	for(int i = rows - 1; i >=0; i--){
-//    		searchTagModel.removeRow(i); 
-//    	}
-//    	
-//    	tagSearchButtonPanel.removeAll();
-//    	tagSearchButtonPanel.updateUI();
-//    	
-//    	//activeTags = TrackListController.getCommonTags(selectedTracks);
-//    	
-//    	//populates rows with tags of selected track
-//    	//for(int i = 0; i < activeTags.size(); i++){
-//    		searchTagModel.addRow(new Object[]{searchTag.getName()});
-//    		//JButton newTagButton = addTagButton(searchTag);
-//    		//tagSearchB,kuttonPanel.add(newTagButton);
-//    	//}
-//		
-//	}
+	private static void updateSearchTagTable(Search theSearch){
+		tagSearchButtonPanel.removeAll();
+		tagSearchButtonPanel.updateUI();
+		
+		intersectTags = theSearch.getTagsToIntersect();
+		excludeTags = theSearch.getTagsToExclude();
+		
+		for(int i = 0; i < intersectTags.size(); i++){
+			JButton newTagButton = addTagButton(intersectTags.get(i),"intersect");
+			tagSearchButtonPanel.add(newTagButton);
+		}
+		for(int i = 0; i < excludeTags.size(); i++){
+			JButton newTagButton = addTagButton(excludeTags.get(i),"exclude");
+			tagSearchButtonPanel.add(newTagButton);
+		}
+	}
 	
 	
 	
@@ -953,7 +932,7 @@ public class MainView {
 		
 		DefaultTableModel currModel = (DefaultTableModel) T.getModel();
 		
-		tagSearchButtonPanel.removeAll();
+		//tagSearchButtonPanel.removeAll();
 		
 		int rows = currModel.getRowCount(); 
     	for(int i = rows - 1; i >=0; i--){
