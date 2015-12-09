@@ -1,115 +1,138 @@
-import java.io.File;
+import java.awt.Dimension;
 
+import java.io.File;
 import java.io.InputStream;
-//import java.net.MalformedURLException;
-//import java.net.URI;
+
 import java.util.ArrayList;
-//import java.util.Vector;
+
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.beans.Observable;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ObservableValue;
+
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.value.ObservableValue;
-//import javafx.embed.swing.JFXPanel;
-//import javafx.stage.Stage;
-import javafx.util.Duration;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.media.MediaPlayer;
-//import javafx.scene.media.MediaView;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.paint.Paint;
-import javafx.scene.media.Media;
-
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-//import javafx.scene.layout.Region;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseEvent;
+
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
+import javafx.scene.Scene;
+
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+
+import javafx.util.Duration;
 
 
 final class PlayBackApplication{//Inherently package private	
-	ImageView imageViewPlay;
-	ImageView imageViewPlay_Hover;
-
-	ImageView imageViewPause;
-	ImageView imageViewPause_Hover;
+	private Button playButton;
+	private Button stopButton;
 	
-	ImageView imageViewStop;
-	ImageView imageViewStop_Hover;
-	
+	private BorderPane innerMediaBar = new BorderPane();
 	private BorderPane mediaBar = new BorderPane();
-	private BorderPane innerMediaBar = new BorderPane(); 
+	
+	private Dimension parentPanelSize;
+	private Duration duration;
+	
+	private ImageView imageViewPause;
+	private ImageView imageViewPause_Hover;
+	private ImageView imageViewPlay;
+	private ImageView imageViewPlay_Hover;
+	private ImageView imageViewStop;
+	private ImageView imageViewStop_Hover;
+	
+	private Label playTimeLabel;
+	private Label timeLabel;
+	private Label trackTitleLabel;
+	private Label volumeLabel;
+	private Label artistTitleLabel;
+	
+	private Media media;
 	
 	private MediaPlayer mediaPlayer;
-	private Media media;
+
+	private Slider timeSlider;
+	private Slider volumeSlider;
+	
 	private String currTrackLocation;
+	
+	private StackPane trackTitleDisplay;
+	
+	private final Timeline trackLabel_timeline = new Timeline();
+	private final Timeline artistLabel_timeline = new Timeline();
 	
 	private Track currTrack;
 	private Track nextTrack;
 	private Track selectedTrack;
 
-	private Label trackTitle;
-	private Label playTime;
-	private Label timeLabel;
-	private Label volumeLabel;
+	private int songRow;
 	
-	StackPane trackTitleDisplay;
-	
-	private Duration duration;
-	
-	private Slider timeSlider;
-	private Slider volumeSlider;
-
-	Button playButton;
-	Button pauseButton;
-	Button stopButton;
-	
-	int songRow;
-	
-	Color sceneColor;
 	
 	//TODO manage resources to avoid memory leak
 	//TODO Adjust components to move with resizing
-	public PlayBackApplication(){
-	    //mediaBar.setPadding(new Insets(5, 10, 5, 10));
-        
-		/**********************************Set up buttons*****************************************/
-		InputStream playImageInput = getClass().getResourceAsStream("Default_Play.png");
+	public PlayBackApplication(Dimension parentPanelSize){
+		this.parentPanelSize = parentPanelSize;
+		
+		//Universal background fill
+		//CornerRadii cornerRadii = new CornerRadii(15);
+		BackgroundFill bgFill = new BackgroundFill(Color.rgb(64,64,64), CornerRadii.EMPTY, Insets.EMPTY);
+		Background bg = new Background(bgFill);
+
+		/**********************************Set up button images************************************/
+		//InputStream playImageInput = getClass().getResourceAsStream("Default_Play.png");
+		//InputStream playImageInput = getClass().getResourceAsStream("playNow.png");
+		//InputStream playImageInput = getClass().getResourceAsStream("media_controls_play_small.png"); 
+		InputStream playImageInput = getClass().getResourceAsStream("playOn.png");
 		Image playButtonImage = new Image(playImageInput);
-		InputStream playImageHover = getClass().getResourceAsStream("Default_Play_Hover.png");
+		InputStream playImageHover = getClass().getResourceAsStream("playOn_Hover.png");
 		Image playButtonHover = new Image(playImageHover);
 		
-		InputStream pauseImageInput = getClass().getResourceAsStream("Default_Pause.png");
+		//InputStream pauseImageInput = getClass().getResourceAsStream("pauseNow.png");
+		//InputStream pauseImageInput = getClass().getResourceAsStream("Default_Pause.png");
+		InputStream pauseImageInput = getClass().getResourceAsStream("pauseOn.png");
 		Image pauseButtonImage = new Image(pauseImageInput);
-		InputStream pauseImageHover = getClass().getResourceAsStream("Default_Pause_Hover.png");
+		InputStream pauseImageHover = getClass().getResourceAsStream("pauseOn_Hover.png");
 		Image pauseButtonHover = new Image(pauseImageHover);
 		
-		InputStream stopImageInput = getClass().getResourceAsStream("Default_Stop.png");
+		//InputStream stopImageInput = getClass().getResourceAsStream("stopNow.png");
+		//InputStream stopImageInput = getClass().getResourceAsStream("Default_Stop.png");
+		InputStream stopImageInput = getClass().getResourceAsStream("stopOn.png");
 		Image stopButtonImage = new Image(stopImageInput);
-		InputStream stopImageHover = getClass().getResourceAsStream("Default_Stop_Hover.png");
+		InputStream stopImageHover = getClass().getResourceAsStream("stopOn_Hover.png");
 		Image stopButtonHover = new Image(stopImageHover);
-		/*****************************************************************************************/
+		
 		imageViewPlay = new ImageView(playButtonImage);
 		imageViewPlay_Hover = new ImageView(playButtonHover);
 		
@@ -118,19 +141,20 @@ final class PlayBackApplication{//Inherently package private
 		
 		imageViewStop = new ImageView(stopButtonImage);
 		imageViewStop_Hover = new ImageView(stopButtonHover);
+		/*****************************************************************************************/
 		
-		
-		//Circle buttonCircle = new Circle();
-		double size = 30;
+		double maxSize = 5;
+		double minSize  = 1;
 		playButton = new Button(); 
 		playButton.setGraphic(imageViewPlay);
+		playButton.setBackground(bg);
 		playButton.setPadding(Insets.EMPTY);
 		playButton.setShape( new Circle() );
-		playButton.setPrefSize(size, size);
-		playButton.setMaxHeight(size);
-		playButton.setMaxWidth(size);
-		playButton.setMinHeight(size);
-		playButton.setMinWidth(size);
+		//playButton.setPrefSize(5, 5);
+		playButton.setMaxHeight(maxSize);
+		playButton.setMaxWidth(maxSize);
+		playButton.setMinHeight(minSize);
+		playButton.setMinWidth(minSize);
 		
 		//For highlighting of play button on start-up prior to track play
 		playButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
@@ -143,8 +167,13 @@ final class PlayBackApplication{//Inherently package private
 		
 		stopButton = new Button();
 		stopButton.setGraphic(imageViewStop);
-		stopButton.setPadding(Insets.EMPTY);
-		stopButton.setShape( new Circle() );
+		//stopButton.setPadding(Insets.EMPTY);
+		//stopButton.setShape( new Circle() );
+		stopButton.setMaxHeight(maxSize);
+		stopButton.setMaxWidth(maxSize);
+		stopButton.setMinHeight(minSize);
+		stopButton.setMinWidth(minSize);
+		
 		//Change button, title display, highlight effects when button hovered
 		stopButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
 			if(newValue.booleanValue())
@@ -152,38 +181,49 @@ final class PlayBackApplication{//Inherently package private
 			else
 				stopButton.setGraphic(imageViewStop);
 		});
-
 		//////////////////////////////////////////////////////////////////////
-		HBox buttons = new HBox(playButton, stopButton);
-		buttons.setAlignment(Pos.BOTTOM_LEFT);
-		innerMediaBar.setLeft(buttons);
+
+		playTimeLabel = new Label();
+		playTimeLabel.setMinWidth(Control.USE_PREF_SIZE);
+		playTimeLabel.setTextFill(Color.DODGERBLUE);
 		
-		
-		playTime = new Label();
-		playTime.setMinWidth(Control.USE_PREF_SIZE);
         timeLabel = new Label("Time");
         timeSlider = new Slider();
+        timeSlider.setPrefWidth(Control.USE_COMPUTED_SIZE);
 		timeSlider.setMinWidth(Control.USE_PREF_SIZE);
-		HBox timeSliderHBox = new HBox();
-        timeSliderHBox.getChildren().addAll(timeLabel,timeSlider, playTime);
-        timeSliderHBox.setAlignment(Pos.CENTER);
-		trackTitle = new Label();
-		VBox trackAndTimeDisplay = new VBox();
-		trackAndTimeDisplay.getChildren().addAll(trackTitle, timeSliderHBox);
-		trackAndTimeDisplay.setAlignment(Pos.CENTER);
-		innerMediaBar.setCenter(trackAndTimeDisplay);
-		
 
+		artistTitleLabel = new Label();
+		artistTitleLabel.setPrefSize(Control.USE_COMPUTED_SIZE, Control.USE_COMPUTED_SIZE);
+		artistTitleLabel.setMaxWidth(Control.USE_PREF_SIZE);
+		artistTitleLabel.setTextFill(Color.WHITE);
+		
+		trackTitleLabel = new Label();
+		trackTitleLabel.setPrefSize(Control.USE_COMPUTED_SIZE, Control.USE_COMPUTED_SIZE);
+		trackTitleLabel.setTextFill(Color.WHITE);
+        trackTitleLabel.setOnMouseEntered((MouseEvent e ) ->{
+        	this.stopLabelAnimation(artistTitleLabel, trackTitleLabel);
+        });
+        trackTitleLabel.setOnMouseExited((MouseEvent e) ->{
+        	if(this.mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)){
+        		this.setLabelAnimation(artistTitleLabel, trackTitleLabel);
+        	}
+        });
+		
+		
         volumeLabel = new Label("Volume");
         volumeLabel.setMinWidth(Control.USE_PREF_SIZE);
-        volumeSlider = new Slider();
-        volumeSlider.setMinWidth(Control.USE_PREF_SIZE);
-        volumeSlider.setMaxWidth(70);
-        VBox volumeSliderVBox = new VBox();
-		volumeSliderVBox.getChildren().addAll(volumeLabel,volumeSlider);
-		volumeSliderVBox.setAlignment(Pos.BOTTOM_LEFT);
-		innerMediaBar.setRight(volumeSliderVBox);
         
+        volumeSlider = new Slider();
+        volumeSlider.setPrefWidth(Control.USE_COMPUTED_SIZE);
+        volumeSlider.setMinWidth(Control.USE_PREF_SIZE);
+        volumeSlider.setOnMouseEntered((MouseEvent e ) ->{
+        	this.stopLabelAnimation(artistTitleLabel, trackTitleLabel);
+        });
+        volumeSlider.setOnMouseExited((MouseEvent e) ->{
+        	if(this.mediaPlayer.getStatus().equals(MediaPlayer.Status.PLAYING)){
+        		this.setLabelAnimation(artistTitleLabel, trackTitleLabel);
+        	}
+        });
         //Set volume of media player to what user sets
         volumeSlider.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
             if (volumeSlider.isValueChanging()) {
@@ -191,9 +231,11 @@ final class PlayBackApplication{//Inherently package private
             }
         });
         
-        mediaBar.setBottom(innerMediaBar);
-        mediaBar.setPrefSize(10, 10);
-		sceneColor = Color.ALICEBLUE;
+		layoutComponents(timeSlider,volumeSlider,
+				  playButton,stopButton,artistTitleLabel,trackTitleLabel,
+				  playTimeLabel,timeLabel,volumeLabel,innerMediaBar);
+		
+		this.innerMediaBar.setBackground(bg);
 	}//END Constructor
 	
 	
@@ -204,8 +246,8 @@ final class PlayBackApplication{//Inherently package private
 	 * Note: trackTable table model assumed to be: "Name", "Artist", "Album", "Date Added"
 	 * 
 	 */
-	public Scene snapPlayBackSetup(DefaultTableModel trackModel, JTable trackTable, ArrayList<Track> selectedTracks, ArrayList<Track> activeTrackList){
-        
+	public Scene snapPlayBackSetup(JTable trackTable, ArrayList<Track> selectedTracks, ArrayList<Track> activeTrackList){
+		
 		/*****************Play Even Handler*************************/
 		
 		//Listener attached to time slider for when user seeks. Track time gets updated too.
@@ -258,8 +300,12 @@ final class PlayBackApplication{//Inherently package private
 						if(playButton.isHover()) playButton.setGraphic(imageViewPause_Hover);
 						else playButton.setGraphic(imageViewPause);
 						
-						//this.playButton.setGraphic(imageViewPause);
-						this.trackTitle.setText("Now Playing: " + currTrack.getTitle());
+						this.playButton.setGraphic(imageViewPause);
+        				this.artistTitleLabel.setText(currTrack.getArtist());
+        				
+						this.trackTitleLabel.setText(currTrack.getTitle());
+						
+						this.setLabelAnimation(this.artistTitleLabel,this.trackTitleLabel);
 						//Change button, title display, highlight effects when button hovered
 						playButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
 							if(newValue.booleanValue())
@@ -312,7 +358,7 @@ final class PlayBackApplication{//Inherently package private
         			if(playButton.isHover()) playButton.setGraphic(imageViewPlay_Hover);
         			else playButton.setGraphic(imageViewPlay);
         			
-        			//this.playButton.setGraphic(imageViewPlay);
+        			this.playButton.setGraphic(imageViewPlay);
         			//Change button, title display, highlight effects when button hovered
 					playButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
 						if(newValue.booleanValue())
@@ -355,8 +401,10 @@ final class PlayBackApplication{//Inherently package private
 	            				if(playButton.isHover()) playButton.setGraphic(imageViewPause_Hover);
 	            				else playButton.setGraphic(imageViewPause);
 	            					
-	            				//this.playButton.setGraphic(imageViewPause);
-	    						this.trackTitle.setText("Now Playing: " + currTrack.getTitle());
+	            				this.playButton.setGraphic(imageViewPause);
+	            				this.artistTitleLabel.setText(currTrack.getArtist());
+	    						this.trackTitleLabel.setText(currTrack.getTitle());
+	    						this.setLabelAnimation(this.artistTitleLabel,this.trackTitleLabel);
 	    						//Change button, title display, highlight effects when button hovered
 	    						playButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
 	    							if(newValue.booleanValue())
@@ -404,8 +452,10 @@ final class PlayBackApplication{//Inherently package private
 	            				if(playButton.isHover()) playButton.setGraphic(imageViewPause_Hover);
 	            				else playButton.setGraphic(imageViewPause); 
 	            					
-	        					//this.playButton.setGraphic(imageViewPause);
-	        					this.trackTitle.setText("Now Playing: " + currTrack.getTitle());
+	        					this.playButton.setGraphic(imageViewPause);
+	            				this.artistTitleLabel.setText(currTrack.getArtist());
+	    						this.trackTitleLabel.setText(currTrack.getTitle());
+	    						this.setLabelAnimation(this.artistTitleLabel,this.trackTitleLabel);
 	        					//Change button, title display, highlight effects when button hovered
 	    						playButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
 	    							if(newValue.booleanValue())
@@ -436,8 +486,10 @@ final class PlayBackApplication{//Inherently package private
         			if(playButton.isHover()) playButton.setGraphic(imageViewPause_Hover);
         			else playButton.setGraphic(imageViewPause);
         			
-					//this.playButton.setGraphic(imageViewPause);
-					this.trackTitle.setText("Now Playing: " + currTrack.getTitle());
+					this.playButton.setGraphic(imageViewPause);
+    				this.artistTitleLabel.setText(currTrack.getArtist());
+					this.trackTitleLabel.setText(currTrack.getTitle());
+					this.setLabelAnimation(this.artistTitleLabel,this.trackTitleLabel);
 					//Change button, title display, highlight effects when button hovered
 					playButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
 						if(newValue.booleanValue())
@@ -457,7 +509,7 @@ final class PlayBackApplication{//Inherently package private
         				if(playButton.isHover()) playButton.setGraphic(imageViewPause_Hover);
         				else playButton.setGraphic(imageViewPause);
         			
-						//this.playButton.setGraphic(imageViewPause);
+						this.playButton.setGraphic(imageViewPause);
 						//Change button, title display, highlight effects when button hovered
 						playButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
 							if(newValue.booleanValue())
@@ -493,9 +545,12 @@ final class PlayBackApplication{//Inherently package private
         EventHandler<ActionEvent> stopEvent = (ActionEvent e)->{
         	mediaPlayer.stop();//Stop playing currently playing track
         	
-        	//this.playButton.setGraphic(imageViewPlay);
-			this.trackTitle.setText("");
-			playButton.setGraphic(imageViewPlay);
+        	this.playButton.setGraphic(imageViewPlay);
+			this.artistTitleLabel.setText("");
+			this.trackTitleLabel.setText("");
+			this.stopLabelAnimation(this.artistTitleLabel,this.trackTitleLabel);
+			this.playButton.setGraphic(imageViewPlay);
+			
 			//Change button, title display, highlight effects when button hovered
 			playButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
 				if(newValue.booleanValue())
@@ -515,9 +570,71 @@ final class PlayBackApplication{//Inherently package private
 		playButton.setOnAction(playEvent);
 		stopButton.setOnAction(stopEvent);
 		
-		Scene scene = new Scene(mediaBar, sceneColor);
+		Color sceneColor = Color.DARKGRAY;
+		Scene scene = new Scene(this.innerMediaBar);
+		scene.setFill(sceneColor);
+		
 		//scene.setFill(Paint.valueOf("#202020"));
+		//this.mediaBar.setCenter(innerMediaBar);
+//		System.out.println("PlayBackApplication: playButton width: " + this.playButton.getWidth() 
+//							+ ": playButton height: " + this.playButton.getHeight());
 		return scene;
+	}
+	
+	/*
+	 * Orients components on BorderPane. Volume slider is vertical and to left.
+	 * In middle vertical box, artist then track and (left-right) play/pause, stop, time slider
+	 * leftPanel in MainView is 180x556
+	 * 
+	 * @param timeSlider, volumeSlider
+	 * @param playButton, stopButton
+	 * @param artistTitleLabel,trackTitleLabelk
+	 * @param playTimeLabel, timeLabel, 
+	 * @param volumeLabel
+	 * @param innerMediaBar The BorderPane where the above components will be laid out in 
+	 * 
+	 */
+	private void layoutComponents(Slider timeSlider, Slider volumeSlider,
+								  Button playButton,Button stopButton,Label artistTitleLabel,
+								  Label trackTitleLabel, Label playTimeLabel,Label timeLabel, 
+								  Label volumeLabel, BorderPane innerMediaBar)
+	{
+		VBox artistAndTrack = new VBox();
+		artistTitleLabel.setText("Artist");
+		trackTitleLabel.setText("Track");
+		artistAndTrack.getChildren().addAll(artistTitleLabel, trackTitleLabel );
+		
+		HBox playBtnContainer = new HBox(playButton);
+		HBox stopBtnContainer = new HBox(stopButton);
+		HBox buttons = new HBox(20, playButton, stopButton);
+
+		HBox timeControls = new HBox(timeSlider, buttons);//, playTimeLabel);
+		
+
+        VBox volumeVBox = new VBox();
+        volumeSlider.setOrientation(Orientation.VERTICAL);
+        volumeSlider.setShowTickMarks(true);
+        volumeVBox.getChildren().addAll(volumeSlider);
+        volumeVBox.setMaxSize(10, 50);
+
+        HBox every1 = new HBox();
+        every1.getChildren().addAll(volumeVBox, artistAndTrack);
+        
+        HBox buttons_playTimeLabel = new HBox();
+        buttons_playTimeLabel.getChildren().addAll(playTimeLabel);
+        playTimeLabel.setAlignment(Pos.TOP_LEFT);
+        buttons.setAlignment(Pos.TOP_RIGHT);
+        
+        VBox control_space_play = new VBox();
+        control_space_play.getChildren().addAll(timeControls, buttons_playTimeLabel);
+        VBox every1Else = new VBox();
+        every1Else.getChildren().addAll(every1,control_space_play);//timeControls,buttons_playTimeLabel);
+        
+
+		innerMediaBar.setTop(every1Else);
+		int mediaView_LeftPanelHeigth = 556; 
+		innerMediaBar.setMaxSize(100, 350);
+		//(175, ((1/5)*(1/3)) * mediaView_LeftPanelHeigth );
 	}
 	
 	/**
@@ -529,7 +646,33 @@ final class PlayBackApplication{//Inherently package private
 		this.currTrackLocation = currentTrack.getTrackLocation();
 	}
 	
+	//Accesses trackTitleLabel and animates that
+	private void setLabelAnimation(Label artistLabel,Label trackLabel ){
 
+		this.artistLabel_timeline.setCycleCount(Timeline.INDEFINITE);
+		final KeyValue artistKV = new KeyValue(artistLabel.translateXProperty(), -(trackLabel.getText().length()) * 3 );
+		final KeyFrame artistKF = new KeyFrame(Duration.millis(10000), artistKV);
+		artistLabel_timeline.getKeyFrames().add(artistKF);
+		artistLabel_timeline.play();
+		
+		this.trackLabel_timeline.setCycleCount(Timeline.INDEFINITE);
+		final KeyValue tracKV = new KeyValue(trackLabel.translateXProperty(), -(trackLabel.getText().length()) * 3 );
+		final KeyFrame tracKF = new KeyFrame(Duration.millis(10000), tracKV);
+		trackLabel_timeline.getKeyFrames().add(tracKF);
+		trackLabel_timeline.play();
+	}
+	
+	/*
+	 * Accesses trackLabel_timeline and stops it. Avoids memory leak.
+	 * Should be called upon "Stop" button press of media application
+	 */
+	private void stopLabelAnimation(Label artistLabel, Label trackLabel){
+		artistLabel_timeline.stop();
+		artistLabel.setTranslateX(0);
+
+		trackLabel_timeline.stop();
+		trackLabel.setTranslateX(0);
+	}
 	/**
 	 * Updates nextTrack
 	 * @param window.getActiveTrackList()
@@ -601,12 +744,12 @@ final class PlayBackApplication{//Inherently package private
 	 * Sets volume slider to represent current audio volume of track.
 	 */
 	private void updateValues() {
-        if (playTime != null && timeSlider != null && volumeSlider != null && duration != null) {
+        if (playTimeLabel != null && timeSlider != null && volumeSlider != null && duration != null) {
         	//System.out.println();
 			
 			Duration currentTime = mediaPlayer.getCurrentTime();//returns duration in milliseconds 
 			
-			playTime.setText(formatTime(currentTime, duration));
+			playTimeLabel.setText(formatTime(currentTime, duration));
 			timeSlider.setDisable(duration.isUnknown());						//Below: allows user to change time slider to seek on track
 			if (!timeSlider.isDisabled() && duration.greaterThan(Duration.ZERO) && !timeSlider.isValueChanging()) {
 				
