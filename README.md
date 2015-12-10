@@ -1,6 +1,6 @@
 SNAP APPLICATION 
 ================
-![Alt text](tvo7/TeamMuse/doc/Screenshot.png?raw=true "OH SNAP")
+![Alt text](/doc/Screenshot.png?raw=true "OH SNAP")
 
 User
 ====
