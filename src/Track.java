@@ -30,11 +30,20 @@ public class Track {
 
 	// private String Title;
 
+	/**
+	 * Creates a reference to a track with a known ID
+	 * @param location The absolute file path of the track
+	 * @param trackId The identifier for the Track
+	 */
 	public Track(String location, int trackId) {
 		this(location);
 		this.id = trackId;
 	}
 
+	/**
+	 * Creates a reference to a track with no known ID
+	 * @param location The absolute file path of the track
+	 */
 	public Track(String location) {
 		Location = location;
 		id = -1;
@@ -73,6 +82,10 @@ public class Track {
 
 	}
 
+	/**
+	 * Adds a Tag to the Track
+	 * @param name Name of the added Tag
+	 */
 	public void addTag(String name) {
 		DbManager.addTagToTrack(name, this);
 	}
@@ -190,11 +203,12 @@ public class Track {
 		//return ((int)mp3File.getMP3AudioHeader().getPreciseTrackLength()) + "";
 		return ((int)(audioFile.getAudioHeader().getTrackLength())) + "";//getPreciseTrackLength()) + "";
 	}
-
-	public void setImportDate(Date date){
-		importDate = date;
-	}
 	
+	/**
+	 * Returns the Date on which the Track was imported
+	 * 
+	 * @return
+	 */
 	public Date getImportDate(){
 		if(importDate == null){
 			importDate = DbManager.getTrackCreatedDate(id);
@@ -202,23 +216,24 @@ public class Track {
 		return importDate;
 	}
 	
+	/**
+	 * Sets the identifier of the Track
+	 * 
+	 * @param id the Track identifier
+	 */
 	public void setTrackId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * Returns the identifier of the Track
+	 * 
+	 * @return
+	 */
 	public int getTrackId() {
 		if(id < 0){
 			id = DbManager.getTrackId(Location);
 		}
 		return id;
-	}
-
-	/**
-	 * Need some sort of plan for doing this.
-	 * 
-	 * @param args
-	 */
-	public void editID3(String[] args) {
-
 	}
 }
