@@ -40,7 +40,12 @@ public class Track {
 
 	/**
 	 * Creates a Track from a given location to an .mp3 file. 
-	 * @param location Absolute path to an .mp3 file
+	 * @param location 					  Absolute path to an .mp3 file
+	 * @throws CannotReadException 		  From jaudiotagger
+	 * @throws IOException 				  From jaudiotagger
+	 * @throws TagException 		      From jaudiotagger
+	 * @throws ReadOnlyFileException	  From jaudiotagger
+	 * @throws InvalidAudioFrameException From jautiotagger: Metadata of music file isn't formatted correctly
 	 */
 	public Track(String location) {
 		Location = location;
