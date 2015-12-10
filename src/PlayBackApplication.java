@@ -55,7 +55,12 @@ import javafx.scene.shape.Rectangle;
 
 import javafx.util.Duration;
 
-
+/**
+ * Sets up control buttons and field components for audio playback of music. 
+ * Note: does not extend JavaFX Application because meant for combination with Java Swing from a driver class
+ * @author Bim
+ *
+ */
 final class PlayBackApplication{//Inherently package private	
 	private Button playButton;
 	private Button stopButton;
@@ -79,16 +84,20 @@ final class PlayBackApplication{//Inherently package private
 	private Label volumeLabel;
 	private Label artistTitleLabel;
 	
+	/**
+	 * Media object that wraps track via its absolute path
+	 */
 	private Media media;
 	
+	/**
+	 * MediaPlayer object that wraps the Media object for playback
+	 */
 	private MediaPlayer mediaPlayer;
 
 	private Slider timeSlider;
 	private Slider volumeSlider;
 	
 	private String currTrackLocation;
-	
-	private StackPane trackTitleDisplay;
 	
 	private final Timeline trackLabel_timeline = new Timeline();
 	private final Timeline artistLabel_timeline = new Timeline();
@@ -102,32 +111,27 @@ final class PlayBackApplication{//Inherently package private
 	
 	//TODO manage resources to avoid memory leak
 	//TODO Adjust components to move with resizing
+	/**
+	 * Sets up controls in play back application panel.
+	 * @param parentPanelSize 
+	 */
 	public PlayBackApplication(Dimension parentPanelSize){
 		this.parentPanelSize = parentPanelSize;
-		
-		//Universal background fill
-		//CornerRadii cornerRadii = new CornerRadii(15);
+
 		BackgroundFill bgFill = new BackgroundFill(Color.rgb(64,64,64), CornerRadii.EMPTY, Insets.EMPTY);
 		Background bg = new Background(bgFill);
 
 		/**********************************Set up button images************************************/
-		//InputStream playImageInput = getClass().getResourceAsStream("Default_Play.png");
-		//InputStream playImageInput = getClass().getResourceAsStream("playNow.png");
-		//InputStream playImageInput = getClass().getResourceAsStream("media_controls_play_small.png"); 
 		InputStream playImageInput = getClass().getResourceAsStream("playOn.png");
 		Image playButtonImage = new Image(playImageInput);
 		InputStream playImageHover = getClass().getResourceAsStream("playOn_Hover.png");
 		Image playButtonHover = new Image(playImageHover);
 		
-		//InputStream pauseImageInput = getClass().getResourceAsStream("pauseNow.png");
-		//InputStream pauseImageInput = getClass().getResourceAsStream("Default_Pause.png");
 		InputStream pauseImageInput = getClass().getResourceAsStream("pauseOn.png");
 		Image pauseButtonImage = new Image(pauseImageInput);
 		InputStream pauseImageHover = getClass().getResourceAsStream("pauseOn_Hover.png");
 		Image pauseButtonHover = new Image(pauseImageHover);
-		
-		//InputStream stopImageInput = getClass().getResourceAsStream("stopNow.png");
-		//InputStream stopImageInput = getClass().getResourceAsStream("Default_Stop.png");
+
 		InputStream stopImageInput = getClass().getResourceAsStream("stopOn.png");
 		Image stopButtonImage = new Image(stopImageInput);
 		InputStream stopImageHover = getClass().getResourceAsStream("stopOn_Hover.png");
@@ -238,13 +242,53 @@ final class PlayBackApplication{//Inherently package private
 		this.innerMediaBar.setBackground(bg);
 	}//END Constructor
 	
+	/**
+	 * Retrieve the Media object that represents the current Track object
+	 * @return Media 
+	 */
+	public Media getMedia(){
+		return media;
+	}
 	
+	/**
+	 * 
+	 * Retrieve the MediaPlayer object that wraps the Media object and controls playback
+	 * @return MediaPlayer
+	 */
+	public MediaPlayer getMediaPlayer(){
+		return mediaPlayer;
+	}
+	
+
+	/**
+	 * Set the Media object within play back application
+	 * @param media
+	 * @return void
+	 */
+	public void setMedia(Media media){
+		this.media = media;
+	}
+	
+	/**
+	 * Set the MediaPlayer controller within play back application
+	 * @param mediaPlayer
+	 * @return void
+	 */
+	public void setMediaPlayer(MediaPlayer mediaPlayer){
+		this.mediaPlayer = mediaPlayer;
+	}
+	
+
 	
 	/**
 	 * Sets up play, stop, pause buttons and actions.
 	 * 
 	 * Note: trackTable table model assumed to be: "Name", "Artist", "Album", "Date Added"
+	 * @param trackTable container for music tracks
+	 * @param selectedTracks holds currently selected music tracks at any given time
+	 * @param activeTrackList music tracks that user sees currently in the trackTable
 	 * 
+	 * @return Scene Visual representation of components and controls in play back application
 	 */
 	public Scene snapPlayBackSetup(JTable trackTable, ArrayList<Track> selectedTracks, ArrayList<Track> activeTrackList){
 		
@@ -368,6 +412,7 @@ final class PlayBackApplication{//Inherently package private
 					});
 					//////////////////////////////////////////////////////////////////////
 					
+					/*
         			System.out.println();
         			System.out.println("PlayBackApplication: mediaPlayer's current time: " + mediaPlayer.getCurrentTime());
         			System.out.println("PlayBackApplication: mediaPlayer's stop time: " + mediaPlayer.getStopTime());
@@ -375,17 +420,18 @@ final class PlayBackApplication{//Inherently package private
         			System.out.println("PlayBackApplication: selectedTrackLocation: " + selectedTrackLocation);
         			System.out.println("PlayBackApplication: currTrackLocation equals selectedTrackLocaiton: " + currTrackLocation.equals(selectedTrackLocation));
         			System.out.println();
-        			
+        			*/
+					
         			if( (mediaPlayer.getCurrentTime().equals(mediaPlayer.getStopTime())) ){
         				
-        				System.out.println("\n PlayBackApplication: PLAYING: Song ended and next track should play: " + selectedTrack.getTitle() );
+        				//System.out.println("\n PlayBackApplication: PLAYING: Song ended and next track should play: " + selectedTrack.getTitle() );
         				media = new Media(selectedTrackURI);
         				mediaPlayer = new MediaPlayer(media);
         				
         				currTrack = selectedTrack;
         				currTrackLocation = selectedTrackLocation;
         				
-        				System.out.println("PlayBackApplication: Playing new song: MediaPlayer status: " + mediaPlayer.getStatus());
+        				//System.out.println("PlayBackApplication: Playing new song: MediaPlayer status: " + mediaPlayer.getStatus());
         				
         				mediaPlayer.setOnReady( () ->{
 	        					duration = mediaPlayer.getMedia().getDuration();
@@ -405,6 +451,7 @@ final class PlayBackApplication{//Inherently package private
 	            				this.artistTitleLabel.setText(currTrack.getArtist());
 	    						this.trackTitleLabel.setText(currTrack.getTitle());
 	    						this.setLabelAnimation(this.artistTitleLabel,this.trackTitleLabel);
+	    						
 	    						//Change button, title display, highlight effects when button hovered
 	    						playButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
 	    							if(newValue.booleanValue())
@@ -415,7 +462,6 @@ final class PlayBackApplication{//Inherently package private
 	    						//////////////////////////////////////////////////////////////////////
         					}
         				);
-
         	            
                 		mediaPlayer.setOnEndOfMedia( ()->{
             					setNextTrackPlay(activeTrackList);  
@@ -425,7 +471,7 @@ final class PlayBackApplication{//Inherently package private
         			}
         			
         			//Reached if play pressed on song currently playing 
-        			System.out.println("PlayBackApplication: in PLAYING: paused pressedon song currently playing");
+        			//System.out.println("PlayBackApplication: in PLAYING: paused pressedon song currently playing");
         			break;
         			
         		case STOPPED://symbols are play, stop
@@ -456,6 +502,7 @@ final class PlayBackApplication{//Inherently package private
 	            				this.artistTitleLabel.setText(currTrack.getArtist());
 	    						this.trackTitleLabel.setText(currTrack.getTitle());
 	    						this.setLabelAnimation(this.artistTitleLabel,this.trackTitleLabel);
+	    						
 	        					//Change button, title display, highlight effects when button hovered
 	    						playButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
 	    							if(newValue.booleanValue())
@@ -473,8 +520,8 @@ final class PlayBackApplication{//Inherently package private
             				}
                 		);//END setOnEndOfMedia
 
-        				System.out.println("\nPlayBackApplication: MediaControl: STOPPED 1");
-        				System.out.println("\nPlayBackApplication: playEvent: mediaPlayer status after poll: " + mediaPlayer.getStatus());
+//        				System.out.println("\nPlayBackApplication: MediaControl: STOPPED 1");
+//        				System.out.println("\nPlayBackApplication: playEvent: mediaPlayer status after poll: " + mediaPlayer.getStatus());
         				return;
         			}
         			
@@ -490,6 +537,7 @@ final class PlayBackApplication{//Inherently package private
     				this.artistTitleLabel.setText(currTrack.getArtist());
 					this.trackTitleLabel.setText(currTrack.getTitle());
 					this.setLabelAnimation(this.artistTitleLabel,this.trackTitleLabel);
+					
 					//Change button, title display, highlight effects when button hovered
 					playButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
 						if(newValue.booleanValue())
@@ -499,7 +547,7 @@ final class PlayBackApplication{//Inherently package private
 					});
 					//////////////////////////////////////////////////////////////////////
 					
-        			System.out.println("\nPlayBackApplication: MediaControl: STOPPED 2: User want to replay same song");
+        			//System.out.println("\nPlayBackApplication: MediaControl: STOPPED 2: User want to replay same song");
         			break;
         			
         		case PAUSED://Symbol is set to play
@@ -510,6 +558,7 @@ final class PlayBackApplication{//Inherently package private
         				else playButton.setGraphic(imageViewPause);
         			
 						this.playButton.setGraphic(imageViewPause);
+						
 						//Change button, title display, highlight effects when button hovered
 						playButton.hoverProperty().addListener( (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)->{
 							if(newValue.booleanValue())
@@ -526,18 +575,19 @@ final class PlayBackApplication{//Inherently package private
         					}
 						);//END setOnEndOfMedia
 						
-						
+						/*
         				System.out.println();
         				System.out.println("PlayBackApplication: PAUSED: User wants to resume && there's time left on the song");
         				System.out.println("PlayBackApplication: PAUSED: mediaPlayer status after poll: " + mediaPlayer.getStatus());
         				System.out.println();
 
     				System.out.println("PlayBackApplication: MediaControl: PAUSED 2");
+    				*/
         			break;
         					
         			
         	}//END Switch stmt
-        	System.out.println("PlayBackApplication: playEvent: mediaPlayer status after poll: " + mediaPlayer.getStatus());
+        	//System.out.println("PlayBackApplication: playEvent: mediaPlayer status after poll: " + mediaPlayer.getStatus());
 
         	
         };//END PlayEvent handler
@@ -564,7 +614,7 @@ final class PlayBackApplication{//Inherently package private
         	mediaPlayer.seek(mediaPlayer.getStartTime());
         	        	
         	updateValues();
-        	System.out.println("PlayBackApplication: MediaControl: stopEvent: UpdateValues running");
+        	//System.out.println("PlayBackApplication: MediaControl: stopEvent: UpdateValues running");
 		};
 
 		playButton.setOnAction(playEvent);
@@ -573,13 +623,10 @@ final class PlayBackApplication{//Inherently package private
 		Color sceneColor = Color.DARKGRAY;
 		Scene scene = new Scene(this.innerMediaBar);
 		scene.setFill(sceneColor);
-		
-		//scene.setFill(Paint.valueOf("#202020"));
-		//this.mediaBar.setCenter(innerMediaBar);
-//		System.out.println("PlayBackApplication: playButton width: " + this.playButton.getWidth() 
-//							+ ": playButton height: " + this.playButton.getHeight());
+
 		return scene;
 	}
+	
 	
 	/*
 	 * Orients components on BorderPane. Volume slider is vertical and to left.
@@ -673,7 +720,7 @@ final class PlayBackApplication{//Inherently package private
 		trackLabel_timeline.stop();
 		trackLabel.setTranslateX(0);
 	}
-	/**
+	/*
 	 * Updates nextTrack
 	 * @param window.getActiveTrackList()
 	 */
@@ -738,7 +785,7 @@ final class PlayBackApplication{//Inherently package private
         }
     }
 
-	/**
+	/*
 	 * Makes time slider change while track plays back.
 	 * Updates time display of track playback.
 	 * Sets volume slider to represent current audio volume of track.

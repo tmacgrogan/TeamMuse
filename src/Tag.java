@@ -21,7 +21,6 @@ public class Tag {
 	private String description;	
 	private boolean searched; 
 	
-
 	
 	/**
 	 * Creates an empty Tag object not linked to the Database. Avoid use out side of test applications.
