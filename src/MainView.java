@@ -866,6 +866,9 @@ public class MainView {
 		}
 	}
 	
+	/**
+	 * Resets and populates saved search table when saving new playlist
+	 */
 	private static void updateSavedSearchTable(){
 		savedSearches = DbManager.getSavedSearches();
 		
@@ -880,27 +883,31 @@ public class MainView {
 		}
 	}
 	
+	/**
+	 * resets and updates tag tables when clicking on a new track
+	 */
 	private static void updateTagTable() {
 		// TODO Auto-generated method stub
 		tagModel = (DefaultTableModel) tagTable.getModel();
     	
     	clearTable(tagTable);
     	
-    	//tagButtonPanel.removeAll();
-    	//tagButtonPanel.updateUI();
-    	
     	activeTags = TrackListController.getCommonTags(selectedTracks);
     	
     	//populates rows with tags of selected track(s)
     	for(int i = 0; i < activeTags.size(); i++){
     		tagModel.addRow(new Object[]{activeTags.get(i).getName()});
-    		//JButton newTagButton = addTagButton(activeTags.get(i),"");
-    		//tagButtonPanel.add(newTagButton);
     	}
     	
     	//tagInfo.setText(trackTable.getValueAt(trackTable.getSelectedRow(), 0).toString());
 	}
 	
+	/**
+	 * resets and updates tags for the search results.
+	 * This should add buttons with the appropriate images for include and exclude tag search variables
+	 * 
+	 * @param theSearch the current search that is being executed to get include and excluded tags
+	 */
 	private static void updateSearchTagTable(Search theSearch){
 		
 		tagSearchButtonPanel.setVisible(true);
@@ -940,11 +947,14 @@ public class MainView {
     	}	
 	}
 	
+	/**
+	 * @return activeTrackList
+	 */
 	private static ArrayList<Track> getActiveTrackList(){
 		return activeTrackList;
 	}
 	
-	/*
+	/**
 	 * Sets instance field to collection passed in.
 	 * It is synchronized for atomic update to instance field. Subsequent reads will happen after its state is updated correctly.
 	 * @param c
@@ -953,11 +963,20 @@ public class MainView {
 		getActiveTrackList().clear();
 		getActiveTrackList().addAll(c);
 	}
-	
+	/**
+	 * getter for track table
+	 * @return trackTable
+	 */
 	public JTable getTrackTable(){
 		return trackTable;
 	}
 	
+	/**
+	 * creates a new button for a tag to be added to the search tag button panel
+	 * @param curTag current tag that needs a button to be created for
+	 * @param iconType indicates whether this tag is included or excluded in search and gets the right button image
+	 * @return newTagButton newButton that corresponds with a tag
+	 */
 	private static JButton addTagButton(Tag curTag, String iconType){
 		ImageIcon xIcon = new ImageIcon();
 		if (iconType == "intersect"){
@@ -1043,28 +1062,6 @@ public class MainView {
 		});
 		
 		return newTagButton;
-	}
-	
-	
-	/** Adds all .mp3 files in specified folder into the Library and updates activeTrackList
-	 * @param folderLocation location of folder containing files to import 
-	 */
-	private void importFiles(String folderLocation){
-		
-	}
-	
-	/**Converts the search parameters passed by the user into a Search object and then sets the activeTracklist to the results of executing the search
-	 * @param searchParams
-	 */
-	private void search(String searchParams){
-		
-	}	
-	
-	/**resets the activeTrackList to the whole Library
-	 * 
-	 */
-	private void clearSearch(){
-		
 	}
 }
 
