@@ -144,8 +144,6 @@ public class MainView {
 
 	}
 	
-	
-	
 	/**
 	 * Create the application.
 	 */
@@ -162,11 +160,6 @@ public class MainView {
 		trackModel = (DefaultTableModel) trackTable.getModel();
 		updateTrackTable();
 		updateSavedSearchTable();
-		
-//		for(int i = 0; i < activeTrackList.size(); i++){
-//			Track currTrack = activeTrackList.get(i);
-//			trackModel.addRow(new Object[]{currTrack.getTitle(), currTrack.getArtist(), currTrack.getAlbum(), currTrack.getGenre()});
-//		}
 	}
 	
 	/**
@@ -317,7 +310,6 @@ public class MainView {
 					.addContainerGap()
 					.addComponent(fxPanel)
 					.addComponent(btnImportPlaylist)
-					//.addGap(126)
 					.addComponent(lblSavedPlaylists)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(savedSearchTable, GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
@@ -439,13 +431,7 @@ public class MainView {
 		
 		tagTable.setShowGrid(false);
 		tagTable.setForeground(Color.LIGHT_GRAY);
-		tagTable.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"Tag"
-			}
-		) {
+		tagTable.setModel(new DefaultTableModel(new Object[][] {},new String[] {"Tag"}) {
 			Class[] columnTypes = new Class[] {
 				String.class
 			};
@@ -470,10 +456,6 @@ public class MainView {
 		tagTable.addMouseListener(new MouseAdapter() {
 		    public void mousePressed(MouseEvent click) {
 		        if (click.getClickCount() == 2) {
-		            System.out.println(tagTable.getSelectedRow());
-		            
-		            
-		            
 		            selectedTag = activeTags.get(tagTable.getSelectedRow());
 		            parent = selectedTag.getParents();
 					
@@ -494,9 +476,8 @@ public class MainView {
 					
 					parentList.addMouseListener(new MouseAdapter() {
 					    public void mouseClicked(MouseEvent evt) {
-					    	//System.out.println("Tag " + parent.get(parentList.getSelectedIndex()).getName());
+					    	// Double-click detected
 					        if (evt.getClickCount() == 2) {
-					            // Double-click detected
 					        	selectedTag.removeParent(parent.get(parentList.getSelectedIndex()));
 					        }
 					    }
@@ -506,10 +487,8 @@ public class MainView {
 					    "Rename tag:", newTagNameField,
 					    "Double click to remove parent",parentList,
 					    "Add parent tag:", newParentField
-					    
 					};
 					
-
 					int option = JOptionPane.showConfirmDialog(null, message, "Edit Tag", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 					if (option == JOptionPane.OK_OPTION) {
 					    if (selectedTag.setName(newTagNameField.getText())) {
@@ -642,12 +621,9 @@ public class MainView {
 			}
 		});
 		searchField = new JTextField();
-		importExportPanel.add(searchField);
-		
 		searchField.setColumns(25);
-		
 		searchField.addActionListener(searchAction);
-		
+		importExportPanel.add(searchField);
 		searchButton = new JButton("Search");
 		importExportPanel.add(searchButton);
 		
@@ -658,8 +634,7 @@ public class MainView {
 				tagSearchButtonPanel.setVisible(false);
 				buttonMiddlePanel.setVisible(false);
 				searchField.setText("");
-				
-				//activeTrackList = DbManager.getLibrary();
+
 				setActiveTrackList(DbManager.getLibrary());
 				updateTrackTable();
 			}
@@ -673,25 +648,22 @@ public class MainView {
 		btnSave = new JButton("Save Playlist");
 		buttonMiddlePanel.add(btnSave);
 		
-		//Save a searched playlist
+		//Save a searched play list
 		btnSave.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				String text = searchField.getText();
 				if(text != null && !text.isEmpty()) {
 			    	Search search = new Search(text);
-			    	
-			    	//activeTrackList = search.executeSearch();
+			    
 					setActiveTrackList(search.executeSearch());
 			    	
 					System.out.println("MainView:Initialize: (coming from executeSearch())activeTrackList size: "+ getActiveTrackList().size());
 					/***************DEBUG:false param means not importToSnap use. Means don't overwrite activeTrackList************/
 					updateTrackTable();
 					search.favoriteSearch();
-				}
-				
+				}	
 				updateSavedSearchTable();
-				
 			}
 		});
 		
@@ -725,13 +697,7 @@ public class MainView {
 		trackTable.setShowHorizontalLines(false);
 		trackTable.setShowGrid(false);
 		trackTable.setForeground(Color.WHITE);
-		trackTable.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"Name", "Artist", "Album", "Date Added"
-			}
-		) {
+		trackTable.setModel(new DefaultTableModel(new Object[][] {},new String[] {"Name", "Artist", "Album", "Date Added"}) {
 			Class[] columnTypes = new Class[] {
 				String.class, String.class, String.class, String.class
 			};
@@ -753,17 +719,12 @@ public class MainView {
 	        		selectedTracks.clear();
 	        		//System.out.println("trackTable.getSelectedRows size: "+ trackTable.getSelectedRows().length);
 	        		
-
 	        		for(int row : trackTable.getSelectedRows()){
-	        			//selectedTracks.add(activeTrackList.get(row));
 	        			selectedTracks.add(getActiveTrackList().get(row));
 	        			
 	        			System.out.println("MainView: Songs in Selected Rows via activeTrackList: " + getActiveTrackList().get(row).getTitle());
 	        		}
 	        		updateTagTable();
-	        		
-	        		//DO WE NEED THIS LINE????
-	        		//addTagField.setText(lastTagAdded);
 	        	}
 	        			
 	        	btnAddTag.setEnabled(true);
@@ -775,8 +736,6 @@ public class MainView {
 		trackTable.getTableHeader().addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent e){
 				String field = trackTable.getModel().getColumnName(trackTable.columnAtPoint(e.getPoint()));
-				
-				//System.out.println("Clicked column: " + field);
 				
 				trackComparator.setField(field);
 				
@@ -794,13 +753,7 @@ public class MainView {
 		
 		savedSearchTable.setShowGrid(false);
 		savedSearchTable.setForeground(Color.LIGHT_GRAY);
-		savedSearchTable.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"Tag"
-			}
-		) {
+		savedSearchTable.setModel(new DefaultTableModel(new Object[][] {},new String[] {"Tag"}) {
 			Class[] columnTypes = new Class[] {
 				String.class
 			};
@@ -820,14 +773,10 @@ public class MainView {
 		
 		savedSearchTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 	        public void valueChanged(ListSelectionEvent event) {
-
-
 	        	if ( !event.getValueIsAdjusting() && savedSearchTable.getSelectedRow() != -1) {	
-	        		//System.out.println("\nMainView: savedSearchTable.getSelectedRow(): " + savedSearchTable.getSelectedRow()+"\n");
 	        		Search search = savedSearches.get(savedSearchTable.getSelectedRow());
 	        		searchField.setText(search.getSearchText());
-	        		
-	        		//activeTrackList = search.executeSearch();
+
 	        		setActiveTrackList(search.executeSearch());
 	        		
 	        		updateTrackTable();
@@ -835,16 +784,13 @@ public class MainView {
 	        	}
 	        }
 	    });
+		
 		leftPanel.setLayout(gl_leftPanel);
 		frmSnap.getContentPane().setLayout(groupLayout);
 		frmSnap.setBounds((screen.width/2)-(width/2), (screen.height/2)-(height/2), width, height);
 		frmSnap.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 	}
-	
-	
-	
-	
 	
 	/***********************DEBUG:Added parameter for importToSnap button and Search button to both work using this call*********/
 	private static void updateTrackTable(){
