@@ -21,10 +21,8 @@ public class Track {
 	/** The unique identifier of the Track as stored in the database */
 	private int id;
 
-	private MP3File mp3File;
 	private AudioFile audioFile;
 	private Date importDate;
-	// private String Genre;
 	/** Absolute path */
 	private String Location;// Absolute path
 

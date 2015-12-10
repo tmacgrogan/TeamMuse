@@ -702,12 +702,6 @@ public class MainView {
 		searchButton.addActionListener(searchAction);
 		tagSearchButtonPanel.setVisible(false);
 		
-		//playerPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		//playerPanel.setBackground(middleBG);
-		//middlePanel.add(playerPanel, BorderLayout.SOUTH);
-		
-		//playerPanel.add(btnMusicPlayer);
-		
 		middlePanel.add(songPanel, BorderLayout.CENTER);
 		
 		songPanel.setOpaque(true);
@@ -950,7 +944,7 @@ public class MainView {
 		return activeTrackList;
 	}
 	
-	/**
+	/*
 	 * Sets instance field to collection passed in.
 	 * It is synchronized for atomic update to instance field. Subsequent reads will happen after its state is updated correctly.
 	 * @param c
