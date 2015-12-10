@@ -1,6 +1,6 @@
 SNAP APPLICATION 
 ================
-![Alt text](/TeamMuse/doc/Screenshot.png?raw=true "OH SNAP")
+![Alt text](tvo7/TeamMuse/doc/Screenshot.png?raw=true "OH SNAP")
 
 User
 ====
@@ -9,6 +9,7 @@ https://github.gatech.edu/aolajubutu3/TeamMuse_Deliver
 Developer
 =========
 Dependencies
+
 1) jaudiotagger-2.2.3.jar (Included in TeamMuse/Util)
 
 2) sqlite-jdbc-3.8.11.1.jar (Included in TeamMuse/Util)
