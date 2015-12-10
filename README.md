@@ -1,6 +1,6 @@
 SNAP APPLICATION 
 ================
-![Alt text](/doc/Screenshot.png?raw=true "OH SNAP")
+![Alt text](/doc/snap_example.png?raw=true "OH SNAP")
 
 User
 ====
