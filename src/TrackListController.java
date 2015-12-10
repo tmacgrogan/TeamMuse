@@ -165,6 +165,7 @@ public class TrackListController {
 			
 			try {
 				read = new BufferedReader(new InputStreamReader(new FileInputStream(file), Charset.forName("UTF8")));
+				
 				//scan = new Scanner(file);
 				
 				for(String line = read.readLine(); line != null; line = read.readLine()){
@@ -217,7 +218,7 @@ public class TrackListController {
 		for(File file : chooseFiles(new FileNameExtensionFilter("MP3 Files", "mp3"))){
 			trackList.add(new Track(file.getAbsolutePath()));
 		}
-		System.out.println(trackList.size());
+		System.out.println("TrackListController: trackList size: " + trackList.size());
 		DbManager.importTracks(trackList);
 		return trackList;
 	}

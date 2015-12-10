@@ -22,6 +22,7 @@ public class Track {
 	private int id;
 
 	private MP3File mp3File;
+	private AudioFile audioFile;
 	private Date importDate;
 	// private String Genre;
 	/** Absolute path */
@@ -49,8 +50,8 @@ public class Track {
 		// AudioFile
 		try {
 
-			AudioFile audioFile = AudioFileIO.read(new File(location));
-			mp3File = (MP3File) audioFile;
+			audioFile = AudioFileIO.read(new File(location));
+			//mp3File = (MP3File) audioFile;
 
 		} catch (CannotReadException e) {
 
@@ -81,6 +82,10 @@ public class Track {
 
 	}
 
+	/**
+	 * Adds a Tag to the Track
+	 * @param name Name of the added Tag
+	 */
 	public void addTag(String name) {
 		DbManager.addTagToTrack(name, this);
 	}
@@ -103,10 +108,11 @@ public class Track {
 	 * @return String
 	 */
 	public String getAlbum() {
-		AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
-
+		//AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
+		String album = audioFile.getTag().getFirst(FieldKey.ALBUM);
+		
 		// ID3v2.3 or ID3v2.4 so use abstract
-		String album = ID3v2Tag.getFirst(FieldKey.ALBUM);
+		//String album = ID3v2Tag.getFirst(FieldKey.ALBUM);
 		return album;
 	}
 
@@ -117,10 +123,11 @@ public class Track {
 	 * @return String
 	 */
 	public String getArtist() {
-		AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
-
+		//AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
+		String artist = audioFile.getTag().getFirst(FieldKey.ARTIST);
+		
 		// ID3v2.3 or ID3v2.4 so use abstract
-		String artist = ID3v2Tag.getFirst(FieldKey.ARTIST);
+		//String artist = ID3v2Tag.getFirst(FieldKey.ARTIST);
 		return artist;
 	}
 
@@ -130,10 +137,11 @@ public class Track {
 	 * @return String
 	 */
 	public String getGenre() {
-		AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
-
+		//AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
+		String genre = audioFile.getTag().getFirst(FieldKey.GENRE);
+		
 		// ID3v2.3 or ID3v2.4 so use abstract
-		String genre = ID3v2Tag.getFirst(FieldKey.GENRE);
+		//String genre = ID3v2Tag.getFirst(FieldKey.GENRE);
 		return genre;
 	}
 
@@ -173,13 +181,15 @@ public class Track {
 	 * @return
 	 */
 	public String getTitle() {
-		AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
-
+		//AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
+		String title = audioFile.getTag().getFirst(FieldKey.TITLE);
+		
 		// ID3v2.3 or ID3v2.4 so use abstract
 		
-		String title = ID3v2Tag.getFirst(FieldKey.TITLE);
-		if (title == "") {
-			return MP3File.getBaseFilename(mp3File.getFile());
+		//String title = ID3v2Tag.getFirst(FieldKey.TITLE);
+		if (title == "" || title == null) {
+			//return MP3File.getBaseFilename(mp3File.getFile());
+			return AudioFile.getBaseFilename(audioFile.getFile());
 		}
 		return title;
 	}
@@ -190,13 +200,15 @@ public class Track {
 	 * @return
 	 */
 	public String getRuntime() {
-		return ((int)mp3File.getMP3AudioHeader().getPreciseTrackLength()) + "";
-	}
-
-	public void setImportDate(Date date){
-		importDate = date;
+		//return ((int)mp3File.getMP3AudioHeader().getPreciseTrackLength()) + "";
+		return ((int)(audioFile.getAudioHeader().getTrackLength())) + "";//getPreciseTrackLength()) + "";
 	}
 	
+	/**
+	 * Returns the Date on which the Track was imported
+	 * 
+	 * @return
+	 */
 	public Date getImportDate(){
 		if(importDate == null){
 			importDate = DbManager.getTrackCreatedDate(id);
@@ -204,23 +216,24 @@ public class Track {
 		return importDate;
 	}
 	
+	/**
+	 * Sets the identifier of the Track
+	 * 
+	 * @param id the Track identifier
+	 */
 	public void setTrackId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * Returns the identifier of the Track
+	 * 
+	 * @return
+	 */
 	public int getTrackId() {
 		if(id < 0){
 			id = DbManager.getTrackId(Location);
 		}
 		return id;
-	}
-
-	/**
-	 * Need some sort of plan for doing this.
-	 * 
-	 * @param args
-	 */
-	public void editID3(String[] args) {
-
 	}
 }

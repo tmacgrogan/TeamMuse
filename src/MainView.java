@@ -1,6 +1,5 @@
 import java.awt.*;
 
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -81,7 +80,7 @@ public class MainView {
 	private static JPanel addTagPanel;
 	private static JPanel tagInfoPanel;
 	private static JPanel searchPanel;
-	private static JPanel playerPanel;
+	//private static JPanel playerPanel;
 	private static JPanel songPanel;
 	private static JPanel tagButtonPanel;
 	
@@ -116,13 +115,10 @@ public class MainView {
 
 	
 	
-	private static JFXPanel fxPanel;
+	private static JFXPanel fxPanel= new JFXPanel();//Inserted into gl_leftPanel manually
 	
 	public static void main(String[] args) {
 		SnapMain();
-		fxPanel= new JFXPanel();
-		middlePanel.add( fxPanel, BorderLayout.SOUTH);
-		
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -135,14 +131,14 @@ public class MainView {
 				}
 			}
 		});
-
+		
+		fxPanel.setBackground(sideBG);
 		Platform.runLater(new Runnable() {
             @Override
             public void run() {
-            	
-            	PlayBackApplication snapPlayBack = new PlayBackApplication();
-            	Scene scene =  snapPlayBack.snapPlayBackSetup(trackModel, trackTable, selectedTracks, activeTrackList);
-        		fxPanel.setScene(scene);                
+            	PlayBackApplication snapPlayBack = new PlayBackApplication(leftPanel.getSize());
+            	Scene scene =  snapPlayBack.snapPlayBackSetup(trackTable, selectedTracks, getActiveTrackList());
+            	fxPanel.setScene(scene);
             }
        });
 
@@ -311,14 +307,17 @@ public class MainView {
 				.addGroup(Alignment.TRAILING, gl_leftPanel.createSequentialGroup()
 					.addContainerGap(34, Short.MAX_VALUE)
 					.addComponent(btnImportPlaylist)
-					.addGap(32))
+					.addGap(60))
+				.addGroup(Alignment.TRAILING, gl_leftPanel.createParallelGroup())
+					.addComponent(fxPanel)//PlayBackApplication
 		);
 		gl_leftPanel.setVerticalGroup(
 			gl_leftPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_leftPanel.createSequentialGroup()
 					.addContainerGap()
+					.addComponent(fxPanel)
 					.addComponent(btnImportPlaylist)
-					.addGap(126)
+					//.addGap(126)
 					.addComponent(lblSavedPlaylists)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(savedSearchTable, GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE)
@@ -348,6 +347,7 @@ public class MainView {
 		lblDetails.setBackground(Color.GRAY);
 		
 		leftPanel.setBackground(sideBG);
+		leftPanel.setForeground(Color.WHITE);
 		
 		middlePanel.setBorder(new LineBorder(Color.DARK_GRAY));
 		middlePanel.setForeground(Color.WHITE);
