@@ -173,7 +173,7 @@ public class Track {
 	public ArrayList<Tag> getTags() {
 		return DbManager.getTags(this);
 	}
-
+	
 	/**
 	 * Return Track title. Return relative file name if no title frame (i.e no
 	 * TIT2)
@@ -214,6 +214,15 @@ public class Track {
 			importDate = DbManager.getTrackCreatedDate(id);
 		}
 		return importDate;
+	}
+	
+	/**
+	 * sets the Date on which the Track was imported
+	 * 
+	 * @param date
+	 */
+	public void setImportDate(Date date){
+		importDate = date;
 	}
 	
 	/**
