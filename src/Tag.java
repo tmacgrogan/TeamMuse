@@ -8,14 +8,20 @@ public class Tag {
 	private String description;	
 	private boolean searched; 
 	
+	/**
+	 * Creates am empty Tag
+	 */
 	public Tag() {
 		this.name = null;
 		this.id = (Integer) null;
 	}
 	
-	//Tag pulled from the database
+	/**
+	 * Creates a reference to a Tag with a known ID
+	 * @param name The name of the Tag
+	 * @param id The identifier for the Tag
+	 */
 	public Tag(String name, int id) throws IllegalArgumentException{ 
-		//TODO Sanitize tag names
 		this.name = name;
 		this.id = id;
 		if(!nameIsValid(name)){
@@ -23,6 +29,10 @@ public class Tag {
 		}
 	}
 	
+	/**
+	 * Creates a Tag by finding the ID in the database using the name
+	 * @param name The name of the Tag
+	 */
 	public Tag(String name) throws IllegalArgumentException{
 		this(name, DbManager.getTagId(name));
 	}
@@ -46,6 +56,11 @@ public class Tag {
 //		return TrackListController.merge(allTrackLists);
 	}
 	
+	/**
+	 * Returns the tracks that have been tagged with this Tag
+	 * @param visitedTags Who even knows?
+	 * @return list of tracks tagged
+	 */
 	public ArrayList<Track> getTracks(ArrayList<Integer> visitedTags){
 		ArrayList<ArrayList<Track>> allTrackLists = new ArrayList<ArrayList<Track>>();
 		
@@ -62,7 +77,11 @@ public class Tag {
 		return TrackListController.merge(allTrackLists);
 	}
 	
-	//TODO addChild method
+	/**
+	 * Adds a reference to a child Tag in the database
+	 * @param child Name of the child Tag
+	 * @return True if successful, otherwise False
+	 */
 	public boolean addChild(String child){
 		if( !nameIsValid(child) )
 			return false;
@@ -92,28 +111,42 @@ public class Tag {
 		return status;
 	}
 	
-	//TODO delete Parent and child tags
-	
-	/** see Track.addTag
+	/** 
+	 * @see Track.addTag
 	 * avoid calling this method
+	 * adds tag to track
 	 * @param trackBeingAdded  
 	 */
 	public void addTrack(Track trackBeingAdded){
 		trackBeingAdded.addTag(this.name);
 	}
 	
-	/** see Track.removeTag
+	/** 
+	 * @see Track.removeTag
 	 * avoid calling this method
+	 * removes tag from track
 	 * @param trackBeingRemoved
 	 */
 	public void removeTrack(Track trackBeingRemoved){
 		trackBeingRemoved.removeTag(this);
 	}
 	
+	/**
+	 * Removes a specific parent tag to this tag. If tag not created. 
+	 * 
+	 * @param parent
+	 * 
+	 */
 	public void removeParent(Tag parent){
 		DbManager.removeParentTagLink(parent.getTagId(), this.id);
 	}
 	
+	/**
+	 * Removes a specific Child tag to this tag. If tag not created. 
+	 * 
+	 * @param parent
+	 * 
+	 */
 	public void removeChild(Tag child){
 		DbManager.removeParentTagLink(this.id, child.getTagId());
 	}
@@ -159,14 +192,33 @@ public class Tag {
 		return DbManager.getParents(id);
 	}
 	
+	/**
+	 * Returns id of tag
+	 * 
+	 * @return
+	 * 
+	 */
 	public int getTagId(){
 		return id;
 	}
 	
+	/**
+	 * Returns name of tag
+	 * 
+	 * @return
+	 * 
+	 */
 	public String getName(){
 		return name;
 	}
 	
+	/**
+	 * Sets name of tag
+	 * 
+	 * @param newName
+	 * @return success
+	 * 
+	 */
 	public boolean setName(String newName){
 		//TODO implement validation
 		if(nameIsValid(newName)){
