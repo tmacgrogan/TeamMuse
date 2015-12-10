@@ -33,7 +33,7 @@ public final class Util_DemoMP3{
 	 * Generates numOfCopies of mp3 file chosen. Inserts copies within home directory(i.e. Desktop).
 	 * 
 	 * 
-	 * @param numOfCopies
+	 * @param numOfCopies Number of copies use would like made
 	 */
 	public static void copyMP3(int numOfCopies) {
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("MP3 Files", "mp3");

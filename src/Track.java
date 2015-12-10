@@ -40,12 +40,7 @@ public class Track {
 
 	/**
 	 * Creates a Track from a given location to an .mp3 file. 
-	 * @param location 					  Absolute path to an .mp3 file
-	 * @throws CannotReadException 		  From jaudiotagger
-	 * @throws IOException 				  From jaudiotagger
-	 * @throws TagException 		      From jaudiotagger
-	 * @throws ReadOnlyFileException	  From jaudiotagger
-	 * @throws InvalidAudioFrameException From jautiotagger: Metadata of music file isn't formatted correctly
+	 * @param location 	Absolute path to an .mp3 file
 	 */
 	public Track(String location) {
 		Location = location;
@@ -160,7 +155,7 @@ public class Track {
 	/**
 	 * Set track location to this absolute path.
 	 * 
-	 * @param trackLocation
+	 * @param trackLocation Absolute path
 	 */
 	public void setTrackLocation(String trackLocation){
 		Location = trackLocation;
@@ -181,7 +176,7 @@ public class Track {
 	 * Return Track title. Return relative file name if no title frame (i.e no
 	 * TIT2)
 	 * 
-	 * @return
+	 * @return String	Title of track
 	 */
 	public String getTitle() {
 		//AbstractID3v2Tag ID3v2Tag = mp3File.getID3v2Tag();
@@ -200,7 +195,7 @@ public class Track {
 	/**
 	 * Return Track runtime
 	 * 
-	 * @return
+	 * @return String Length of the music track
 	 */
 	public String getRuntime() {
 		//return ((int)mp3File.getMP3AudioHeader().getPreciseTrackLength()) + "";
@@ -210,7 +205,7 @@ public class Track {
 	/**
 	 * Returns the Date on which the Track was imported
 	 * 
-	 * @return
+	 * @return Date Date at which track was imported
 	 */
 	public Date getImportDate(){
 		if(importDate == null){
@@ -222,7 +217,7 @@ public class Track {
 	/**
 	 * sets the Date on which the Track was imported
 	 * 
-	 * @param date
+	 * @param date 
 	 */
 	public void setImportDate(Date date){
 		importDate = date;
@@ -240,7 +235,7 @@ public class Track {
 	/**
 	 * Returns the identifier of the Track
 	 * 
-	 * @return
+	 * @return int The trackID
 	 */
 	public int getTrackId() {
 		if(id < 0){

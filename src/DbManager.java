@@ -99,9 +99,9 @@ public class DbManager {
 
 	/**
 	 * 
-	 * @param trackName
-	 *            - file location
-	 * @return
+	 * @param trackLocation Absolute path to file location
+	 * 
+	 * @return int trackID
 	 */
 	public static int getTrackId(String trackLocation) {
 		int id = 0;
@@ -231,7 +231,7 @@ public class DbManager {
 	 * 
 	 * @param parentTagID
 	 * @param childTagID
-	 * @throws SQLException
+	 * @return boolean 		Insertion completed successfully
 	 */
 	// Catch SQLException in caller and prompt user that parent already attached
 	// to this child
@@ -386,7 +386,7 @@ public class DbManager {
 	/**
 	 * Inserts tagName into Tag table and returns the tag object.
 	 * 
-	 * @param tagName
+	 * @param tagName	
 	 * @return Tag
 	 */
 	public static Tag insertTag(String tagName) {

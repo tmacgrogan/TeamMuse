@@ -48,8 +48,9 @@ public class Tag {
 	/**
 	 * Creates a Tag object with a given name. If a Tag with this name already exists in the database, creates the Tag with the corresponding id,
 	 * otherwise is added as a new Tag to the database and is assigned an id
-	 * @param name The name of the Tag
-	 * @throws IllegalArgumentException
+	 * 
+	 * @param name 						The name of the Tag
+	 * @throws IllegalArgumentException	Tag name is invalid
 	 */
 	public Tag(String name) throws IllegalArgumentException{
 		this(name, DbManager.getTagId(name));
@@ -104,8 +105,8 @@ public class Tag {
 	/**
 	 * Add a parent tag to this tag. If tag not created. 
 	 * 
-	 * @param parent
-	 * @return status
+	 * @param parent	The parent tag for this tag
+	 * @return status	The addition was successful
 	 * 
 	 */
 	public boolean addParent(String parent){
@@ -120,7 +121,7 @@ public class Tag {
 	}
 	
 	/** 
-	 * @see Track.addTag
+	 * @see Track.addTag(String name)
 	 * avoid calling this method
 	 * adds tag to track
 	 * @param trackBeingAdded  
@@ -130,7 +131,7 @@ public class Tag {
 	}
 	
 	/** 
-	 * @see Track.removeTag
+	 * @see Track.removeTag(Tag tagBeingRemoved)
 	 * avoid calling this method
 	 * removes tag from track
 	 * @param trackBeingRemoved
@@ -142,7 +143,6 @@ public class Tag {
 	/**
 	 * Removes the parent-child relationship between this and a parent Tag
 	 * @param parent The former parent Tag
-	 * @param parent
 	 */
 	public void removeParent(Tag parent){
 		DbManager.removeParentTagLink(parent.getTagId(), this.id);
